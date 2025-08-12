@@ -1,9 +1,17 @@
-import type {Metadata} from 'next';
-import './globals.css';
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/contexts/AuthContext";
+import PublicLayout from "@/layouts/PublicLayout";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Remau Bako Tuo - Dev',
-  description: 'Discover the charm of Remau Bako Tuo, a village thriving on agriculture and community.',
+  title: "Desa Remau Bako Tuo",
+  description: "Sistem Informasi Desa Remau Bako Tuo",
 };
 
 export default function RootLayout({
@@ -13,12 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
-      </head>
-      <body className="font-body antialiased">{children}</body>
+      <body className={inter.className}>
+        <AuthProvider>
+          <TooltipProvider>
+            {children}
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
