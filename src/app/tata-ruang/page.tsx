@@ -14,13 +14,13 @@ const MapComponentWithNoSSR = dynamic(
 export default function TataRuangPage() {
     return (
       <>
-        <div className="fixed inset-0">
-          <MapComponentWithNoSSR />
-        </div>
-        <div className="fixed top-0 left-0 right-0 z-[1000]">
+        <div className="fixed top-0 left-0 right-0 z-[1001]">
           <TopNav hasNewNews={false} />
         </div>
-        <div className="fixed bottom-0 left-0 right-0 z-[1000]">
+        <div className="fixed inset-0 z-[1000]">
+          <MapComponentWithNoSSR />
+        </div>
+        <div className="fixed bottom-0 left-0 right-0 z-[1001]">
           <BottomNav />
         </div>
       </>
