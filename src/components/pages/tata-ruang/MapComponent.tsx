@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, useMap, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import '@/styles/map.css';
 import { LatLngTuple, LatLngBounds, Icon, divIcon } from 'leaflet';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { 
@@ -26,9 +25,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { getMapFeatures } from '@/lib/map-actions';
 import type { MapFeature } from '@/lib/types';
 import { BASE_LAYERS, LAYER_CATEGORIES } from '@/lib/map-data';
-import TopNav from '@/components/TopNav';
-import BottomNav from '@/components/BottomNav';
-
 
 // Fix Leaflet default marker issue
 if (typeof window !== 'undefined') {
@@ -213,10 +209,7 @@ export default function MapComponent() {
 
 
     return (
-        <div className="w-full h-full">
-            <div className="fixed top-0 left-0 right-0 z-[1001]">
-              <TopNav hasNewNews={false} />
-            </div>
+        <div className="w-full h-full relative">
             <MapContainer center={DESA_CENTER} zoom={DEFAULT_ZOOM} className="w-full h-full" zoomControl={false} maxBounds={DESA_BOUNDS} maxBoundsViscosity={1.0}>
                 <TileLayer url={BASE_LAYERS[activeBaseLayer].url} attribution={BASE_LAYERS[activeBaseLayer].attribution} />
                 
@@ -237,9 +230,6 @@ export default function MapComponent() {
             </MapContainer>
             <LayerPanel expanded={layerPanelExpanded} onToggle={() => setLayerPanelExpanded(!layerPanelExpanded)} activeLayers={activeOverlays} onLayerToggle={(l) => setActiveOverlays(p => p.includes(l) ? p.filter(i => i !== l) : [...p, l])} />
             <LayerInfo isOpen={!!selectedFeature} onClose={() => setSelectedFeature(null)} featureInfo={selectedFeature} />
-             <div className="fixed bottom-0 left-0 right-0 z-[1001]">
-              <BottomNav />
-            </div>
         </div>
     );
 };
