@@ -1,7 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 
-const MapComponent = dynamic(
+const MapComponentWithNoSSR = dynamic(
   () => import('@/components/MapComponent'),
   { 
     ssr: false,
@@ -11,6 +11,6 @@ const MapComponent = dynamic(
 
 export default function TataRuangPage() {
     return (
-        <MapComponent />
+        <MapComponentWithNoSSR />
     )
 }

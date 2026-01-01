@@ -9,7 +9,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyC-uCgjFbSZE7kkoClQYjo63dalLQlS0_o",
   authDomain: "remaubakotuo-devnew.firebaseapp.com",
   projectId: "remaubakotuo-devnew",
-  storageBucket: "remaubakotuo-devnew.firebasestorage.app",
+  storageBucket: "remaubakotuo-devnew.appspot.com",
   messagingSenderId: "529395813880",
   appId: "1:529395813880:web:af6aec7927b90a0f029a0d"
 };
