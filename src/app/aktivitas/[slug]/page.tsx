@@ -1,26 +1,18 @@
 'use client';
 import { notFound } from 'next/navigation';
-import Agenda from '@/components/pages/informasi/Agenda';
-import KalenderKegiatan from '@/components/pages/informasi/KalenderKegiatan';
-import KalenderPangan from '@/components/pages/informasi/KalenderPangan';
 import PublicLayout from '@/layouts/PublicLayout';
+import DynamicPage from '@/components/pages/DynamicPage';
 
-const pageComponents: { [key: string]: React.ComponentType } = {
-  'agenda': Agenda,
-  'kalender-kegiatan': KalenderKegiatan,
-  'kalender-pangan': KalenderPangan,
-};
+const validSlugs = ['agenda', 'kalender-kegiatan', 'kalender-pangan'];
 
 export default function AktivitasPage({ params }: { params: { slug: string } }) {
-  const PageComponent = pageComponents[params.slug];
-
-  if (!PageComponent) {
+  if (!validSlugs.includes(params.slug)) {
     notFound();
   }
 
   return (
     <PublicLayout>
-      <PageComponent />
+      <DynamicPage pageSlug={params.slug} category="aktivitas" />
     </PublicLayout>
   );
 }

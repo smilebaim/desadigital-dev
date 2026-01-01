@@ -1,24 +1,18 @@
 'use client';
 import { notFound } from 'next/navigation';
-import LKMD from '@/components/pages/kelembagaan/LKMD';
-import PKK from '@/components/pages/kelembagaan/PKK';
 import PublicLayout from '@/layouts/PublicLayout';
+import DynamicPage from '@/components/pages/DynamicPage';
 
-const pageComponents: { [key: string]: React.ComponentType } = {
-  'lkmd': LKMD,
-  'pkk': PKK,
-};
+const validSlugs = ['lkmd', 'pkk'];
 
 export default function KelembagaanPage({ params }: { params: { slug: string } }) {
-  const PageComponent = pageComponents[params.slug];
-
-  if (!PageComponent) {
+  if (!validSlugs.includes(params.slug)) {
     notFound();
   }
 
   return (
     <PublicLayout>
-      <PageComponent />
+      <DynamicPage pageSlug={params.slug} category="kelembagaan" />
     </PublicLayout>
   );
 }
