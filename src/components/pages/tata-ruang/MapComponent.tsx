@@ -157,7 +157,7 @@ const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, featureInfo }) =
 const MapControls: React.FC<{ activeLayer: keyof typeof BASE_LAYERS; setActiveLayer: (layer: keyof typeof BASE_LAYERS) => void; setLayerPanelExpanded: (expanded: boolean) => void; layerPanelExpanded: boolean }> = ({ activeLayer, setActiveLayer, setLayerPanelExpanded, layerPanelExpanded }) => {
     const map = useMap();
     return (
-        <div className="absolute left-2 top-20 z-[999] space-y-2">
+        <div className="absolute left-2 top-4 z-[999] space-y-2">
             <div className="bg-white/20 backdrop-blur-xl rounded-lg shadow-2xl overflow-hidden border border-white/40">
                 <TooltipProvider>
                     <Tooltip><TooltipTrigger asChild><button onClick={() => setLayerPanelExpanded(!layerPanelExpanded)} className="w-[48px] h-[48px] flex items-center justify-center transition-colors text-black hover:bg-white/20"><Layers className="h-5 w-5" /></button></TooltipTrigger><TooltipContent side="right"><p>Layers</p></TooltipContent></Tooltip>
