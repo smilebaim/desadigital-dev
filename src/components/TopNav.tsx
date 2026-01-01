@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -24,7 +25,8 @@ import {
   Calendar,
   ListTodo,
   Library,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Home
 } from 'lucide-react';
 import {
   Sheet,
@@ -41,6 +43,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TopNavProps {
   className?: string;
@@ -50,6 +53,7 @@ interface TopNavProps {
 const menuItems = [
   {
     title: "Layanan",
+    basePath: "/layanan",
     items: [
       { title: "Persuratan", path: "/layanan/persuratan", icon: ScrollText },
       { title: "Perlindungan Sosial", path: "/layanan/perlindungan-sosial", icon: HeartHandshake },
@@ -60,6 +64,7 @@ const menuItems = [
   },
   {
     title: "Ekonomi",
+    basePath: "/ekonomi",
     items: [
       { title: "BUMDes", path: "/ekonomi/bumdes", icon: Building2 },
       { title: "Koperasi Merah Putih", path: "/ekonomi/koperasi", icon: HandshakeIcon },
@@ -68,6 +73,7 @@ const menuItems = [
   },
   {
     title: "Kelembagaan",
+    basePath: "/kelembagaan",
     items: [
       { title: "LKMD", path: "/kelembagaan/lkmd", icon: Users },
       { title: "PKK", path: "/kelembagaan/pkk", icon: Users },
@@ -77,6 +83,7 @@ const menuItems = [
   },
   {
     title: "Aktivitas",
+    basePath: "/aktivitas",
     items: [
       { title: "Kalender Pangan", path: "/aktivitas/kalender-pangan", icon: Apple },
       { title: "Kalender Kegiatan", path: "/aktivitas/kalender-kegiatan", icon: Calendar },
@@ -85,6 +92,7 @@ const menuItems = [
   },
   {
     title: "Literasi",
+    basePath: "/pustaka",
     items: [
       { title: "Pustaka Desa", path: "/pustaka/pustaka-desa", icon: Library },
       { title: "Publikasi", path: "/pustaka/publikasi", icon: FileSpreadsheet }
@@ -95,189 +103,23 @@ const menuItems = [
 const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
 
-  const SidebarLayanan = () => {
-    const isLayananRoute = pathname.startsWith('/layanan');
-    if (!isLayananRoute) return null;
+  const activeCategory = menuItems.find(category => pathname.startsWith(category.basePath));
 
-    return (
-      <div className="fixed left-0 md:top-16 top-1/2 -translate-y-1/2 md:translate-y-0 h-auto md:h-[calc(100vh-9rem)] md:w-72 w-12 bg-emerald-800/90 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-emerald-900 z-40 transition-all duration-300 rounded-r-[2rem] md:rounded-none md:rounded-br-[4rem]">
-        <ScrollArea className="h-full max-h-[70vh] md:max-h-none md:px-4 px-1 py-8">
-          <div className="space-y-2 md:pb-16">
-            <h3 className="font-semibold text-lg mb-6 text-emerald-50 border-b border-emerald-100/20 pb-3 hidden md:block">
-              Menu Layanan
-            </h3>
-            <div className="space-y-4">
-              <TooltipProvider delayDuration={100}>
-                {menuItems[0].items.map((item, index) => (
-                  <Tooltip key={index}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className={`w-full justify-center md:justify-start text-emerald-50 hover:text-emerald-50 hover:bg-emerald-700/50 transition-all py-3 md:py-2.5 px-1 md:px-3 text-sm ${
-                          pathname === item.path ? 'bg-emerald-700/70' : ''
-                        }`}
-                        asChild
-                      >
-                        <Link href={item.path}>
-                          <item.icon className="h-4 w-4 md:h-5 md:w-5 md:mr-3 text-white" />
-                          <span className="hidden md:inline">{item.title}</span>
-                        </Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={16} className="md:hidden bg-emerald-800/90 text-emerald-50 border-emerald-700">
-                      <p>{item.title}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </TooltipProvider>
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-    );
-  };
-
-  const SidebarEkonomi = () => {
-    const isEkonomiRoute = pathname.startsWith('/ekonomi');
-    if (!isEkonomiRoute) return null;
+  const Sidebar = () => {
+    if (!activeCategory) return null;
 
     return (
       <div className="fixed left-0 md:top-16 top-1/2 -translate-y-1/2 md:translate-y-0 h-auto md:h-[calc(100vh-9rem)] md:w-72 w-12 bg-emerald-800/90 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-emerald-900 z-40 transition-all duration-300 rounded-r-[2rem] md:rounded-none md:rounded-br-[4rem]">
         <ScrollArea className="h-full max-h-[70vh] md:max-h-none md:px-4 px-1 py-8">
           <div className="space-y-2 md:pb-16">
             <h3 className="font-semibold text-lg mb-6 text-emerald-50 border-b border-emerald-100/20 pb-3 hidden md:block">
-              Menu Ekonomi
+              Menu {activeCategory.title}
             </h3>
             <div className="space-y-4">
               <TooltipProvider delayDuration={100}>
-                {menuItems[1].items.map((item, index) => (
-                  <Tooltip key={index}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className={`w-full justify-center md:justify-start text-emerald-50 hover:text-emerald-50 hover:bg-emerald-700/50 transition-all py-3 md:py-2.5 px-1 md:px-3 text-sm ${
-                          pathname === item.path ? 'bg-emerald-700/70' : ''
-                        }`}
-                        asChild
-                      >
-                        <Link href={item.path}>
-                          <item.icon className="h-4 w-4 md:h-5 md:w-5 md:mr-3 text-white" />
-                          <span className="hidden md:inline">{item.title}</span>
-                        </Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={16} className="md:hidden bg-emerald-800/90 text-emerald-50 border-emerald-700">
-                      <p>{item.title}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </TooltipProvider>
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-    );
-  };
-
-  const SidebarKelembagaan = () => {
-    const isKelembagaanRoute = pathname.startsWith('/kelembagaan');
-    if (!isKelembagaanRoute) return null;
-
-    return (
-      <div className="fixed left-0 md:top-16 top-1/2 -translate-y-1/2 md:translate-y-0 h-auto md:h-[calc(100vh-9rem)] md:w-72 w-12 bg-emerald-800/90 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-emerald-900 z-40 transition-all duration-300 rounded-r-[2rem] md:rounded-none md:rounded-br-[4rem]">
-        <ScrollArea className="h-full max-h-[70vh] md:max-h-none md:px-4 px-1 py-8">
-          <div className="space-y-2 md:pb-16">
-            <h3 className="font-semibold text-lg mb-6 text-emerald-50 border-b border-emerald-100/20 pb-3 hidden md:block">
-              Menu Kelembagaan
-            </h3>
-            <div className="space-y-4">
-              <TooltipProvider delayDuration={100}>
-                {menuItems[2].items.map((item, index) => (
-                  <Tooltip key={index}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className={`w-full justify-center md:justify-start text-emerald-50 hover:text-emerald-50 hover:bg-emerald-700/50 transition-all py-3 md:py-2.5 px-1 md:px-3 text-sm ${
-                          pathname === item.path ? 'bg-emerald-700/70' : ''
-                        }`}
-                        asChild
-                      >
-                        <Link href={item.path}>
-                          <item.icon className="h-4 w-4 md:h-5 md:w-5 md:mr-3 text-white" />
-                          <span className="hidden md:inline">{item.title}</span>
-                        </Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={16} className="md:hidden bg-emerald-800/90 text-emerald-50 border-emerald-700">
-                      <p>{item.title}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </TooltipProvider>
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-    );
-  };
-
-  const SidebarAktivitas = () => {
-    const isAktivitasRoute = pathname.startsWith('/aktivitas');
-    if (!isAktivitasRoute) return null;
-
-    return (
-      <div className="fixed left-0 md:top-16 top-1/2 -translate-y-1/2 md:translate-y-0 h-auto md:h-[calc(100vh-9rem)] md:w-72 w-12 bg-emerald-800/90 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-emerald-900 z-40 transition-all duration-300 rounded-r-[2rem] md:rounded-none md:rounded-br-[4rem]">
-        <ScrollArea className="h-full max-h-[70vh] md:max-h-none md:px-4 px-1 py-8">
-          <div className="space-y-2 md:pb-16">
-            <h3 className="font-semibold text-lg mb-6 text-emerald-50 border-b border-emerald-100/20 pb-3 hidden md:block">
-              Menu Aktivitas
-            </h3>
-            <div className="space-y-4">
-              <TooltipProvider delayDuration={100}>
-                {menuItems[3].items.map((item, index) => (
-                  <Tooltip key={index}>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className={`w-full justify-center md:justify-start text-emerald-50 hover:text-emerald-50 hover:bg-emerald-700/50 transition-all py-3 md:py-2.5 px-1 md:px-3 text-sm ${
-                          pathname === item.path ? 'bg-emerald-700/70' : ''
-                        }`}
-                        asChild
-                      >
-                        <Link href={item.path}>
-                          <item.icon className="h-4 w-4 md:h-5 md:w-5 md:mr-3 text-white" />
-                          <span className="hidden md:inline">{item.title}</span>
-                        </Link>
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={16} className="md:hidden bg-emerald-800/90 text-emerald-50 border-emerald-700">
-                      <p>{item.title}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                ))}
-              </TooltipProvider>
-            </div>
-          </div>
-        </ScrollArea>
-      </div>
-    );
-  };
-
-  const SidebarLiterasi = () => {
-    const isPustakaRoute = pathname.startsWith('/pustaka');
-    if (!isPustakaRoute) return null;
-
-    return (
-      <div className="fixed left-0 md:top-16 top-1/2 -translate-y-1/2 md:translate-y-0 h-auto md:h-[calc(100vh-9rem)] md:w-72 w-12 bg-emerald-800/90 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-emerald-900 z-40 transition-all duration-300 rounded-r-[2rem] md:rounded-none md:rounded-br-[4rem]">
-        <ScrollArea className="h-full max-h-[70vh] md:max-h-none md:px-4 px-1 py-8">
-          <div className="space-y-2 md:pb-16">
-            <h3 className="font-semibold text-lg mb-6 text-emerald-50 border-b border-emerald-100/20 pb-3 hidden md:block">
-              Menu Literasi
-            </h3>
-            <div className="space-y-4">
-              <TooltipProvider delayDuration={100}>
-                {menuItems[4].items.map((item, index) => (
+                {activeCategory.items.map((item, index) => (
                   <Tooltip key={index}>
                     <TooltipTrigger asChild>
                       <Button
@@ -394,10 +236,17 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
                       variant="ghost" 
                       className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
                     >
-                      <Link href="/login" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
-                        <User className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
-                        <span>Masuk</span>
-                      </Link>
+                      {isAuthenticated ? (
+                        <Link href="/dashboard" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
+                          <Home className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
+                          <span>Dashboard</span>
+                        </Link>
+                      ) : (
+                        <Link href="/login" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
+                          <User className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
+                          <span>Masuk</span>
+                        </Link>
+                      )}
                     </Button>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-black/10">
@@ -411,13 +260,11 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
           </div>
         </div>
       </nav>
-      <SidebarLayanan />
-      <SidebarEkonomi />
-      <SidebarKelembagaan />
-      <SidebarAktivitas />
-      <SidebarLiterasi />
+      <Sidebar />
     </>
   );
 };
 
-export default TopNav; 
+export default TopNav;
+
+    
