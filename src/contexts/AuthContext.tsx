@@ -5,6 +5,7 @@ import {
   User,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut as firebaseSignOut
 } from 'firebase/auth';
 import { useToast } from '@/components/ui/use-toast';
@@ -67,13 +68,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
       return true;
     } catch (error: any) {
-      toast({
-        title: "Login Gagal",
-        description: "Email atau password salah!",
-        variant: "destructive",
-      });
-      console.error("Login error:", error.message);
-      return false;
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+          toast({
+            title: "Akun Baru Dibuat",
+            description: "Akun baru telah berhasil dibuat dan Anda telah login.",
+          });
+          return true;
+        } catch (creationError: any) {
+          toast({
+            title: "Pembuatan Akun Gagal",
+            description: creationError.message || "Gagal membuat akun baru.",
+            variant: "destructive",
+          });
+          console.error("Account creation error:", creationError.message);
+          return false;
+        }
+      } else {
+        toast({
+          title: "Login Gagal",
+          description: "Email atau password salah!",
+          variant: "destructive",
+        });
+        console.error("Login error:", error.message);
+        return false;
+      }
     }
   };
 
