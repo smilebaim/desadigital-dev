@@ -10,7 +10,5 @@ const MapComponentWithNoSSR = dynamic(
 );
 
 export default function TataRuangPage() {
-    return (
-        <MapComponentWithNoSSR />
-    )
+    return <MapComponentWithNoSSR />;
 }
