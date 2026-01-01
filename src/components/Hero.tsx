@@ -11,7 +11,7 @@ const Hero: React.FC<HeroProps> = ({ className }) => {
   return (
     <section className={cn('relative h-screen flex items-center justify-center overflow-hidden', className)}>
       <Image 
-        src="https://picsum.photos/seed/hero/1920/1080" 
+        src="/Background utama.png" 
         alt="Desa Remau Bako Tuo" 
         fill
         className="object-cover -z-10"

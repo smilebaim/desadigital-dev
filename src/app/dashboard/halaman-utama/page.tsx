@@ -10,7 +10,7 @@ import { toast } from "sonner";
 
 const HalamanUtamaPage = () => {
     const [logoUrl, setLogoUrl] = useState("/logo-desa.png");
-    const [heroUrl, setHeroUrl] = useState("https://picsum.photos/seed/hero/1920/1080");
+    const [heroUrl, setHeroUrl] = useState("/Background utama.png");
 
     const handleSave = () => {
         // Here you would typically save the URLs to your backend/database
