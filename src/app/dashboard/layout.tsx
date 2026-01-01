@@ -108,6 +108,33 @@ const DashboardLayout = ({
                   <Home size={18} className="text-white" />
                   <span>Beranda</span>
                 </Link>
+
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="halaman" className="border-none">
+                    <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <FileSpreadsheet size={18} className="text-white" />
+                        <span className="text-white">Kelola Halaman</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <ul className="space-y-1 pl-4">
+                        <li><Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <ListTodo size={16} className="text-white" />
+                          <span>Daftar Halaman</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/halaman-utama" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <LayoutGrid size={16} className="text-white" />
+                          <span>Halaman Utama</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                            <ListTodo size={16} className="text-white" />
+                            <span>Kelola Menu</span>
+                        </Link></li>
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
                 
                 <Link href="/dashboard/info" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
                   <Newspaper size={18} className="text-white" />
@@ -163,32 +190,6 @@ const DashboardLayout = ({
                         <li><Link href="/dashboard/apps/surat-pindah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
                           <FileText size={16} className="text-white" />
                           <span>Surat Pindah</span>
-                        </Link></li>
-                      </ul>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="halaman" className="border-none">
-                    <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
-                      <div className="flex items-center gap-2">
-                        <FileSpreadsheet size={18} className="text-white" />
-                        <span className="text-white">Kelola Halaman</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <ul className="space-y-1 pl-4">
-                        <li><Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                          <ListTodo size={16} className="text-white" />
-                          <span>Daftar Halaman</span>
-                        </Link></li>
-                        <li><Link href="/dashboard/halaman-utama" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                          <LayoutGrid size={16} className="text-white" />
-                          <span>Halaman Utama</span>
-                        </Link></li>
-                        <li><Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                            <ListTodo size={16} className="text-white" />
-                            <span>Kelola Menu</span>
                         </Link></li>
                       </ul>
                     </AccordionContent>
