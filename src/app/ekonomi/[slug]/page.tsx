@@ -1,26 +1,18 @@
 'use client';
 import { notFound } from 'next/navigation';
-import BUMDes from '@/components/pages/ekonomi/BUMDes';
-import Koperasi from '@/components/pages/ekonomi/Koperasi';
-import UMKM from '@/components/pages/ekonomi/UMKM';
 import PublicLayout from '@/layouts/PublicLayout';
+import DynamicPage from '@/components/pages/DynamicPage';
 
-const pageComponents: { [key: string]: React.ComponentType } = {
-  'bumdes': BUMDes,
-  'koperasi': Koperasi,
-  'umkm': UMKM,
-};
+const validSlugs = ['bumdes', 'koperasi', 'umkm'];
 
 export default function EkonomiPage({ params }: { params: { slug: string } }) {
-  const PageComponent = pageComponents[params.slug];
-
-  if (!PageComponent) {
+  if (!validSlugs.includes(params.slug)) {
     notFound();
   }
 
   return (
     <PublicLayout>
-      <PageComponent />
+      <DynamicPage pageSlug={params.slug} category="ekonomi" />
     </PublicLayout>
   );
 }

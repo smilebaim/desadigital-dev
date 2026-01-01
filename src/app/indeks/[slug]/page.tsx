@@ -1,26 +1,18 @@
 'use client';
 import { notFound } from 'next/navigation';
-import KetahananEkonomi from '@/components/pages/indeks/KetahananEkonomi';
-import KetahananLingkungan from '@/components/pages/indeks/KetahananLingkungan';
-import KetahananSosial from '@/components/pages/indeks/KetahananSosial';
 import PublicLayout from '@/layouts/PublicLayout';
+import DynamicPage from '@/components/pages/DynamicPage';
 
-const pageComponents: { [key: string]: React.ComponentType } = {
-  'ketahanan-ekonomi': KetahananEkonomi,
-  'ketahanan-lingkungan': KetahananLingkungan,
-  'ketahanan-sosial': KetahananSosial,
-};
+const validSlugs = ['ketahanan-ekonomi', 'ketahanan-lingkungan', 'ketahanan-sosial'];
 
 export default function IndeksPage({ params }: { params: { slug: string } }) {
-  const PageComponent = pageComponents[params.slug];
-
-  if (!PageComponent) {
+  if (!validSlugs.includes(params.slug)) {
     notFound();
   }
 
   return (
     <PublicLayout>
-      <PageComponent />
+      <DynamicPage pageSlug={params.slug} category="indeks" />
     </PublicLayout>
   );
 }
