@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -115,7 +116,7 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
       <nav className={cn('fixed top-0 left-0 right-0 z-50 bg-white/40 border-b border-black/10 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 transition-all', className)}>
         <div className="container mx-auto px-4 flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
           <div className="flex items-center gap-1 -ml-1 sm:-ml-2">
-            <Image src="https://picsum.photos/seed/logo/40/40" alt="Logo Desa" className="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-all duration-300" width={40} height={40} />
+            <Image src="/logo-desa.png" alt="Logo Desa" className="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-all duration-300" width={40} height={40} />
             <div className="ml-1">
               <Link href="/" className="text-base sm:text-xl font-poppins font-medium tracking-tight text-black hover:text-black transition-all">
                 Desa Remau Bako Tuo

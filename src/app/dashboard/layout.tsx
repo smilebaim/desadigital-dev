@@ -1,3 +1,4 @@
+
 'use client';
 import { 
   Sidebar, 
@@ -97,7 +98,7 @@ const DashboardLayout = ({
           <Sidebar className="bg-black shadow-sm">
             <SidebarHeader className="flex items-center gap-2 p-4">
               <div className="flex items-center gap-2">
-                <Image src="https://picsum.photos/seed/logo/32/32" alt="Logo Desa" className="h-8 w-8" width={32} height={32} />
+                <Image src="/logo-desa.png" alt="Logo Desa" className="h-8 w-8" width={32} height={32} />
                 <span className="font-semibold text-white">Dashboard</span>
               </div>
             </SidebarHeader>

@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 
 const HalamanUtamaPage = () => {
-    const [logoUrl, setLogoUrl] = useState("https://picsum.photos/seed/logo/40/40");
+    const [logoUrl, setLogoUrl] = useState("/logo-desa.png");
     const [heroUrl, setHeroUrl] = useState("https://picsum.photos/seed/hero/1920/1080");
 
     const handleSave = () => {
