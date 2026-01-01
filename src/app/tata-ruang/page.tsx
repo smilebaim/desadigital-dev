@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, useMap, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getMapFeatures } from '@/lib/map-actions';
 import type { MapFeature } from '@/lib/types';
+import { BASE_LAYERS, LAYER_CATEGORIES } from '@/lib/map-data';
 
 // Fix Leaflet default marker issue
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -29,18 +30,6 @@ const DESA_BOUNDS = new LatLngBounds(
   [-1.28, 104.33],
   [-1.18, 104.43]
 );
-
-const BASE_LAYERS = {
-  street: { url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap', name: 'Street', icon: Map },
-  satellite: { url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', attribution: '&copy; Google', name: 'Satellite', icon: Satellite },
-  terrain: { url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenTopoMap', name: 'Terrain', icon: Mountain }
-};
-
-const LAYER_CATEGORIES = {
-  wilayah: { name: 'Peta Wilayah', layers: ['Peta Administrasi', 'Penggunaan Lahan'] },
-  sosial: { name: 'Peta Sosial', layers: ['Demografi', 'Pendidikan', 'Kesehatan'] },
-  ekonomi: { name: 'Peta Ekonomi', layers: ['Sektor Pangan', 'Perkebunan', 'Peternakan'] },
-};
 
 interface LayerPanelProps {
   expanded: boolean;
@@ -164,6 +153,11 @@ const TataRuang: React.FC = () => {
         return () => unsubscribe();
     }, []);
 
+    const filteredFeatures = useMemo(() => {
+        if (activeOverlays.length === 0) return mapFeatures;
+        return mapFeatures.filter(feature => activeOverlays.includes(feature.category));
+    }, [mapFeatures, activeOverlays]);
+
 
     if (loading) {
         return <div className="w-full h-full flex items-center justify-center bg-gray-100">Memuat Peta...</div>
@@ -174,7 +168,7 @@ const TataRuang: React.FC = () => {
             <MapContainer center={DESA_CENTER} zoom={DEFAULT_ZOOM} className="w-full h-full" zoomControl={false} maxBounds={DESA_BOUNDS} maxBoundsViscosity={1.0}>
                 <TileLayer url={BASE_LAYERS[activeBaseLayer].url} attribution={BASE_LAYERS[activeBaseLayer].attribution} />
                 
-                {mapFeatures.map(feature => {
+                {filteredFeatures.map(feature => {
                     if (feature.type === 'marker') {
                         const pos = parseMarkerCoords(feature.coordinates);
                         return pos ? <Marker key={feature.id} position={pos} eventHandlers={{ click: () => setSelectedFeature(feature) }} /> : null;

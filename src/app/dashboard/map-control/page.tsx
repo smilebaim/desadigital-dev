@@ -18,6 +18,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LAYER_CATEGORIES } from '@/lib/map-data';
 
 export default function MapControlPage() {
   const { toast } = useToast();
@@ -40,7 +42,8 @@ export default function MapControlPage() {
       description: '',
       type: 'marker',
       coordinates: '',
-      color: '#3388ff'
+      color: '#3388ff',
+      category: Object.keys(LAYER_CATEGORIES)[0]
     });
     setIsDialogOpen(true);
   };
@@ -62,7 +65,7 @@ export default function MapControlPage() {
   };
   
   const handleSave = async () => {
-    if (!currentFeature) return;
+    if (!currentFeature || !currentFeature.category) return;
 
     try {
       if (currentFeature.id) {
@@ -83,10 +86,16 @@ export default function MapControlPage() {
     }
   };
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setCurrentFeature(prev => prev ? { ...prev, [name]: value } : null);
   };
+
+  const handleSelectChange = (name: string, value: string) => {
+     setCurrentFeature(prev => prev ? { ...prev, [name]: value } : null);
+  }
+
+  const allLayerItems = Object.values(LAYER_CATEGORIES).flatMap(cat => cat.layers);
 
   return (
     <div className="space-y-6">
@@ -109,7 +118,7 @@ export default function MapControlPage() {
                 <Card key={feature.id} className="flex items-center justify-between p-4">
                   <div>
                     <p className="font-semibold">{feature.title}</p>
-                    <p className="text-sm text-muted-foreground">{feature.type}</p>
+                    <p className="text-sm text-muted-foreground">{feature.category} - {feature.type}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="icon" onClick={() => handleEdit(feature)}>
@@ -142,11 +151,29 @@ export default function MapControlPage() {
                 <Textarea id="description" name="description" value={currentFeature.description || ''} onChange={handleInputChange} />
               </div>
               <div>
+                <Label htmlFor="category">Kategori Layer</Label>
+                 <Select name="category" value={currentFeature.category} onValueChange={(value) => handleSelectChange('category', value)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Pilih kategori layer" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {allLayerItems.map(item => (
+                            <SelectItem key={item} value={item}>{item}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <Label htmlFor="type">Tipe</Label>
-                <select id="type" name="type" value={currentFeature.type || 'marker'} onChange={handleInputChange} className="w-full p-2 border rounded">
-                  <option value="marker">Penanda (Marker)</option>
-                  <option value="polygon">Area (Polygon)</option>
-                </select>
+                 <Select name="type" value={currentFeature.type} onValueChange={(value) => handleSelectChange('type', value)}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Pilih tipe fitur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="marker">Penanda (Marker)</SelectItem>
+                      <SelectItem value="polygon">Area (Polygon)</SelectItem>
+                    </SelectContent>
+                </Select>
               </div>
                <div>
                 <Label htmlFor="coordinates">
