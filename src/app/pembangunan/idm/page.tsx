@@ -1,11 +1,12 @@
+
 'use client';
-import ProfilDesa from "@/components/pages/profile/ProfilDesa";
+import IDM from "@/components/pages/pembangunan/IDM";
 import PublicLayout from "@/layouts/PublicLayout";
 
-export default function ProfilDesaPage() {
+export default function IDMPage() {
     return (
         <PublicLayout>
-            <ProfilDesa />
+            <IDM />
         </PublicLayout>
     )
 }

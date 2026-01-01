@@ -1,5 +1,5 @@
 'use client';
-import SejarahDesa from "@/components/pages/profil/SejarahDesa";
+import SejarahDesa from "@/components/pages/profile/SejarahDesa";
 import PublicLayout from "@/layouts/PublicLayout";
 
 export default function SejarahDesaPage() {

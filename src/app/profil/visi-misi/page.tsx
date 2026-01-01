@@ -1,5 +1,5 @@
 'use client';
-import VisiMisi from "@/components/pages/profil/VisiMisi";
+import VisiMisi from "@/components/pages/profile/VisiMisi";
 import PublicLayout from "@/layouts/PublicLayout";
 
 export default function VisiMisiPage() {

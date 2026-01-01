@@ -1,16 +1,14 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Polygon, Marker } from 'react-leaflet';
-import L, { LatLngTuple, LatLngBounds, Map as LeafletMap } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
-import TopNav from './TopNav';
-import BottomNav from './BottomNav';
 
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
 const DEFAULT_ZOOM = 16;
@@ -367,58 +365,95 @@ const MapControls: React.FC<{
 };
 
 const MapComponent = () => {
-    const [map, setMap] = useState<LeafletMap | null>(null);
+    const mapContainerRef = useRef<HTMLDivElement>(null);
+    const mapInstanceRef = useRef<LeafletMap | null>(null);
+    const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
     const [activeBaseLayer, setActiveBaseLayer] = useState<string>('satellite');
     const [activeOverlays, setActiveOverlays] = useState<string[]>(['Peta Administrasi']);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedMarker, setSelectedMarker] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary'; } | null>(null);
 
-    const officeMarkerIcon = L.icon({
-        iconUrl: 'https://img.icons8.com/office/40/building.png',
-        iconSize: [32, 32],
-    });
+    useEffect(() => {
+        if (mapContainerRef.current && !mapInstanceRef.current) {
+            const map = L.map(mapContainerRef.current, {
+                center: DESA_CENTER,
+                zoom: DEFAULT_ZOOM,
+                zoomControl: false,
+                maxBounds: DESA_BOUNDS,
+                maxBoundsViscosity: 1.0,
+            });
+            mapInstanceRef.current = map;
+
+            L.marker(DESA_CENTER).on('click', () => {
+                setSelectedMarker({
+                    title: 'Kantor Desa Remau Bako Tuo',
+                    coordinates: DESA_CENTER,
+                    description: 'Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo. Melayani berbagai kebutuhan administratif warga desa.',
+                    type: 'marker',
+                });
+            }).addTo(map);
+
+            setMapInstance(map);
+        }
+
+        return () => {
+            if (mapInstanceRef.current) {
+                mapInstanceRef.current.remove();
+                mapInstanceRef.current = null;
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        if (mapInstance) {
+            const currentLayer = Object.values(mapInstance._layers).find(layer => layer instanceof L.TileLayer);
+            if (currentLayer) {
+              mapInstance.removeLayer(currentLayer);
+            }
+
+            const baseLayerData = BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS];
+            L.tileLayer(baseLayerData.url, {
+                attribution: baseLayerData.attribution
+            }).addTo(mapInstance).bringToBack();
+        }
+    }, [activeBaseLayer, mapInstance]);
+
+    useEffect(() => {
+        if (mapInstance) {
+            Object.values(mapInstance._layers).forEach(layer => {
+                if (layer instanceof L.Polygon) {
+                    mapInstance.removeLayer(layer);
+                }
+            });
+
+            if (activeOverlays.includes('Peta Administrasi')) {
+                const adminBoundary = L.polygon(ADMINISTRATIVE_BOUNDARY as LatLngTuple[], {
+                    color: 'white', weight: 2, fillColor: '#10b981', fillOpacity: 0.2, opacity: 0.8,
+                }).on('click', () => {
+                    setSelectedMarker({
+                        title: 'Batas Administrasi Desa Remau Bako Tuo',
+                        description: 'Batas wilayah administratif resmi Desa Remau Bako Tuo yang telah ditetapkan sesuai dengan peraturan yang berlaku.',
+                        type: 'boundary',
+                    });
+                });
+                adminBoundary.addTo(mapInstance);
+            }
+        }
+    }, [activeOverlays, mapInstance]);
+
+    const handleLayerToggle = (layerName: string) => {
+        setActiveOverlays(prev =>
+            prev.includes(layerName)
+            ? prev.filter(l => l !== layerName)
+            : [...prev, layerName]
+        );
+    };
 
     return (
-        <div className="w-full h-full relative">
-            <header className="fixed top-0 left-0 right-0 z-[1001]">
-              <TopNav hasNewNews={false} />
-            </header>
-            <MapContainer ref={setMap} center={DESA_CENTER} zoom={DEFAULT_ZOOM} className="w-full h-full" zoomControl={false} maxBounds={DESA_BOUNDS} maxBoundsViscosity={1.0}>
-                <TileLayer url={BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].url} attribution={BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].attribution} />
-                
-                {activeOverlays.includes('Peta Administrasi') && (
-                    <Polygon 
-                        positions={ADMINISTRATIVE_BOUNDARY} 
-                        pathOptions={{ color: 'white', weight: 2, fillColor: '#10b981', fillOpacity: 0.2 }}
-                        eventHandlers={{
-                            click: () => {
-                                setSelectedMarker({
-                                    title: 'Batas Administrasi Desa Remau Bako Tuo',
-                                    description: 'Batas wilayah administratif resmi Desa Remau Bako Tuo yang telah ditetapkan sesuai dengan peraturan yang berlaku.',
-                                    type: 'boundary',
-                                });
-                            }
-                        }}
-                    />
-                )}
-                
-                <Marker 
-                    position={DESA_CENTER} 
-                    icon={officeMarkerIcon}
-                    eventHandlers={{
-                        click: () => {
-                             setSelectedMarker({
-                                title: 'Kantor Desa Remau Bako Tuo',
-                                coordinates: DESA_CENTER,
-                                description: 'Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo. Melayani berbagai kebutuhan administratif warga desa.',
-                                type: 'marker',
-                            });
-                        }
-                    }}
-                />
-            </MapContainer>
+        <div className="fixed inset-0">
+            <div ref={mapContainerRef} className="w-full h-full" />
             <MapControls
-                map={map}
+                map={mapInstance}
                 activeLayer={activeBaseLayer as keyof typeof BASE_LAYERS}
                 setActiveLayer={setActiveBaseLayer as (layer: keyof typeof BASE_LAYERS) => void}
                 layerPanelExpanded={layerPanelExpanded}
@@ -428,22 +463,13 @@ const MapComponent = () => {
                 expanded={layerPanelExpanded}
                 onToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
                 activeLayers={activeOverlays}
-                onLayerToggle={(layerName) => {
-                    setActiveOverlays(prev =>
-                        prev.includes(layerName)
-                        ? prev.filter(l => l !== layerName)
-                        : [...prev, layerName]
-                    );
-                }}
+                onLayerToggle={handleLayerToggle}
             />
             <LayerInfo
                 isOpen={!!selectedMarker}
                 onClose={() => setSelectedMarker(null)}
                 markerInfo={selectedMarker}
             />
-            <footer className="fixed bottom-0 left-0 right-0 z-[1001]">
-              <BottomNav />
-            </footer>
         </div>
     );
 };

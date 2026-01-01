@@ -1,5 +1,5 @@
 'use client';
-import RPJMDes from "@/components/pages/pembangunan/RPJMDes";
+import RPJMDes from "@/components/pages/program/RPJMDes";
 import PublicLayout from "@/layouts/PublicLayout";
 
 export default function RPJMDesPage() {
