@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon, Marker } from 'react-leaflet';
-import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Map as LeafletMap } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -373,7 +373,7 @@ const MapComponent = () => {
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedMarker, setSelectedMarker] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary'; } | null>(null);
 
-    const officeMarker = L.icon({
+    const officeMarkerIcon = L.icon({
         iconUrl: 'https://img.icons8.com/office/40/building.png',
         iconSize: [32, 32],
     });
@@ -404,7 +404,7 @@ const MapComponent = () => {
                 
                 <Marker 
                     position={DESA_CENTER} 
-                    icon={officeMarker}
+                    icon={officeMarkerIcon}
                     eventHandlers={{
                         click: () => {
                              setSelectedMarker({
