@@ -210,27 +210,29 @@ export default function MapComponent() {
 
 
     return (
-        <MapContainer center={DESA_CENTER} zoom={DEFAULT_ZOOM} className="w-full h-full" zoomControl={false} maxBounds={DESA_BOUNDS} maxBoundsViscosity={1.0}>
-            <TileLayer url={BASE_LAYERS[activeBaseLayer].url} attribution={BASE_LAYERS[activeBaseLayer].attribution} />
-            
-            {filteredFeatures.map(feature => {
-                if (feature.type === 'marker') {
-                    const pos = parseMarkerCoords(feature.coordinates);
-                    const icon = getIconForCategory(feature.category);
-                    return pos ? <Marker key={feature.id} position={pos} icon={icon} eventHandlers={{ click: () => setSelectedFeature(feature) }} /> : null;
-                }
-                if (feature.type === 'polygon') {
-                    const pos = parsePolygonCoords(feature.coordinates);
-                    return pos ? <Polygon key={feature.id} positions={pos} pathOptions={{ color: feature.color || '#3388ff' }} eventHandlers={{ click: () => setSelectedFeature(feature) }} /> : null;
-                }
-                return null;
-            })}
+        <div className="w-full h-full">
+            <MapContainer center={DESA_CENTER} zoom={DEFAULT_ZOOM} className="w-full h-full" zoomControl={false} maxBounds={DESA_BOUNDS} maxBoundsViscosity={1.0}>
+                <TileLayer url={BASE_LAYERS[activeBaseLayer].url} attribution={BASE_LAYERS[activeBaseLayer].attribution} />
+                
+                {filteredFeatures.map(feature => {
+                    if (feature.type === 'marker') {
+                        const pos = parseMarkerCoords(feature.coordinates);
+                        const icon = getIconForCategory(feature.category);
+                        return pos ? <Marker key={feature.id} position={pos} icon={icon} eventHandlers={{ click: () => setSelectedFeature(feature) }} /> : null;
+                    }
+                    if (feature.type === 'polygon') {
+                        const pos = parsePolygonCoords(feature.coordinates);
+                        return pos ? <Polygon key={feature.id} positions={pos} pathOptions={{ color: feature.color || '#3388ff' }} eventHandlers={{ click: () => setSelectedFeature(feature) }} /> : null;
+                    }
+                    return null;
+                })}
 
-            <MapControls activeLayer={activeBaseLayer} setActiveLayer={setActiveBaseLayer} layerPanelExpanded={layerPanelExpanded} setLayerPanelExpanded={setLayerPanelExpanded} />
+                <MapControls activeLayer={activeBaseLayer} setActiveLayer={setActiveBaseLayer} layerPanelExpanded={layerPanelExpanded} setLayerPanelExpanded={setLayerPanelExpanded} />
+            </MapContainer>
             
             <LayerPanel expanded={layerPanelExpanded} onToggle={() => setLayerPanelExpanded(!layerPanelExpanded)} activeLayers={activeOverlays} onLayerToggle={(l) => setActiveOverlays(p => p.includes(l) ? p.filter(i => i !== l) : [...p, l])} />
             
             <LayerInfo isOpen={!!selectedFeature} onClose={() => setSelectedFeature(null)} featureInfo={selectedFeature} />
-        </MapContainer>
+        </div>
     );
 };
