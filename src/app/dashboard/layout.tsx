@@ -38,7 +38,8 @@ import {
   ScrollText,
   ChevronDown,
   Palette,
-  Newspaper
+  Newspaper,
+  LayoutGrid
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -166,6 +167,10 @@ const DashboardLayout = ({
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
+                 <Link href="/dashboard/halaman-utama" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                  <LayoutGrid size={18} className="text-white" />
+                  <span>Halaman Utama</span>
+                </Link>
                  <Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
                   <ListTodo size={18} className="text-white" />
                   <span>Kelola Menu</span>
