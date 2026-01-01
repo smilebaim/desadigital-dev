@@ -1,10 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, useMap, Marker, Popup, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
-import { LatLngTuple, LatLngBounds, Icon, latLng } from 'leaflet';
-import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, Warehouse, Ruler, MapPin } from 'lucide-react';
+import { LatLngTuple, LatLngBounds, Icon } from 'leaflet';
+import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, MapPin } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
