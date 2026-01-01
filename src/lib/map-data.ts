@@ -10,4 +10,5 @@ export const LAYER_CATEGORIES = {
   wilayah: { name: 'Peta Wilayah', layers: ['Peta Administrasi', 'Penggunaan Lahan'] },
   sosial: { name: 'Peta Sosial', layers: ['Demografi', 'Pendidikan', 'Kesehatan'] },
   ekonomi: { name: 'Peta Ekonomi', layers: ['Sektor Pangan', 'Perkebunan', 'Peternakan'] },
+  fasilitas: { name: 'Fasilitas', layers: ['Fasilitas Umum', 'Kantor Desa'] },
 };

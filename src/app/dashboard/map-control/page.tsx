@@ -43,7 +43,7 @@ export default function MapControlPage() {
       type: 'marker',
       coordinates: '',
       color: '#3388ff',
-      category: Object.keys(LAYER_CATEGORIES)[0]
+      category: Object.values(LAYER_CATEGORIES).flatMap(cat => cat.layers)[0] || ''
     });
     setIsDialogOpen(true);
   };
@@ -177,7 +177,7 @@ export default function MapControlPage() {
               </div>
                <div>
                 <Label htmlFor="coordinates">
-                  Koordinat (Format: `lat,lng` untuk marker, `lat1,lng1;lat2,lng2;...` untuk polygon)
+                  Koordinat (Format: `lat,lng` untuk marker, `lat1,lng1;...` untuk polygon)
                 </Label>
                 <Textarea id="coordinates" name="coordinates" value={currentFeature.coordinates || ''} onChange={handleInputChange} rows={5}/>
               </div>
