@@ -17,7 +17,8 @@ import {
   AppWindow, 
   Settings2,
   ChevronDown,
-  Palette
+  Palette,
+  Wallet
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
