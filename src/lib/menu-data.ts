@@ -1,112 +1,53 @@
-import {
-  Home,
-  History,
-  Target,
-  Compass,
-  Building2,
-  FileText,
-  ListTodo,
-  HeartHandshake,
-  MessageSquareWarning,
-  BookOpen,
-  Scale,
-  Handshake,
-  Store,
-  Users,
-  Activity,
-  Apple,
-  Calendar,
-  Library,
-  FileSpreadsheet,
-  Wallet,
-  ChevronRight,
-} from "lucide-react";
 
-export const webControlMenuItems = [
-    {
-      title: "Profil Desa",
-      basePath: "profil",
-      items: [
-        { title: "Profil Desa", slug: "profil-desa", icon: Home },
-        { title: "Sejarah Desa", slug: "sejarah-desa", icon: History },
-        { title: "Perkembangan", slug: "perkembangan", icon: ChevronRight },
-        { title: "Visi dan Misi", slug: "visi-misi", icon: Target },
-        { title: "Arah Kebijakan", slug: "arah-kebijakan", icon: Compass },
-        { title: "Pemerintahan Desa", slug: "struktur-pemerintah", icon: Building2 },
-      ]
-    },
-    {
-      title: "Layanan",
-       basePath: "layanan",
-      items: [
-        { title: "Persuratan", slug: "persuratan", icon: FileText },
-        { title: "Perlindungan Sosial", slug: "perlindungan-sosial", icon: HeartHandshake },
-        { title: "Penanganan Keluhan", slug: "penanganan-keluhan", icon: MessageSquareWarning },
-        { title: "Monografi Desa", slug: "monografi-desa", icon: BookOpen },
-        { title: "Peraturan Desa", slug: "peraturan-desa", icon: Scale },
-        { title: "Posyandu", slug: "posyandu", icon: Activity },
-        { title: "MPG", slug: "mpg", icon: Activity }
-      ]
-    },
-    {
-      title: "Ekonomi",
-      basePath: "ekonomi",
-      items: [
-        { title: "BUMDes", slug: "bumdes", icon: Building2 },
-        { title: "Koperasi Merah Putih", slug: "koperasi", icon: Handshake },
-        { title: "UMKM", slug: "umkm", icon: Store }
-      ]
-    },
-    {
-      title: "Kelembagaan",
-       basePath: "kelembagaan",
-      items: [
-        { title: "LKMD", slug: "lkmd", icon: Users },
-        { title: "PKK", slug: "pkk", icon: Users },
-      ]
-    },
-    {
-      title: "Aktivitas",
-       basePath: "aktivitas",
-      items: [
-        { title: "Kalender Pangan", slug: "kalender-pangan", icon: Apple },
-        { title: "Kalender Kegiatan", slug: "kalender-kegiatan", icon: Calendar },
-        { title: "Agenda", slug: "agenda", icon: ListTodo }
-      ]
-    },
-    {
-      title: "Literasi",
-       basePath: "pustaka",
-      items: [
-        { title: "Pustaka Desa", slug: "pustaka-desa", icon: Library },
-        { title: "Publikasi", slug: "publikasi", icon: FileSpreadsheet }
-      ]
-    },
-    {
-        title: "Pembangunan",
-        basePath: "pembangunan",
-        items: [
-            { title: "Daftar Program", slug: "daftar-program", icon: ListTodo },
-            { title: "RKPDes", slug: "rkpdes", icon: FileText },
-            { title: "RPJMDes", slug: "rpjmdes", icon: FileText },
-        ]
-    },
-    {
-        title: "Dana Desa",
-        basePath: "dana-desa",
-        items: [
-            { title: "Pendapatan", slug: "pendapatan", icon: Building2 },
-            { title: "Belanja", slug: "belanja", icon: Wallet },
-            { title: "Pembiayaan", slug: "pembiayaan", icon: Building2 },
-        ]
-    },
-     {
-        title: "Indeks Desa",
-        basePath: "indeks",
-        items: [
-            { title: "Ketahanan Sosial", slug: "ketahanan-sosial", icon: HeartHandshake },
-            { title: "Ketahanan Ekonomi", slug: "ketahanan-ekonomi", icon: Building2 },
-            { title: "Ketahanan Lingkungan", slug: "ketahanan-lingkungan", icon: Compass },
-        ]
-    }
-  ];
+export type MenuItem = {
+  id: number;
+  title: string;
+  path: string;
+  menuId: number;
+  parentId: number | null;
+  icon: string | null;
+};
+
+export type Menu = {
+  id: number;
+  name: string;
+  items: MenuItem[];
+};
+
+export const menus: Menu[] = [
+  {
+    id: 1,
+    name: "TopNav",
+    items: [
+      { id: 1, title: 'Profil', path: '/profil/profil-desa', menuId: 1, parentId: null, icon: null },
+      { id: 2, title: 'Sejarah Desa', path: '/profil/sejarah-desa', menuId: 1, parentId: 1, icon: 'History' },
+      { id: 3, title: 'Perkembangan', path: '/profil/perkembangan', menuId: 1, parentId: 1, icon: 'ChevronUp' },
+      { id: 4, title: 'Visi & Misi', path: '/profil/visi-misi', menuId: 1, parentId: 1, icon: 'Target' },
+      { id: 5, title: 'Layanan', path: '/layanan', menuId: 1, parentId: null, icon: null },
+      { id: 6, title: 'Persuratan', path: '/layanan/persuratan', menuId: 1, parentId: 5, icon: 'ScrollText' },
+      { id: 7, title: 'Perlindungan Sosial', path: '/layanan/perlindungan-sosial', menuId: 1, parentId: 5, icon: 'HeartHandshake' },
+      { id: 8, title: 'Penanganan Keluhan', path: '/layanan/penanganan-keluhan', menuId: 1, parentId: 5, icon: 'MessageSquareWarning' },
+      { id: 9, title: 'Monografi Desa', path: '/layanan/monografi-desa', menuId: 1, parentId: 5, icon: 'BookOpen' },
+      { id: 10, title: 'Peraturan Desa', path: '/layanan/peraturan-desa', menuId: 1, parentId: 5, icon: 'Scale' },
+    ],
+  },
+  {
+    id: 2,
+    name: "BottomNav",
+    items: [
+        { id: 11, title: 'Profil', path: '/profil/profil-desa', menuId: 2, parentId: null, icon: 'User' },
+        { id: 12, title: 'Profil Desa', path: '/profil/profil-desa', menuId: 2, parentId: 11, icon: 'Home' },
+        { id: 13, title: 'Sejarah Desa', path: '/profil/sejarah-desa', menuId: 2, parentId: 11, icon: 'History' },
+        { id: 14, title: 'Visi & Misi', path: '/profil/visi-misi', menuId: 2, parentId: 11, icon: 'Target' },
+        { id: 15, title: 'Arah Kebijakan', path: '/profil/arah-kebijakan', menuId: 2, parentId: 11, icon: 'Compass' },
+        { id: 16, title: 'Pembangunan', path: '/pembangunan/daftar-program', menuId: 2, parentId: null, icon: 'Building2' },
+        { id: 17, title: 'Daftar Program', path: '/pembangunan/daftar-program', menuId: 2, parentId: 16, icon: 'ListTodo' },
+        { id: 18, title: 'Indeks Desa Membangun', path: '/pembangunan/idm', menuId: 2, parentId: 16, icon: 'FileText' },
+        { id: 19, title: 'Ketahanan Desa', path: '/pembangunan/ketahanan-desa', menuId: 2, parentId: 16, icon: 'FileText' },
+        { id: 20, title: 'Dana Desa', path: '/dana-desa', menuId: 2, parentId: null, icon: 'Wallet' },
+        { id: 21, title: 'Pendapatan', path: '/dana-desa/pendapatan', menuId: 2, parentId: 20, icon: 'FileText' },
+        { id: 22, title: 'Belanja', path: '/dana-desa/belanja', menuId: 2, parentId: 20, icon: 'FileText' },
+        { id: 23, title: 'Pembiayaan', path: '/dana-desa/pembiayaan', menuId: 2, parentId: 20, icon: 'FileText' },
+    ],
+  },
+];

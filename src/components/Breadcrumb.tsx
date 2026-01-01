@@ -1,3 +1,4 @@
+'use client';
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
@@ -32,4 +33,4 @@ const Breadcrumb = ({ items }: BreadcrumbProps) => {
   );
 };
 
-export default Breadcrumb; 
+export default Breadcrumb;

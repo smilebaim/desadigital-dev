@@ -1,132 +1,132 @@
 'use client';
-import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { useToast } from "@/components/ui/use-toast";
+import { auth, db } from '@/lib/firebase';
 import { 
-  Auth,
-  User,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
+  onAuthStateChanged, 
+  signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
-  signOut as firebaseSignOut
-} from 'firebase/auth';
-import { useToast } from '@/components/ui/use-toast';
-import { useAuth as useFirebaseAuth } from '@/firebase';
+  signOut,
+  User as FirebaseUser
+} from "firebase/auth";
+import { doc, setDoc } from 'firebase/firestore';
+
+interface User {
+  email: string | null;
+  uid: string;
+  displayName?: string;
+}
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  register: (email: string, password: string, displayName: string) => Promise<boolean>;
   isAuthenticated: boolean;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const auth = useFirebaseAuth();
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   
   useEffect(() => {
-    if (!auth) {
-      setLoading(false);
-      return;
-    }
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setLoading(false);
-    }, (error) => {
-      console.error("Auth state error:", error);
-      toast({
-        title: "Error Autentikasi",
-        description: "Gagal memuat status login.",
-        variant: "destructive",
-      });
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        setUser({ 
+          email: firebaseUser.email, 
+          uid: firebaseUser.uid, 
+          displayName: firebaseUser.displayName || undefined 
+        });
+      } else {
+        setUser(null);
+      }
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [auth, toast]);
-
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    if (!auth) {
-      toast({
-        title: "Login Gagal",
-        description: "Layanan autentikasi tidak tersedia.",
-        variant: "destructive",
-      });
-      return false;
-    }
-
+    setLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       toast({
         title: "Login Berhasil",
         description: "Selamat datang kembali!",
       });
+      setLoading(false);
       return true;
     } catch (error: any) {
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
-        try {
-          await createUserWithEmailAndPassword(auth, email, password);
-          toast({
-            title: "Akun Baru Dibuat",
-            description: "Akun baru telah berhasil dibuat dan Anda telah login.",
-          });
-          return true;
-        } catch (creationError: any) {
-          toast({
-            title: "Pembuatan Akun Gagal",
-            description: creationError.message || "Gagal membuat akun baru.",
-            variant: "destructive",
-          });
-          console.error("Account creation error:", creationError.message);
-          return false;
-        }
-      } else {
-        toast({
-          title: "Login Gagal",
-          description: "Email atau password salah!",
-          variant: "destructive",
-        });
-        console.error("Login error:", error.message);
-        return false;
-      }
+      toast({
+        title: "Login Gagal",
+        description: "Email atau password salah!",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return false;
+    }
+  };
+  
+  const register = async (email: string, password: string, displayName: string): Promise<boolean> => {
+    setLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const newUser = userCredential.user;
+
+      // Create a user profile in Firestore
+      await setDoc(doc(db, "users", newUser.uid), {
+        uid: newUser.uid,
+        email: newUser.email,
+        displayName: displayName,
+        photoURL: newUser.photoURL
+      });
+
+      toast({
+        title: "Registrasi Berhasil",
+        description: "Akun Anda telah berhasil dibuat. Silakan login.",
+      });
+      setLoading(false);
+      return true;
+    } catch (error: any) {
+      toast({
+        title: "Registrasi Gagal",
+        description: error.message || "Terjadi kesalahan saat mendaftar.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return false;
     }
   };
 
   const logout = async () => {
-    if (!auth) {
-      toast({
-        title: "Logout Gagal",
-        description: "Layanan autentikasi tidak tersedia.",
-        variant: "destructive",
-      });
-      return;
-    }
+    setLoading(true);
     try {
-      await firebaseSignOut(auth);
+      await signOut(auth);
       toast({
         title: "Logout Berhasil",
-        description: "Anda telah keluar dari sistem!",
+        description: "Anda telah keluar dari sistem.",
       });
     } catch (error: any) {
       toast({
         title: "Logout Gagal",
-        description: "Terjadi kesalahan saat keluar.",
+        description: error.message || "Terjadi kesalahan saat keluar.",
         variant: "destructive",
       });
-      console.error("Logout error:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   const value = {
     user,
     login,
+    register,
     logout,
-    isAuthenticated: !loading && !!user,
+    isAuthenticated: !!user,
     loading,
   };
 

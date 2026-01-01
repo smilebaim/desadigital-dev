@@ -16,9 +16,29 @@ import {
   Map, 
   AppWindow, 
   Settings2,
+  Home,
+  History,
+  Target,
+  Compass,
+  Building2,
+  FileText,
+  ListTodo,
+  HeartHandshake,
+  MessageSquareWarning,
+  BookOpen,
+  Scale,
+  HandshakeIcon,
+  Store,
+  Users,
+  Activity,
+  Apple,
+  Calendar,
+  Library,
+  FileSpreadsheet,
+  ScrollText,
   ChevronDown,
   Palette,
-  Wallet
+  Newspaper
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -33,6 +53,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu";
 import {
   Accordion,
@@ -42,7 +65,7 @@ import {
 } from "@/components/ui/accordion";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useTheme } from "next-themes";
-import { webControlMenuItems } from "@/lib/menu-data";
+import Image from "next/image";
 
 
 const DashboardLayout = ({
@@ -64,6 +87,8 @@ const DashboardLayout = ({
     router.push('/');
   };
 
+  const webControlMenuItems: any[] = [];
+
   return (
     <ProtectedRoute>
       <SidebarProvider>
@@ -71,51 +96,84 @@ const DashboardLayout = ({
           <Sidebar className="bg-black shadow-sm">
             <SidebarHeader className="flex items-center gap-2 p-4">
               <div className="flex items-center gap-2">
-                <img src="/lovable-uploads/logo-desa.png" alt="Logo Desa" className="h-8 w-8" />
+                <Image src="https://picsum.photos/seed/logo/32/32" alt="Logo Desa" className="h-8 w-8" width={32} height={32} />
                 <span className="font-semibold text-white">Dashboard</span>
               </div>
             </SidebarHeader>
             <SidebarContent>
               <nav className="space-y-1 px-2 py-4">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white">
-                    <Globe size={18} className="text-white" />
-                    <span>Kontrol Web</span>
-                  </div>
-                  <div className="space-y-1 pl-4">
-                    <Accordion type="single" collapsible className="w-full">
-                      {webControlMenuItems.map((category, index) => (
-                        <AccordionItem key={index} value={`category-${index}`} className="border-none">
-                          <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
-                            <span className="text-white">{category.title}</span>
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <ul className="space-y-1 pl-4">
-                              {category.items.map((item, itemIndex) => (
-                                <li key={itemIndex}>
-                                  <Link
-                                    href={`/dashboard/konten/${category.basePath}/${item.slug}`}
-                                    className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
-                                  >
-                                    <item.icon size={16} className="text-white" />
-                                    <span>{item.title}</span>
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </div>
-                </div>
-
-                <Link href="/dashboard/map-control" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                  <Map size={18} className="text-white" />
-                  <span>Kontrol Peta</span>
+                 <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                  <Home size={18} className="text-white" />
+                  <span>Beranda</span>
+                </Link>
+                
+                <Link href="/dashboard/info" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                  <Newspaper size={18} className="text-white" />
+                  <span>Info & Berita</span>
                 </Link>
 
-                {/* Other menu items can be added here */}
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="apps" className="border-none">
+                    <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <AppWindow size={18} className="text-white" />
+                        <span className="text-white">Aplikasi Desa</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <ul className="space-y-1 pl-4">
+                        <li><Link href="/dashboard/apps/surat-masuk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Masuk</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-keluar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Keluar</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-keterangan" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Keterangan</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-pengantar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Pengantar</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-nikah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Nikah</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-domisili" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Domisili</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Usaha</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-kematian" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Kematian</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-kelahiran" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Kelahiran</span>
+                        </Link></li>
+                        <li><Link href="/dashboard/apps/surat-pindah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                          <FileText size={16} className="text-white" />
+                          <span>Surat Pindah</span>
+                        </Link></li>
+                      </ul>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+                 <Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                  <ListTodo size={18} className="text-white" />
+                  <span>Kelola Menu</span>
+                </Link>
+                 <Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                  <FileSpreadsheet size={18} className="text-white" />
+                  <span>Kelola Halaman</span>
+                </Link>
               </nav>
             </SidebarContent>
             <SidebarFooter className="p-4">

@@ -1,8 +1,7 @@
-'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, Users, Activity, Map, Globe, AppWindow, Settings2, Home, Building2, HeartHandshake, Store } from "lucide-react";
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const DashboardHome = () => {
@@ -27,6 +26,7 @@ const DashboardHome = () => {
     }
   ];
 
+  // Data untuk chart penduduk berdasarkan usia
   const pendudukData = [
     { name: '0-14', value: 450 },
     { name: '15-24', value: 380 },
@@ -35,6 +35,7 @@ const DashboardHome = () => {
     { name: '65+', value: 120 },
   ];
 
+  // Data untuk chart ekonomi
   const ekonomiData = [
     { name: 'Pertanian', value: 45 },
     { name: 'Perdagangan', value: 25 },
@@ -42,6 +43,7 @@ const DashboardHome = () => {
     { name: 'Industri', value: 10 },
   ];
 
+  // Data untuk chart fasilitas
   const fasilitasData = [
     { name: 'Jan', value: 4 },
     { name: 'Feb', value: 3 },
@@ -51,6 +53,7 @@ const DashboardHome = () => {
     { name: 'Jun', value: 4 },
   ];
 
+  // Data untuk chart layanan
   const layananData = [
     { name: 'Surat Keterangan', value: 65 },
     { name: 'Surat Nikah', value: 25 },
@@ -64,8 +67,8 @@ const DashboardHome = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Selamat Datang di Dasbor</h1>
           <p className="text-black/60">
+            Selamat datang di panel admin Desa Remau Bakotuo. 
             Kelola informasi dan layanan desa dari sini.
           </p>
         </div>

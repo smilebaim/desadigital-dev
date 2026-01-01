@@ -1,10 +1,16 @@
-import LandingPage from "@/pages/landing/LandingPage";
-import PublicLayout from "@/layouts/PublicLayout";
+'use client';
+import React from 'react';
+import Hero from '@/components/Hero';
+import PublicLayout from '@/layouts/PublicLayout';
 
-export default function Home() {
+const LandingPage = () => {
   return (
     <PublicLayout>
-      <LandingPage />
+      <main className="relative">
+        <Hero />
+      </main>
     </PublicLayout>
   );
-}
+};
+
+export default LandingPage;

@@ -1,7 +1,7 @@
-
-"use client";
+'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -26,7 +26,7 @@ import {
   ListTodo,
   Library,
   FileSpreadsheet,
-  Home
+  LayoutDashboard
 } from 'lucide-react';
 import {
   Sheet,
@@ -53,49 +53,12 @@ interface TopNavProps {
 const menuItems = [
   {
     title: "Layanan",
-    basePath: "/layanan",
     items: [
       { title: "Persuratan", path: "/layanan/persuratan", icon: ScrollText },
       { title: "Perlindungan Sosial", path: "/layanan/perlindungan-sosial", icon: HeartHandshake },
       { title: "Penanganan Keluhan", path: "/layanan/penanganan-keluhan", icon: MessageSquareWarning },
       { title: "Monografi Desa", path: "/layanan/monografi-desa", icon: BookOpen },
       { title: "Peraturan Desa", path: "/layanan/peraturan-desa", icon: Scale }
-    ]
-  },
-  {
-    title: "Ekonomi",
-    basePath: "/ekonomi",
-    items: [
-      { title: "BUMDes", path: "/ekonomi/bumdes", icon: Building2 },
-      { title: "Koperasi Merah Putih", path: "/ekonomi/koperasi", icon: HandshakeIcon },
-      { title: "UMKM", path: "/ekonomi/umkm", icon: Store }
-    ]
-  },
-  {
-    title: "Kelembagaan",
-    basePath: "/kelembagaan",
-    items: [
-      { title: "LKMD", path: "/kelembagaan/lkmd", icon: Users },
-      { title: "PKK", path: "/kelembagaan/pkk", icon: Users },
-      { title: "Posyandu", path: "/layanan/posyandu", icon: Activity },
-      { title: "MPG", path: "/layanan/mpg", icon: Activity }
-    ]
-  },
-  {
-    title: "Aktivitas",
-    basePath: "/aktivitas",
-    items: [
-      { title: "Kalender Pangan", path: "/aktivitas/kalender-pangan", icon: Apple },
-      { title: "Kalender Kegiatan", path: "/aktivitas/kalender-kegiatan", icon: Calendar },
-      { title: "Agenda", path: "/aktivitas/agenda", icon: ListTodo }
-    ]
-  },
-  {
-    title: "Literasi",
-    basePath: "/pustaka",
-    items: [
-      { title: "Pustaka Desa", path: "/pustaka/pustaka-desa", icon: Library },
-      { title: "Publikasi", path: "/pustaka/publikasi", icon: FileSpreadsheet }
     ]
   }
 ];
@@ -105,21 +68,20 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
 
-  const activeCategory = menuItems.find(category => pathname.startsWith(category.basePath));
-
-  const Sidebar = () => {
-    if (!activeCategory) return null;
+  const SidebarLayanan = () => {
+    const isLayananRoute = pathname.startsWith('/layanan');
+    if (!isLayananRoute) return null;
 
     return (
       <div className="fixed left-0 md:top-16 top-1/2 -translate-y-1/2 md:translate-y-0 h-auto md:h-[calc(100vh-9rem)] md:w-72 w-12 bg-emerald-800/90 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-emerald-900 z-40 transition-all duration-300 rounded-r-[2rem] md:rounded-none md:rounded-br-[4rem]">
         <ScrollArea className="h-full max-h-[70vh] md:max-h-none md:px-4 px-1 py-8">
           <div className="space-y-2 md:pb-16">
             <h3 className="font-semibold text-lg mb-6 text-emerald-50 border-b border-emerald-100/20 pb-3 hidden md:block">
-              Menu {activeCategory.title}
+              Menu Layanan
             </h3>
             <div className="space-y-4">
               <TooltipProvider delayDuration={100}>
-                {activeCategory.items.map((item, index) => (
+                {menuItems.find(m => m.title === 'Layanan')?.items.map((item, index) => (
                   <Tooltip key={index}>
                     <TooltipTrigger asChild>
                       <Button
@@ -153,7 +115,7 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
       <nav className={cn('fixed top-0 left-0 right-0 z-50 bg-white/40 border-b border-black/10 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 transition-all', className)}>
         <div className="container mx-auto px-4 flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
           <div className="flex items-center gap-1 -ml-1 sm:-ml-2">
-            <img src="/lovable-uploads/logo-desa.png" alt="Logo Desa" className="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-all duration-300" />
+            <Image src="https://picsum.photos/seed/logo/40/40" alt="Logo Desa" className="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-all duration-300" width={40} height={40} />
             <div className="ml-1">
               <Link href="/" className="text-base sm:text-xl font-poppins font-medium tracking-tight text-black hover:text-black transition-all">
                 Desa Remau Bako Tuo
@@ -190,9 +152,9 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
                 <SheetDescription className="sr-only">Menu utama untuk mengakses berbagai layanan dan informasi desa</SheetDescription>
                 <ScrollArea className="h-full">
                   <div className="space-y-3 sm:space-y-4 py-6 sm:py-8">
-                    <Accordion type="single" collapsible className="w-full">
+                    <Accordion type="single" collapsible defaultValue="Layanan" className="w-full">
                       {menuItems.map((category, index) => (
-                        <AccordionItem key={index} value={`item-${index}`} className="border-black/10">
+                        <AccordionItem key={index} value={category.title} className="border-black/10">
                           <AccordionTrigger className="px-2 sm:px-3 text-black hover:text-black hover:no-underline border-b border-black/10 pb-2 transition-all hover:bg-black/10">
                             <span className="font-poppins font-semibold text-sm sm:text-base">{category.title}</span>
                           </AccordionTrigger>
@@ -223,7 +185,7 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
                       variant="ghost" 
                       className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
                     >
-                      <Link href="/berita" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
+                      <Link href="/info" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
                         <Bell className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
                         <span>Notifikasi</span>
                         {hasNewNews && (
@@ -238,7 +200,7 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
                     >
                       {isAuthenticated ? (
                         <Link href="/dashboard" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
-                          <Home className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
+                          <LayoutDashboard className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
                           <span>Dashboard</span>
                         </Link>
                       ) : (
@@ -260,11 +222,9 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
           </div>
         </div>
       </nav>
-      <Sidebar />
+      <SidebarLayanan />
     </>
   );
 };
 
 export default TopNav;
-
-    

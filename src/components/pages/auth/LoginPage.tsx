@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,14 +8,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, LogIn } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { login, isAuthenticated, loading } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -23,34 +23,27 @@ const LoginPage = () => {
     }
   }, [isAuthenticated, loading, router]);
 
-  if (loading || isAuthenticated) {
-    return <div>Loading...</div>;
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setIsSubmitting(true);
     
     if (!email || !password) {
-      setError("Mohon isi semua kolom");
-      setIsSubmitting(false);
+      toast({
+        title: "Input tidak lengkap",
+        description: "Mohon isi semua kolom.",
+        variant: "destructive",
+      });
       return;
     }
 
-    try {
-      const success = await login(email, password);
-      if (success) {
-        router.push("/dashboard");
-      } else {
-        setError("Email atau password yang Anda masukkan salah.");
-      }
-    } catch (err: any) {
-        setError(err.message || "Terjadi kesalahan saat login.");
-    } finally {
-        setIsSubmitting(false);
+    const success = await login(email, password);
+    if (success) {
+      router.push("/dashboard");
     }
   };
+
+  if (loading || (!loading && isAuthenticated)) {
+     return <div className="min-h-screen flex items-center justify-center">Memuat...</div>;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
@@ -78,7 +71,7 @@ const LoginPage = () => {
                     placeholder="admin@desaremaubakotuo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    disabled={isSubmitting}
+                    disabled={loading}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -88,20 +81,17 @@ const LoginPage = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    disabled={isSubmitting}
+                    disabled={loading}
                   />
                 </div>
-                {error && (
-                  <div className="text-red-500 text-sm">{error}</div>
-                )}
-                <Button type="submit" className="w-full flex items-center gap-2" disabled={isSubmitting}>
-                  <LogIn size={18} />
-                  <span>{isSubmitting ? 'Memproses...' : 'Login'}</span>
+                <Button type="submit" className="w-full flex items-center gap-2" disabled={loading}>
+                  {loading ? 'Memproses...' : <> <LogIn size={18} /> <span>Login</span> </>}
                 </Button>
               </div>
             </form>
           </CardContent>
-          <CardFooter className="text-center text-sm text-gray-600">
+          <CardFooter className="flex flex-col gap-2 text-center text-sm text-gray-600">
+            <p>Belum punya akun? <Link href="/register" className="text-primary hover:underline">Daftar di sini</Link></p>
             <p className="w-full">
               Portal Admin Desa Remau Bakotuo
             </p>
