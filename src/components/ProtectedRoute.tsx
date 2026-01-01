@@ -8,18 +8,18 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  // const { isAuthenticated } = useAuth();
-  // const router = useRouter();
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   if (!isAuthenticated) {
-  //     router.replace("/login");
-  //   }
-  // }, [isAuthenticated, router]);
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      router.replace("/login");
+    }
+  }, [isAuthenticated, loading, router]);
 
-  // if (!isAuthenticated) {
-  //   return null; // or a loading spinner
-  // }
+  if (loading || !isAuthenticated) {
+    return <div>Loading...</div>; // or a loading spinner
+  }
 
   return <>{children}</>;
 };

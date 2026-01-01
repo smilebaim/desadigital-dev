@@ -13,9 +13,14 @@ const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, loading } = useAuth();
 
+  if (loading) {
+    return <div>Loading...</div>
+  }
+  
   if (isAuthenticated) {
     router.replace("/dashboard");
     return null;
@@ -24,15 +29,25 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
     
     if (!email || !password) {
       setError("Mohon isi semua kolom");
+      setIsSubmitting(false);
       return;
     }
 
-    const success = login(email, password);
-    if (success) {
-      router.push("/dashboard");
+    try {
+      const success = await login(email, password);
+      if (success) {
+        router.push("/dashboard");
+      } else {
+        setError("Email atau password yang Anda masukkan salah.");
+      }
+    } catch (err: any) {
+        setError(err.message || "Terjadi kesalahan saat login.");
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
@@ -62,6 +77,7 @@ const LoginPage = () => {
                     placeholder="admin@desaremaubakotuo.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -71,14 +87,15 @@ const LoginPage = () => {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={isSubmitting}
                   />
                 </div>
                 {error && (
                   <div className="text-red-500 text-sm">{error}</div>
                 )}
-                <Button type="submit" className="w-full flex items-center gap-2">
+                <Button type="submit" className="w-full flex items-center gap-2" disabled={isSubmitting}>
                   <LogIn size={18} />
-                  <span>Login</span>
+                  <span>{isSubmitting ? 'Memproses...' : 'Login'}</span>
                 </Button>
               </div>
             </form>

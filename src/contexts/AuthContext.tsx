@@ -1,77 +1,113 @@
-"use client";
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { useToast } from "@/components/ui/use-toast";
-
-interface User {
-  email: string;
-  role: string;
-}
+'use client';
+import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
+import { 
+  Auth,
+  User,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut
+} from 'firebase/auth';
+import { useToast } from '@/components/ui/use-toast';
+import { useAuth as useFirebaseAuth } from '@/firebase';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => boolean;
+  login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   isAuthenticated: boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const auth = useFirebaseAuth();
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   
-  // Check if user is already logged in from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    if (!auth) {
+      setLoading(false);
+      return;
     }
-  }, []);
 
-  // Admin credentials
-  const adminUser = {
-    email: 'admin@desaremaubakotuo.com',
-    password: 'admin123456',
-    role: 'admin'
-  };
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    }, (error) => {
+      console.error("Auth state error:", error);
+      toast({
+        title: "Error Autentikasi",
+        description: "Gagal memuat status login.",
+        variant: "destructive",
+      });
+      setLoading(false);
+    });
 
-  // Login function
-  const login = (email: string, password: string): boolean => {
-    // Simple authentication check
-    if (email === adminUser.email && password === adminUser.password) {
-      const userData = { email: adminUser.email, role: adminUser.role };
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
+    return () => unsubscribe();
+  }, [auth, toast]);
+
+
+  const login = async (email: string, password: string): Promise<boolean> => {
+    if (!auth) {
+      toast({
+        title: "Login Gagal",
+        description: "Layanan autentikasi tidak tersedia.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       toast({
         title: "Login Berhasil",
         description: "Selamat datang kembali!",
       });
       return true;
-    } else {
+    } catch (error: any) {
       toast({
         title: "Login Gagal",
         description: "Email atau password salah!",
         variant: "destructive",
       });
+      console.error("Login error:", error.message);
       return false;
     }
   };
 
-  // Logout function
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    toast({
-      title: "Logout Berhasil",
-      description: "Anda telah keluar dari sistem!",
-    });
+  const logout = async () => {
+    if (!auth) {
+      toast({
+        title: "Logout Gagal",
+        description: "Layanan autentikasi tidak tersedia.",
+        variant: "destructive",
+      });
+      return;
+    }
+    try {
+      await firebaseSignOut(auth);
+      toast({
+        title: "Logout Berhasil",
+        description: "Anda telah keluar dari sistem!",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Logout Gagal",
+        description: "Terjadi kesalahan saat keluar.",
+        variant: "destructive",
+      });
+      console.error("Logout error:", error.message);
+    }
   };
 
   const value = {
     user,
     login,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: !loading && !!user,
+    loading,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
