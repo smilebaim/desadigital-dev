@@ -194,12 +194,10 @@ export default function MapComponent() {
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedFeature, setSelectedFeature] = useState<MapFeature | null>(null);
     const [mapFeatures, setMapFeatures] = useState<MapFeature[]>([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = getMapFeatures((data) => {
             setMapFeatures(data);
-            setLoading(false);
         });
         return () => unsubscribe();
     }, []);
@@ -209,10 +207,6 @@ export default function MapComponent() {
         return mapFeatures.filter(feature => activeOverlays.includes(feature.category));
     }, [mapFeatures, activeOverlays]);
 
-
-    if (loading) {
-        return <div className="w-full h-full flex items-center justify-center bg-gray-100">Memuat Peta...</div>
-    }
 
     return (
         <>

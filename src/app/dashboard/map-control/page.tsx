@@ -183,7 +183,7 @@ export default function MapControlPage() {
               </div>
               <div>
                 <Label htmlFor="color">Warna (contoh: #ff0000)</Label>
-                <Input id="color" name="color" type="color" defaultValue={currentFeature.color || '#3388ff'} onChange={handleInputChange} />
+                <Input id="color" name="color" type="color" value={currentFeature.color || '#3388ff'} onChange={handleInputChange} />
               </div>
             </div>
           )}
