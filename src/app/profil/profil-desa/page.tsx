@@ -1,5 +1,5 @@
 'use client';
-import ProfilDesa from "@/components/pages/profile/ProfilDesa";
+import ProfilDesa from "@/components/pages/profil/ProfilDesa";
 import PublicLayout from "@/layouts/PublicLayout";
 
 export default function ProfilDesaPage() {

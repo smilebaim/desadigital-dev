@@ -1,5 +1,5 @@
 'use client';
-import Perkembangan from "@/components/pages/profile/Perkembangan";
+import Perkembangan from "@/components/pages/profil/Perkembangan";
 import PublicLayout from "@/layouts/PublicLayout";
 
 export default function PerkembanganPage() {
