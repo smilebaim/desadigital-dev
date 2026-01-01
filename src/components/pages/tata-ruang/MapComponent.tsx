@@ -28,12 +28,14 @@ import type { MapFeature } from '@/lib/types';
 import { BASE_LAYERS, LAYER_CATEGORIES } from '@/lib/map-data';
 
 // Fix Leaflet default marker issue with a blank icon, as we'll be using custom ones.
-delete (Icon.Default.prototype as any)._getIconUrl;
-Icon.Default.mergeOptions({
-  iconRetinaUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-  iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-  shadowUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
-});
+if (typeof window !== 'undefined') {
+  delete (Icon.Default.prototype as any)._getIconUrl;
+  Icon.Default.mergeOptions({
+    iconRetinaUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+    iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+    shadowUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  });
+}
 
 
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
@@ -138,6 +140,7 @@ const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, featureInfo }) =
             <SheetContent side="right" className="w-[70vw] sm:w-[336px] bg-white/40 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-l border-white/20 rounded-l-[2rem] top-14 sm:top-20 h-[calc(100vh-7rem)] sm:h-[calc(100vh-10rem)] transition-all duration-300">
                 <SheetHeader>
                     <SheetTitle>{featureInfo.title}</SheetTitle>
+                    <SheetDescription />
                 </SheetHeader>
                 <ScrollArea className="h-full px-4 py-8">
                     <div className="space-y-6 sm:space-y-8">
