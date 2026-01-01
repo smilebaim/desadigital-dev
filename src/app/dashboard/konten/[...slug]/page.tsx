@@ -8,7 +8,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Save } from 'lucide-react';
-import DashboardLayout from '@/app/dashboard/layout';
 
 interface PageData {
   title: string;
@@ -76,7 +75,6 @@ export default function ContentEditorPage({ params }: { params: { slug: string[]
   const pageTitle = pageData?.title || pageSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <Card>
           <CardHeader>
@@ -126,6 +124,5 @@ export default function ContentEditorPage({ params }: { params: { slug: string[]
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   );
 }

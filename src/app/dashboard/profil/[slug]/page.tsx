@@ -1,5 +1,4 @@
 'use client'
-import DashboardLayout from '@/app/dashboard/layout';
 import ProfilDesa from '@/components/pages/dashboard/ProfilDesa';
 import { notFound } from 'next/navigation';
 
@@ -20,9 +19,5 @@ export default function DashboardProfilPage({ params }: { params: { slug: string
         notFound();
     }
     
-  return (
-    <DashboardLayout>
-      <PageComponent />
-    </DashboardLayout>
-  );
+  return <PageComponent />;
 }
