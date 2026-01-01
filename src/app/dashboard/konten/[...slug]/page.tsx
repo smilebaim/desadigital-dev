@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { Save } from 'lucide-react';
-import DashboardLayout from '@/dashboard/layout';
+import DashboardLayout from '@/app/dashboard/layout';
 
 interface PageData {
   title: string;
