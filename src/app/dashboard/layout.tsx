@@ -186,14 +186,14 @@ const DashboardLayout = ({
                           <LayoutGrid size={16} className="text-white" />
                           <span>Halaman Utama</span>
                         </Link></li>
+                        <li><Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                            <ListTodo size={16} className="text-white" />
+                            <span>Kelola Menu</span>
+                        </Link></li>
                       </ul>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
-                <Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                  <ListTodo size={18} className="text-white" />
-                  <span>Kelola Menu</span>
-                </Link>
               </nav>
             </SidebarContent>
             <SidebarFooter className="p-4">
