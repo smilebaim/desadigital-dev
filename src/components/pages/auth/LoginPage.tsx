@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -17,13 +17,14 @@ const LoginPage = () => {
   const router = useRouter();
   const { login, isAuthenticated, loading } = useAuth();
 
-  if (loading) {
-    return <div>Loading...</div>
-  }
-  
-  if (isAuthenticated) {
-    router.replace("/dashboard");
-    return null;
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.replace("/dashboard");
+    }
+  }, [isAuthenticated, loading, router]);
+
+  if (loading || isAuthenticated) {
+    return <div>Loading...</div>;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
