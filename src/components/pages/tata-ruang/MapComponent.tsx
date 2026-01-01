@@ -29,8 +29,9 @@ import { BASE_LAYERS, LAYER_CATEGORIES } from '@/lib/map-data';
 
 // Fix Leaflet default marker issue with a blank icon, as we'll be using custom ones.
 if (typeof window !== 'undefined') {
-  delete (Icon.Default.prototype as any)._getIconUrl;
-  Icon.Default.mergeOptions({
+  const L = require('leaflet');
+  delete (L.Icon.Default.prototype as any)._getIconUrl;
+  L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
     iconUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
     shadowUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
