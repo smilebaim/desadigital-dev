@@ -1,26 +1,18 @@
 'use client';
 import { notFound } from 'next/navigation';
-import DaftarProgram from '@/components/pages/pembangunan/DaftarProgram';
-import RKPDes from '@/components/pages/pembangunan/RKPDes';
-import RPJMDes from '@/components/pages/pembangunan/RPJMDes';
 import PublicLayout from '@/layouts/PublicLayout';
+import DynamicPage from '@/components/pages/DynamicPage';
 
-const pageComponents: { [key: string]: React.ComponentType } = {
-  'daftar-program': DaftarProgram,
-  'rkpdes': RKPDes,
-  'rpjmdes': RPJMDes,
-};
+const validSlugs = ['daftar-program', 'rkpdes', 'rpjmdes'];
 
 export default function PembangunanPage({ params }: { params: { slug: string } }) {
-  const PageComponent = pageComponents[params.slug];
-
-  if (!PageComponent) {
+  if (!validSlugs.includes(params.slug)) {
     notFound();
   }
 
   return (
     <PublicLayout>
-      <PageComponent />
+      <DynamicPage pageSlug={params.slug} category="pembangunan" />
     </PublicLayout>
   );
 }
