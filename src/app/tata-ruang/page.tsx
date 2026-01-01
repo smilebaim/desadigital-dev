@@ -3,10 +3,13 @@ import dynamic from 'next/dynamic';
 import TopNav from '@/components/TopNav';
 import BottomNav from '@/components/BottomNav';
 
-const MapComponentWithNoSSR = dynamic(() => import('@/components/pages/tata-ruang/MapComponent'), {
-  ssr: false,
-  loading: () => <div className="w-full h-full flex items-center justify-center bg-gray-100">Memuat Peta...</div>
-});
+const MapComponentWithNoSSR = dynamic(
+  () => import('@/components/pages/tata-ruang/MapComponent'), 
+  {
+    ssr: false,
+    loading: () => <div className="w-full h-full flex items-center justify-center bg-gray-100">Memuat Peta...</div>
+  }
+);
 
 export default function TataRuangPage() {
   return (

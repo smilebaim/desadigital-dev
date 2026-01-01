@@ -27,7 +27,7 @@ import { getMapFeatures } from '@/lib/map-actions';
 import type { MapFeature } from '@/lib/types';
 import { BASE_LAYERS, LAYER_CATEGORIES } from '@/lib/map-data';
 
-// Fix Leaflet default marker issue with a blank icon, as we'll be using custom ones.
+// Fix Leaflet default marker issue
 if (typeof window !== 'undefined') {
   const L = require('leaflet');
   delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -37,7 +37,6 @@ if (typeof window !== 'undefined') {
     shadowUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
   });
 }
-
 
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
 const DEFAULT_ZOOM = 14;
@@ -80,15 +79,12 @@ const getIconForCategory = (category: string) => {
   });
 };
 
-
-interface LayerPanelProps {
+const LayerPanel: React.FC<{
   expanded: boolean;
   onToggle: () => void;
   activeLayers: string[];
   onLayerToggle: (layer: string) => void;
-}
-
-const LayerPanel: React.FC<LayerPanelProps> = ({ expanded, onToggle, activeLayers, onLayerToggle }) => {
+}> = ({ expanded, onToggle, activeLayers, onLayerToggle }) => {
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
     const toggleCategory = (category: string) => {
@@ -128,13 +124,11 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ expanded, onToggle, activeLayer
     );
 };
 
-interface LayerInfoProps {
+const LayerInfo: React.FC<{
     isOpen: boolean;
     onClose: () => void;
     featureInfo: MapFeature | null;
-}
-
-const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, featureInfo }) => {
+}> = ({ isOpen, onClose, featureInfo }) => {
     if (!featureInfo) return null;
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
@@ -153,8 +147,12 @@ const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, featureInfo }) =
     );
 };
 
-
-const MapControls: React.FC<{ activeLayer: keyof typeof BASE_LAYERS; setActiveLayer: (layer: keyof typeof BASE_LAYERS) => void; setLayerPanelExpanded: (expanded: boolean) => void; layerPanelExpanded: boolean }> = ({ activeLayer, setActiveLayer, setLayerPanelExpanded, layerPanelExpanded }) => {
+const MapControls: React.FC<{ 
+    activeLayer: keyof typeof BASE_LAYERS; 
+    setActiveLayer: (layer: keyof typeof BASE_LAYERS) => void; 
+    setLayerPanelExpanded: (expanded: boolean) => void; 
+    layerPanelExpanded: boolean 
+}> = ({ activeLayer, setActiveLayer, setLayerPanelExpanded, layerPanelExpanded }) => {
     const map = useMap();
     return (
         <div className="absolute left-2 top-4 z-[999] space-y-2">
@@ -190,7 +188,6 @@ const parsePolygonCoords = (coords: string): LatLngTuple[] | null => {
     }
     return null;
 };
-
 
 export default function MapComponent() {
     const [activeBaseLayer, setActiveBaseLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
