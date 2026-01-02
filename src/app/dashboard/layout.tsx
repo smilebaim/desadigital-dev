@@ -219,9 +219,11 @@ const DashboardLayout = ({
                       <span>Profil</span>
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-black">
-                    <Settings className="mr-2 h-4 w-4 text-black" />
-                    <span>Pengaturan</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/pengaturan" className="text-black">
+                      <Settings className="mr-2 h-4 w-4 text-black" />
+                      <span>Pengaturan</span>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="text-red-600">
