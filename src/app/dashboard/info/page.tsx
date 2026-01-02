@@ -13,13 +13,11 @@ import {
 import { 
   Search, 
   Plus, 
-  Filter, 
   MoreVertical, 
   Edit, 
   Trash2, 
   Eye,
-  Download,
-  Image as ImageIcon
+  Download
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,50 +27,41 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { getPostsStream } from "@/lib/posts-actions"; // Assuming you create this file
+import { useAuth } from "@/contexts/AuthContext";
+
+interface Post {
+  id: string;
+  title: string;
+  category: string;
+  author: string;
+  status: 'Published' | 'Draft';
+  createdAt: any;
+  views: number;
+}
 
 const BeritaDashboardPage = () => {
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const berita = [
-    {
-      id: 1,
-      judul: "Peringatan HUT RI ke-79: Rangkaian Acara dan Lomba",
-      kategori: "Pengumuman",
-      tanggal: "2024-08-01",
-      penulis: "Panitia Desa",
-      status: "Published",
-      views: 150,
-    },
-    {
-      id: 2,
-      judul: "Rehabilitasi Mangrove Tahap II Dimulai",
-      kategori: "Berita",
-      tanggal: "2024-07-28",
-      penulis: "Tim Lingkungan",
-      status: "Published",
-      views: 98,
-    },
-    {
-        id: 3,
-        judul: "Jadwal Penyaluran Bantuan Pangan Bulan Agustus 2024",
-        kategori: "Pengumuman",
-        tanggal: "2024-07-25",
-        penulis: "Seksi Kesra",
-        status: "Published",
-        views: 210,
-    },
-    {
-        id: 4,
-        judul: "BUMDes Bahari Sejahtera Luncurkan Produk Olahan Ikan Baru",
-        kategori: "Berita",
-        tanggal: "2024-07-20",
-        penulis: "Admin",
-        status: "Draft",
-        views: 0,
+  useEffect(() => {
+    if (user?.uid) {
+      const unsubscribe = getPostsStream((data) => {
+        setPosts(data as Post[]);
+        setLoading(false);
+      });
+      return () => unsubscribe();
     }
-  ];
+  }, [user]);
+
+  const filteredPosts = posts.filter(post => 
+    post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    post.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -84,13 +73,15 @@ const BeritaDashboardPage = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" disabled>
             <Download className="h-4 w-4 mr-2" />
             Export Data
           </Button>
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            Tambah Artikel Baru
+          <Button size="sm" asChild>
+            <Link href="/dashboard/info/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Tambah Artikel Baru
+            </Link>
           </Button>
         </div>
       </div>
@@ -101,7 +92,7 @@ const BeritaDashboardPage = () => {
             <div>
               <CardTitle>Daftar Artikel</CardTitle>
               <CardDescription>
-                Total artikel: {berita.length}
+                Total artikel: {posts.length}
               </CardDescription>
             </div>
             <div className="flex items-center gap-4">
@@ -131,20 +122,25 @@ const BeritaDashboardPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {berita.map((item) => (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center">Memuat data artikel...</TableCell>
+                </TableRow>
+              ) : filteredPosts.length > 0 ? (
+                filteredPosts.map((item) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.judul}</TableCell>
+                  <TableCell className="font-medium">{item.title}</TableCell>
                   <TableCell>
                      <span className={`px-2 py-1 rounded-full text-xs ${
-                      item.kategori === 'Berita' 
+                      item.category === 'Berita' 
                         ? 'bg-blue-100 text-blue-800' 
                         : 'bg-orange-100 text-orange-800'
                     }`}>
-                      {item.kategori}
+                      {item.category}
                     </span>
                   </TableCell>
-                  <TableCell>{item.tanggal}</TableCell>
-                  <TableCell>{item.penulis}</TableCell>
+                  <TableCell>{item.createdAt ? new Date(item.createdAt.seconds * 1000).toLocaleDateString() : '-'}</TableCell>
+                  <TableCell>{item.author}</TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs ${
                       item.status === 'Published' 
@@ -154,7 +150,7 @@ const BeritaDashboardPage = () => {
                       {item.status}
                     </span>
                   </TableCell>
-                  <TableCell>{item.views}</TableCell>
+                  <TableCell>{item.views || 0}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -165,15 +161,15 @@ const BeritaDashboardPage = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>
+                        <DropdownMenuItem disabled>
                           <Eye className="h-4 w-4 mr-2" />
                           Preview
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem disabled>
                           <Edit className="h-4 w-4 mr-2" />
                           Edit Konten
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
+                        <DropdownMenuItem className="text-red-600" disabled>
                           <Trash2 className="h-4 w-4 mr-2" />
                           Hapus
                         </DropdownMenuItem>
@@ -181,7 +177,12 @@ const BeritaDashboardPage = () => {
                     </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+              ) : (
+                 <TableRow>
+                  <TableCell colSpan={7} className="text-center">Belum ada artikel.</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
