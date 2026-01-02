@@ -40,7 +40,8 @@ import {
   ChevronDown,
   Palette,
   Newspaper,
-  LayoutGrid
+  LayoutGrid,
+  Briefcase
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -107,6 +108,11 @@ const DashboardLayout = ({
                  <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
                   <Home size={18} className="text-white" />
                   <span>Beranda</span>
+                </Link>
+                
+                <Link href="/dashboard/workspaces" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                  <Briefcase size={18} className="text-white" />
+                  <span>Workspaces</span>
                 </Link>
 
                 <Accordion type="single" collapsible className="w-full">
@@ -261,3 +267,5 @@ const DashboardLayout = ({
 };
 
 export default DashboardLayout;
+
+    
