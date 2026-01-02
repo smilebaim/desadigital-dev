@@ -1,11 +1,12 @@
+'use server';
 import { db } from './firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const SETTINGS_DOC_ID = 'main'; // Use a consistent ID for the settings document
 
-interface SiteSettings {
-    logoUrl: string;
-    heroUrl: string;
+export interface SiteSettings {
+    logoUrl?: string;
+    heroUrl?: string;
 }
 
 // Function to get the current site settings
@@ -17,8 +18,11 @@ export const getSiteSettings = async (): Promise<SiteSettings | null> => {
         if (docSnap.exists()) {
             return docSnap.data() as SiteSettings;
         } else {
-            console.log("No such document!");
-            return null;
+            // Return default or empty settings if not found
+            return {
+                logoUrl: "/logo-desa.png",
+                heroUrl: "/Background utama.png",
+            };
         }
     } catch (error) {
         console.error("Error getting site settings: ", error);

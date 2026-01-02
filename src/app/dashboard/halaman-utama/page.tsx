@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { getSiteSettings, updateSiteSettings } from "@/lib/site-settings-actions";
 
 const HalamanUtamaPage = () => {
@@ -30,11 +30,15 @@ const HalamanUtamaPage = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            await updateSiteSettings({ logoUrl, heroUrl });
-            toast.success("Perubahan telah disimpan!");
+            const success = await updateSiteSettings({ logoUrl, heroUrl });
+            if (success) {
+                toast({ title: "Perubahan telah disimpan!" });
+            } else {
+                throw new Error("Gagal menyimpan ke database.");
+            }
         } catch (error) {
             console.error("Failed to save settings:", error);
-            toast.error("Gagal menyimpan perubahan.");
+            toast({ title: "Gagal menyimpan perubahan.", variant: "destructive" });
         } finally {
             setIsSaving(false);
         }
