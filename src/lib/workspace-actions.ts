@@ -1,6 +1,6 @@
 
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot, query, where, orderBy, deleteDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, onSnapshot, query, where, deleteDoc, doc } from 'firebase/firestore';
 
 interface WorkspaceData {
     name: string;
@@ -26,8 +26,8 @@ export const addWorkspace = async (workspaceData: WorkspaceData) => {
 export const getWorkspacesStream = (uid: string, callback: (workspaces: any[]) => void) => {
     const q = query(
         collection(db, 'workspaces'),
-        where('ownerUid', '==', uid),
-        orderBy('createdAt', 'desc')
+        where('ownerUid', '==', uid)
+        // orderBy('createdAt', 'desc') // Removed to prevent index error
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -35,6 +35,14 @@ export const getWorkspacesStream = (uid: string, callback: (workspaces: any[]) =
             id: doc.id,
             ...doc.data()
         }));
+        
+        // Sort on the client-side
+        workspaces.sort((a, b) => {
+            if (!a.createdAt) return 1;
+            if (!b.createdAt) return -1;
+            return b.createdAt.toMillis() - a.createdAt.toMillis();
+        });
+
         callback(workspaces);
     });
 
