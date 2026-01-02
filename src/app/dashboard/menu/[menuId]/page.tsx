@@ -1,4 +1,3 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,7 +49,7 @@ const MenuItemsPage = () => {
     if (menuId) {
       const fetchMenuDetails = async () => {
         try {
-          const details = await getMenuDetails(parseInt(menuId));
+          const details = await getMenuDetails(parseInt(menuId, 10));
           setMenuDetails(details as MenuWithItems);
         } catch (error) {
           console.error("Failed to fetch menu details:", error);

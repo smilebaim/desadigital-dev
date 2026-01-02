@@ -2,32 +2,39 @@
 import { menus } from './menu-data';
 
 export async function getMenus() {
-  return menus;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(menus);
+    }, 500); // Simulate network delay
+  });
 }
 
 export async function getMenuDetails(id: number) {
-  if (isNaN(id)) {
-    return null;
-  }
-  
-  const menu = menus.find(m => m.id === id);
-  
-  if (!menu) {
-    return null;
-  }
-
-  // Simulate include items with ordering
-  const menuWithItems = {
-    ...menu,
-    items: menu.items.sort((a, b) => {
-      if (a.parentId === b.parentId) {
-        return a.id - b.id;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (isNaN(id)) {
+        resolve(null);
       }
-      if (a.parentId === null) return -1;
-      if (b.parentId === null) return 1;
-      return a.parentId - b.parentId;
-    })
-  };
-
-  return menuWithItems;
+      
+      const menu = menus.find(m => m.id === id);
+      
+      if (!menu) {
+        resolve(null);
+      } else {
+        // Simulate include items with ordering
+        const menuWithItems = {
+          ...menu,
+          items: menu.items.sort((a, b) => {
+            if (a.parentId === b.parentId) {
+              return a.id - b.id;
+            }
+            if (a.parentId === null) return -1;
+            if (b.parentId === null) return 1;
+            return a.parentId - b.parentId;
+          })
+        };
+        resolve(menuWithItems);
+      }
+    }, 500); // Simulate network delay
+  });
 }
