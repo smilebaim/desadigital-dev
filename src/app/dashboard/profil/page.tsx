@@ -25,7 +25,12 @@ export default function ProfilPage() {
                 if (docSnap.exists()) {
                     setUserProfile(docSnap.data() as UserProfile);
                 } else {
-                    console.log("No such document!");
+                    // Fallback for users that might not be in firestore
+                    // e.g. created before firestore profile sync was implemented
+                    setUserProfile({
+                        displayName: user.displayName || user.email || "Admin",
+                        email: user.email || "Tidak ada email",
+                    });
                 }
             }
         };
@@ -35,11 +40,20 @@ export default function ProfilPage() {
         }
     }, [user, loading]);
 
-    if (loading || !userProfile) {
+    if (loading || !user) {
         return (
             <div className="p-4">
                 <h1 className="text-2xl font-bold mb-4">Profil Admin</h1>
                 <p>Memuat profil...</p>
+            </div>
+        );
+    }
+    
+    if (!userProfile) {
+        return (
+            <div className="p-4">
+                <h1 className="text-2xl font-bold mb-4">Profil Admin</h1>
+                <p>Gagal memuat profil pengguna.</p>
             </div>
         );
     }

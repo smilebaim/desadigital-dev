@@ -213,9 +213,11 @@ const DashboardLayout = ({
                 <DropdownMenuContent align="end" className="w-56">
                   <DropdownMenuLabel className="text-black">Akun Saya</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="text-black">
-                    <User className="mr-2 h-4 w-4 text-black" />
-                    <span>Profil</span>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/profil" className="text-black">
+                      <User className="mr-2 h-4 w-4 text-black" />
+                      <span>Profil</span>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="text-black">
                     <Settings className="mr-2 h-4 w-4 text-black" />
