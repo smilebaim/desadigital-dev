@@ -5,17 +5,19 @@ import Image from 'next/image';
 
 interface HeroProps {
   className?: string;
+  heroImageUrl: string;
 }
 
-const Hero: React.FC<HeroProps> = ({ className }) => {
+const Hero: React.FC<HeroProps> = ({ className, heroImageUrl }) => {
   return (
     <section className={cn('relative h-screen flex items-center justify-center overflow-hidden', className)}>
       <Image 
-        src="/Background utama.png" 
+        src={heroImageUrl} 
         alt="Desa Remau Bako Tuo" 
         fill
         className="object-cover -z-10"
         priority
+        unoptimized
         data-ai-hint="coastline village"
       />
       <div className="absolute inset-0 bg-black/10"></div>
