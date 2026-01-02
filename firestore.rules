@@ -8,5 +8,11 @@ service cloud.firestore {
     match /workspaces/{workspaceId} {
       allow read, write: if request.auth != null && request.auth.uid == resource.data.ownerUid;
     }
+
+    // Allow any authenticated user to read and write site settings
+    // This is for admin dashboard functionality
+    match /siteSettings/{document} {
+      allow read, write: if request.auth != null;
+    }
   }
 }

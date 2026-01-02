@@ -1,22 +1,48 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
+import { getSiteSettings, updateSiteSettings } from "@/lib/site-settings-actions";
 
 const HalamanUtamaPage = () => {
     const [logoUrl, setLogoUrl] = useState("/logo-desa.png");
     const [heroUrl, setHeroUrl] = useState("/Background utama.png");
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
 
-    const handleSave = () => {
-        // Here you would typically save the URLs to your backend/database
-        console.log("Saving new URLs:", { logoUrl, heroUrl });
-        toast.success("Perubahan telah disimpan!");
+    useEffect(() => {
+        const fetchSettings = async () => {
+            setIsLoading(true);
+            const settings = await getSiteSettings();
+            if (settings) {
+                setLogoUrl(settings.logoUrl || "/logo-desa.png");
+                setHeroUrl(settings.heroUrl || "/Background utama.png");
+            }
+            setIsLoading(false);
+        };
+        fetchSettings();
+    }, []);
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            await updateSiteSettings({ logoUrl, heroUrl });
+            toast.success("Perubahan telah disimpan!");
+        } catch (error) {
+            console.error("Failed to save settings:", error);
+            toast.error("Gagal menyimpan perubahan.");
+        } finally {
+            setIsSaving(false);
+        }
     };
+
+    if (isLoading) {
+        return <div>Memuat pengaturan...</div>;
+    }
 
     return (
         <div className="space-y-6">
@@ -43,6 +69,7 @@ const HalamanUtamaPage = () => {
                                 value={logoUrl} 
                                 onChange={(e) => setLogoUrl(e.target.value)}
                                 placeholder="https://example.com/logo.png"
+                                disabled={isSaving}
                             />
                         </div>
                         <div>
@@ -78,6 +105,7 @@ const HalamanUtamaPage = () => {
                                 value={heroUrl} 
                                 onChange={(e) => setHeroUrl(e.target.value)}
                                 placeholder="https://example.com/hero-image.jpg"
+                                disabled={isSaving}
                             />
                         </div>
                         <div>
@@ -99,8 +127,8 @@ const HalamanUtamaPage = () => {
             </div>
             
             <div className="flex justify-end">
-                <Button onClick={handleSave}>
-                    Simpan Perubahan
+                <Button onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
                 </Button>
             </div>
         </div>
