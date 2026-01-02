@@ -1,6 +1,6 @@
 
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot, query, where, deleteDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, onSnapshot, query, where, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 
 interface WorkspaceData {
     name: string;
@@ -27,7 +27,6 @@ export const getWorkspacesStream = (uid: string, callback: (workspaces: any[]) =
     const q = query(
         collection(db, 'workspaces'),
         where('ownerUid', '==', uid)
-        // orderBy('createdAt', 'desc') // Removed to prevent index error
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -47,6 +46,21 @@ export const getWorkspacesStream = (uid: string, callback: (workspaces: any[]) =
     });
 
     return unsubscribe;
+};
+
+// Function to update a workspace
+export const updateWorkspace = async (workspaceId: string, data: { name: string; description: string }) => {
+    try {
+        const workspaceRef = doc(db, 'workspaces', workspaceId);
+        await updateDoc(workspaceRef, {
+            ...data,
+            updatedAt: serverTimestamp(),
+        });
+        return true;
+    } catch (error) {
+        console.error("Error updating workspace: ", error);
+        return false;
+    }
 };
 
 
