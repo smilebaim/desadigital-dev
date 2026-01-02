@@ -1,6 +1,7 @@
 
 'use client';
 import { useState, useEffect, use } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -189,7 +190,11 @@ const WorkspacesPage = () => {
                   ) : workspaces.length > 0 ? (
                     workspaces.map((ws) => (
                       <TableRow key={ws.id}>
-                        <TableCell className="font-medium">{ws.name}</TableCell>
+                        <TableCell className="font-medium">
+                          <Link href={`/dashboard/workspaces/${ws.id}`} className="hover:underline">
+                            {ws.name}
+                          </Link>
+                        </TableCell>
                         <TableCell>{ws.description}</TableCell>
                         <TableCell className="text-right">
                           <DropdownMenu>
@@ -329,3 +334,5 @@ const WorkspacesPage = () => {
 };
 
 export default WorkspacesPage;
+
+    

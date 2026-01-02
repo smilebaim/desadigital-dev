@@ -1,6 +1,5 @@
-
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot, query, where, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, onSnapshot, query, where, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 
 interface WorkspaceData {
     name: string;
@@ -48,6 +47,25 @@ export const getWorkspacesStream = (uid: string, callback: (workspaces: any[]) =
     return unsubscribe;
 };
 
+// Function to get a single workspace
+export const getWorkspace = async (workspaceId: string) => {
+    try {
+        const docRef = doc(db, 'workspaces', workspaceId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() };
+        } else {
+            console.log("No such document!");
+            return null;
+        }
+    } catch (error) {
+        console.error("Error getting workspace: ", error);
+        return null;
+    }
+};
+
+
 // Function to update a workspace
 export const updateWorkspace = async (workspaceId: string, data: { name: string; description: string }) => {
     try {
@@ -74,3 +92,5 @@ export const deleteWorkspace = async (workspaceId: string) => {
         return false;
     }
 };
+
+    
