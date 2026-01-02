@@ -29,5 +29,10 @@ service cloud.firestore {
     match /menus/{menuId} {
        allow read, write: if request.auth != null;
     }
+
+    // Allow any authenticated user to manage map markers
+    match /mapMarkers/{markerId} {
+      allow read, create, update, delete: if request.auth != null;
+    }
   }
 }
