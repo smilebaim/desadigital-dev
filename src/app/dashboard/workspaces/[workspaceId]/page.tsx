@@ -119,5 +119,3 @@ const WorkspaceDetailPage = () => {
 };
 
 export default WorkspaceDetailPage;
-
-    

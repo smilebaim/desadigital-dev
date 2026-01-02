@@ -1,3 +1,4 @@
+
 import { db } from './firebase';
 import { collection, addDoc, serverTimestamp, onSnapshot, query, where, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 
@@ -92,5 +93,3 @@ export const deleteWorkspace = async (workspaceId: string) => {
         return false;
     }
 };
-
-    
