@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,16 +30,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { menus, type MenuItem } from "@/lib/menu-data";
+import { getMenus } from "@/lib/menu-actions";
+import type { Menu, MenuItem } from "@/lib/menu-data";
 
 const PagesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [allPages, setAllPages] = useState<MenuItem[]>([]);
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Flatten all menu items into a single array of pages
-    const pagesFromMenus = menus.flatMap(menu => menu.items);
-    setAllPages(pagesFromMenus);
+    const fetchPages = async () => {
+      setLoading(true);
+      const menusData = await getMenus();
+      const pagesFromMenus = menusData.flatMap(menu => (menu as Menu).items);
+      setAllPages(pagesFromMenus);
+      setMenus(menusData as Menu[]);
+      setLoading(false);
+    }
+    fetchPages();
   }, []);
 
   const filteredPages = allPages.filter(page => 
@@ -60,7 +70,7 @@ const PagesPage = () => {
             <Download className="h-4 w-4 mr-2" />
             Export Data
           </Button>
-          <Button size="sm">
+          <Button size="sm" disabled>
             <Plus className="h-4 w-4 mr-2" />
             Tambah Halaman
           </Button>
@@ -101,49 +111,55 @@ const PagesPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredPages.map((page) => (
-                <TableRow key={page.id}>
-                  <TableCell className="font-medium">{page.title}</TableCell>
-                  <TableCell>
-                    <Link href={page.path} className="text-blue-600 hover:underline" target="_blank">
-                      {page.path}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{menus.find(m => m.id === page.menuId)?.name}</TableCell>
-                  <TableCell>
-                    <span className={'px-2 py-1 rounded-full text-xs bg-green-100 text-green-800'}>
-                      Published
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                           <Link href={page.path} target="_blank">
-                            <Eye className="h-4 w-4 mr-2" />
-                            Preview
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Konten
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Hapus
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {loading ? (
+                 <TableRow>
+                    <TableCell colSpan={5} className="text-center">Memuat data halaman...</TableCell>
+                  </TableRow>
+              ) : (
+                filteredPages.map((page) => (
+                  <TableRow key={page.id}>
+                    <TableCell className="font-medium">{page.title}</TableCell>
+                    <TableCell>
+                      <Link href={page.path} className="text-blue-600 hover:underline" target="_blank">
+                        {page.path}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{menus.find(m => m.id === page.menuId)?.name || '-'}</TableCell>
+                    <TableCell>
+                      <span className={'px-2 py-1 rounded-full text-xs bg-green-100 text-green-800'}>
+                        Published
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem asChild>
+                            <Link href={page.path} target="_blank">
+                              <Eye className="h-4 w-4 mr-2" />
+                              Preview
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem disabled>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Konten
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600" disabled>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Hapus
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>

@@ -1,4 +1,5 @@
 
+'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,10 +29,22 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getMenus } from "@/lib/menu-actions";
+import type { Menu } from "@/lib/menu-data";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-const MenuPage = async () => {
-  const menus = await getMenus();
+const MenuPage = () => {
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMenus = async () => {
+      const data = await getMenus();
+      setMenus(data as Menu[]);
+      setLoading(false);
+    };
+    fetchMenus();
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -47,7 +60,7 @@ const MenuPage = async () => {
             <Download className="h-4 w-4 mr-2" />
             Export Data
           </Button>
-          <Button size="sm">
+          <Button size="sm" disabled>
             <Plus className="h-4 w-4 mr-2" />
             Tambah Menu
           </Button>
@@ -69,6 +82,7 @@ const MenuPage = async () => {
                 <Input
                   placeholder="Cari menu..."
                   className="pl-8"
+                  disabled
                 />
               </div>
             </div>
@@ -85,40 +99,46 @@ const MenuPage = async () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {menus.map((menu) => (
-                <TableRow key={menu.id}>
-                  <TableCell className="font-medium">{menu.name}</TableCell>
-                  <TableCell>{menu.items.length}</TableCell>
-                  <TableCell>{menu.name === 'TopNav' ? 'Menu navigasi utama di bagian atas halaman' : 'Menu navigasi di bagian bawah halaman'}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                          <Link href={`/dashboard/menu/${menu.id}`}>
-                            <Eye className="h-4 w-4 mr-2" />
-                            Lihat Item
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Menu
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-600">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Hapus Menu
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">Memuat data menu...</TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                menus.map((menu) => (
+                  <TableRow key={menu.id}>
+                    <TableCell className="font-medium">{menu.name}</TableCell>
+                    <TableCell>{menu.items.length}</TableCell>
+                    <TableCell>{menu.name === 'TopNav' ? 'Menu navigasi utama di bagian atas halaman' : 'Menu navigasi di bagian bawah halaman'}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem asChild>
+                            <Link href={`/dashboard/menu/${menu.id}`}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              Lihat Item
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem disabled>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Menu
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600" disabled>
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Hapus Menu
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
