@@ -16,7 +16,12 @@ export const getSiteSettings = async (): Promise<SiteSettings | null> => {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-            return docSnap.data() as SiteSettings;
+            const data = docSnap.data();
+            // Return a plain object to avoid Next.js serialization errors with Timestamps
+            return {
+                logoUrl: data.logoUrl,
+                heroUrl: data.heroUrl,
+            };
         } else {
             // Return default or empty settings if not found
             return {
