@@ -42,6 +42,7 @@ async function getMockMenus(): Promise<Menu[]> {
             { id: 21, title: 'Pendapatan', path: '/dana-desa/pendapatan', menuId: 2, parentId: 20, icon: 'FileText' },
             { id: 22, title: 'Belanja', path: '/dana-desa/belanja', menuId: 2, parentId: 20, icon: 'FileText' },
             { id: 23, title: 'Pembiayaan', path: '/dana-desa/pembiayaan', menuId: 2, parentId: 20, icon: 'FileText' },
+            { id: 24, title: 'Tata Ruang', path: '/tata-ruang', menuId: 2, parentId: null, icon: 'Map' },
         ],
       },
     ];

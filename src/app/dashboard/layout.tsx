@@ -147,6 +147,11 @@ const DashboardLayout = ({
                   <span>Info & Berita</span>
                 </Link>
 
+                <Link href="/dashboard/map-control" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                  <Map size={18} className="text-white" />
+                  <span>Kontrol Peta</span>
+                </Link>
+
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="apps" className="border-none">
                     <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
@@ -267,5 +272,3 @@ const DashboardLayout = ({
 };
 
 export default DashboardLayout;
-
-    
