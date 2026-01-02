@@ -37,7 +37,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useAuth } from "@/contexts/AuthContext";
-import { addWorkspace, getWorkspaces, deleteWorkspace } from "@/lib/workspace-actions";
+import { addWorkspace, getWorkspacesStream, deleteWorkspace } from "@/lib/workspace-actions";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Workspace {
@@ -60,8 +60,8 @@ const WorkspacesPage = () => {
 
   useEffect(() => {
     if (user?.uid) {
-      const unsubscribe = getWorkspaces(user.uid, (data) => {
-        setWorkspaces(data);
+      const unsubscribe = getWorkspacesStream(user.uid, (data) => {
+        setWorkspaces(data as Workspace[]);
         setIsLoading(false);
       });
       return () => unsubscribe();
@@ -233,5 +233,3 @@ const WorkspacesPage = () => {
 };
 
 export default WorkspacesPage;
-
-    

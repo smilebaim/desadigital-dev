@@ -1,7 +1,7 @@
 
 'use server';
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot, query, where, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, onSnapshot, query, where, orderBy, deleteDoc, doc, getDocs } from 'firebase/firestore';
 
 interface WorkspaceData {
     name: string;
@@ -23,8 +23,8 @@ export const addWorkspace = async (workspaceData: WorkspaceData) => {
     }
 };
 
-// Function to get workspaces for a user
-export const getWorkspaces = (uid: string, callback: (workspaces: any[]) => void) => {
+// Function to get workspaces for a user in real-time
+export const getWorkspacesStream = (uid: string, callback: (workspaces: any[]) => void) => {
     const q = query(
         collection(db, 'workspaces'),
         where('ownerUid', '==', uid),
@@ -42,6 +42,7 @@ export const getWorkspaces = (uid: string, callback: (workspaces: any[]) => void
     return unsubscribe;
 };
 
+
 // Function to delete a workspace
 export const deleteWorkspace = async (workspaceId: string) => {
     try {
@@ -52,5 +53,3 @@ export const deleteWorkspace = async (workspaceId: string) => {
         return false;
     }
 };
-
-    
