@@ -9,6 +9,7 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
+import { getMarkersStream, getLayerCategoriesStream, type MapLayerCategory, type MapMarker } from '@/lib/map-actions';
 
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
 const DEFAULT_ZOOM = 16;
@@ -139,39 +140,28 @@ const ADMINISTRATIVE_BOUNDARY: [number, number][] = [
     [-1.217517, 104.39295], [-1.217408, 104.392888], [-1.217323, 104.392787]
 ].map(([lat, lng]) => [lat, lng] as [number, number]);
 
-const LAYER_CATEGORIES = {
-  wilayah: {
-    name: 'Peta Wilayah',
-    layers: [ 'Peta Administrasi', 'Penggunaan Lahan', 'Bidang Tanah', 'Infrastruktur Publik', 'Prasarana Umum' ]
-  },
-  sosial: {
-    name: 'Peta Sosial',
-    layers: [ 'Demografi', 'Pendidikan', 'Kesehatan', 'Sosial dan Budaya', 'Partisipasi Publik' ]
-  },
-  ekonomi: {
-    name: 'Peta Ekonomi',
-    layers: [ 'Tingkat Pendapatan', 'Seltor Pangan', 'Perkebunan', 'Peternakan', 'Perikanan', 'Kehutanan', 'Pertambangan', 'Pengolahan', 'Energi' ]
-  },
-  lingkungan: {
-    name: 'Peta Lingkungan',
-    layers: [ 'Geomorfologi Tanah', 'Iklim Dan Cuaca', 'Daerah Aliran Sungai', 'Keragaman Hayati', 'Limbah-Sampah', 'Karateristik Lahan', 'Lokasi Lahan Bencana' ]
-  },
-  aset: {
-    name: 'Peta Aset',
-    layers: [ 'Aset Desa', 'Aset Masyarakat' ]
-  }
-};
+interface ExtendedMarker extends MapMarker {
+  id: string;
+}
 
 const LayerPanel: React.FC<{
   expanded: boolean;
   onToggle: () => void;
   activeLayers: string[];
   onLayerToggle: (layer: string) => void;
-}> = ({ expanded, onToggle, activeLayers, onLayerToggle }) => {
+  layerCategories: MapLayerCategory[];
+}> = ({ expanded, onToggle, activeLayers, onLayerToggle, layerCategories }) => {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
-  const toggleCategory = (category: string) => {
-    setExpandedCategory(expandedCategory === category ? null : category);
+  useEffect(() => {
+    // Automatically expand the first category if not already expanded
+    if (layerCategories.length > 0 && !expandedCategory) {
+      setExpandedCategory(layerCategories[0].id);
+    }
+  }, [layerCategories, expandedCategory]);
+
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
   };
 
   return (
@@ -184,20 +174,20 @@ const LayerPanel: React.FC<{
         <SheetTitle className="sr-only">Layer Controls</SheetTitle>
         <ScrollArea className="h-full px-4 py-8">
           <div className="space-y-3 sm:space-y-4">
-            {Object.entries(LAYER_CATEGORIES).map(([key, category]) => (
-              <div key={key} className="rounded-lg overflow-hidden">
+            {layerCategories.map((category) => (
+              <div key={category.id} className="rounded-lg overflow-hidden">
                 <button
-                  onClick={() => toggleCategory(key)}
-                  className={`w-full flex items-center justify-between transition-all py-1.5 sm:py-2 px-2 sm:px-3 text-xs sm:text-sm text-black/90 hover:bg-white/20 ${expandedCategory === key ? 'bg-white/10' : '' }`}
-                  aria-expanded={expandedCategory === key}
-                  aria-controls={`category-${key}-layers`}
+                  onClick={() => toggleCategory(category.id)}
+                  className={`w-full flex items-center justify-between transition-all py-1.5 sm:py-2 px-2 sm:px-3 text-xs sm:text-sm text-black/90 hover:bg-white/20 ${expandedCategory === category.id ? 'bg-white/10' : '' }`}
+                  aria-expanded={expandedCategory === category.id}
+                  aria-controls={`category-${category.id}-layers`}
                 >
                   {category.name}
-                  {expandedCategory === key ? ( <ChevronDown className="h-4 w-4 text-black/90" /> ) : ( <ChevronRight className="h-4 w-4 text-black/90" /> )}
+                  {expandedCategory === category.id ? ( <ChevronDown className="h-4 w-4 text-black/90" /> ) : ( <ChevronRight className="h-4 w-4 text-black/90" /> )}
                 </button>
                 <div
-                  id={`category-${key}-layers`}
-                  className={`transition-all duration-200 ${expandedCategory === key ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}
+                  id={`category-${category.id}-layers`}
+                  className={`transition-all duration-200 ${expandedCategory === category.id ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'} overflow-hidden`}
                 >
                   <div className="py-1">
                     {category.layers.map(layer => (
@@ -367,11 +357,14 @@ const MapControls: React.FC<{
 const MapComponent = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<LeafletMap | null>(null);
+    const markersRef = useRef<L.Marker[]>([]);
     const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
     const [activeBaseLayer, setActiveBaseLayer] = useState<string>('satellite');
     const [activeOverlays, setActiveOverlays] = useState<string[]>(['Peta Administrasi']);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedMarker, setSelectedMarker] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary'; } | null>(null);
+    const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
+
 
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
@@ -383,24 +376,47 @@ const MapComponent = () => {
                 maxBoundsViscosity: 1.0,
             });
             mapInstanceRef.current = map;
-
-            L.marker(DESA_CENTER).on('click', () => {
-                setSelectedMarker({
-                    title: 'Kantor Desa Remau Bako Tuo',
-                    coordinates: DESA_CENTER,
-                    description: 'Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo. Melayani berbagai kebutuhan administratif warga desa.',
-                    type: 'marker',
-                });
-            }).addTo(map);
-
             setMapInstance(map);
         }
+
+        // Fetch layer categories
+        const unsubscribeCategories = getLayerCategoriesStream((data) => {
+            setLayerCategories(data as MapLayerCategory[]);
+        });
+
+        // Fetch markers
+        const unsubscribeMarkers = getMarkersStream((data) => {
+            if (mapInstanceRef.current) {
+                 // Clear existing markers
+                markersRef.current.forEach(marker => marker.remove());
+                markersRef.current = [];
+
+                const newMarkers = (data as ExtendedMarker[]).map(markerData => {
+                    const marker = L.marker([markerData.latitude, markerData.longitude])
+                        .on('click', () => {
+                            setSelectedMarker({
+                                title: markerData.name,
+                                coordinates: [markerData.latitude, markerData.longitude],
+                                description: markerData.description,
+                                type: 'marker',
+                            });
+                        });
+                    return marker;
+                });
+                
+                newMarkers.forEach(marker => marker.addTo(mapInstanceRef.current!));
+                markersRef.current = newMarkers;
+            }
+        });
+
 
         return () => {
             if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove();
                 mapInstanceRef.current = null;
             }
+            unsubscribeCategories();
+            unsubscribeMarkers();
         };
     }, []);
 
@@ -464,6 +480,7 @@ const MapComponent = () => {
                 onToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
                 activeLayers={activeOverlays}
                 onLayerToggle={handleLayerToggle}
+                layerCategories={layerCategories}
             />
             <LayerInfo
                 isOpen={!!selectedMarker}

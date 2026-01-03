@@ -1,6 +1,6 @@
 'use server';
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
 
 export interface MapMarker {
     name: string;
@@ -9,6 +9,14 @@ export interface MapMarker {
     longitude: number;
     category: string;
 }
+
+export interface MapLayerCategory {
+    name: string;
+    layers: string[];
+    order: number;
+}
+
+// --- Marker Actions ---
 
 // Function to add a new map marker
 export const addMarker = async (markerData: MapMarker) => {
@@ -44,6 +52,7 @@ export const getMarkersStream = (callback: (markers: any[]) => void) => {
     return unsubscribe;
 };
 
+
 // Function to update a map marker
 export const updateMarker = async (markerId: string, data: Partial<MapMarker>) => {
     try {
@@ -69,3 +78,26 @@ export const deleteMarker = async (markerId: string) => {
         return { success: false, error: error.message };
     }
 };
+
+
+// --- Layer Category Actions ---
+
+// Function to get map layer categories in real-time
+export const getLayerCategoriesStream = (callback: (categories: any[]) => void) => {
+    const q = query(
+        collection(db, 'mapLayerCategories'),
+        orderBy('order', 'asc')
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const categories = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        callback(categories);
+    }, (error) => {
+        console.error("Error getting layer categories stream: ", error);
+    });
+
+    return unsubscribe;
+}
