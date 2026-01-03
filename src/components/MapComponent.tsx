@@ -54,6 +54,20 @@ interface FeatureLayer {
     category: string;
 }
 
+const getPolygonStyle = (category: string) => {
+    switch (category) {
+        case 'Wilayah Administratif':
+            return { color: '#ff0000', weight: 3, fillColor: '#ff0000', fillOpacity: 0.1 };
+        case 'Area Pertanian':
+            return { color: '#22c55e', weight: 2, fillColor: '#22c55e', fillOpacity: 0.2 };
+        case 'Fasilitas Umum':
+            return { color: '#3b82f6', weight: 2, fillColor: '#3b82f6', fillOpacity: 0.2 };
+        default:
+            return { color: '#ffffff', weight: 2, fillColor: '#10b981', fillOpacity: 0.2 };
+    }
+};
+
+
 const LayerPanel: React.FC<{
   expanded: boolean;
   onToggle: () => void;
@@ -64,7 +78,6 @@ const LayerPanel: React.FC<{
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
   useEffect(() => {
-    // Automatically expand the first category if not already expanded
     if (layerCategories.length > 0 && !expandedCategory) {
       setExpandedCategory(layerCategories[0].id);
     }
@@ -340,9 +353,7 @@ const MapComponent = () => {
                 const newPolygons = (data as ExtendedPolygon[]).map(polygonData => {
                     try {
                         const coordinates = JSON.parse(polygonData.coordinates) as [number, number][];
-                        const polygon = L.polygon(coordinates, {
-                            color: 'white', weight: 2, fillColor: '#10b981', fillOpacity: 0.2, opacity: 0.8,
-                        }).on('click', () => {
+                        const polygon = L.polygon(coordinates, getPolygonStyle(polygonData.category)).on('click', () => {
                             setSelectedFeature({
                                 title: polygonData.name,
                                 description: polygonData.description,
