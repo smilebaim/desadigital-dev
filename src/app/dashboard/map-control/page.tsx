@@ -47,7 +47,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/components/ui/use-toast';
-import { getMarkersStream, addMarker, updateMarker, deleteMarker, type MapMarker } from '@/lib/map-actions';
+import { addMarker, updateMarker, deleteMarker, type MapMarker } from '@/lib/map-actions';
+import { getMarkersStream } from '@/lib/map-client-actions';
 
 interface Marker extends MapMarker {
     id: string;

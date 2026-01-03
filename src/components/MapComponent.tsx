@@ -9,7 +9,8 @@ import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
-import { getMarkersStream, getLayerCategoriesStream, type MapLayerCategory, type MapMarker } from '@/lib/map-actions';
+import { getMarkersStream, getLayerCategoriesStream } from '@/lib/map-client-actions';
+import type { MapLayerCategory, MapMarker } from '@/lib/map-actions';
 
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
 const DEFAULT_ZOOM = 16;
