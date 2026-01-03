@@ -10,6 +10,7 @@ import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
 import { getMarkersStream, getLayerCategoriesStream, getPolygonsStream } from '@/lib/map-client-actions';
 import type { MapLayerCategory, MapMarker, MapPolygon } from '@/lib/map-actions';
+import { ADMINISTRATIVE_BOUNDARY } from '@/lib/map-data';
 
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
 const DEFAULT_ZOOM = 16;
@@ -57,15 +58,30 @@ interface FeatureLayer {
 const getPolygonStyle = (category: string) => {
     switch (category) {
         case 'Wilayah Administratif':
+        case 'Batas Desa':
             return { color: '#ff0000', weight: 3, fillColor: '#ff0000', fillOpacity: 0.1 };
         case 'Area Pertanian':
-            return { color: '#22c55e', weight: 2, fillColor: '#22c55e', fillOpacity: 0.2 };
-        case 'Fasilitas Umum':
+        case 'Bidang Tanah':
             return { color: '#3b82f6', weight: 2, fillColor: '#3b82f6', fillOpacity: 0.2 };
         default:
             return { color: '#ffffff', weight: 2, fillColor: '#10b981', fillOpacity: 0.2 };
     }
 };
+
+// --- DUMMY DATA ---
+const dummyLayerCategories: MapLayerCategory[] = [
+    { id: 'cat1', name: 'Batas Wilayah', layers: ['Batas Desa', 'Batas Dusun'], order: 1 },
+    { id: 'cat2', name: 'Penggunaan Lahan', layers: ['Bidang Tanah', 'Area Pertanian', 'Kawasan Lindung'], order: 2 },
+    { id: 'cat3', name: 'Fasilitas Umum', layers: ['Kantor Desa', 'Sekolah', 'Masjid'], order: 4 },
+];
+
+const dummyMarkers: ExtendedMarker[] = [
+    { id: 'marker1', name: 'Kantor Desa', description: 'Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo.', latitude: -1.222418, longitude: 104.383073, category: 'Kantor Desa' }
+];
+
+const dummyPolygons: ExtendedPolygon[] = [
+    { id: 'polygon1', name: 'Batas Administrasi Desa', description: 'Batas wilayah administratif resmi Desa Remau Bako Tuo.', category: 'Batas Desa', coordinates: JSON.stringify(ADMINISTRATIVE_BOUNDARY) }
+];
 
 
 const LayerPanel: React.FC<{
@@ -79,7 +95,7 @@ const LayerPanel: React.FC<{
 
   useEffect(() => {
     if (layerCategories.length > 0 && !expandedCategory) {
-      setExpandedCategory(layerCategories[0].id);
+      setExpandedCategory(layerCategories[0].id!);
     }
   }, [layerCategories, expandedCategory]);
 
@@ -100,7 +116,7 @@ const LayerPanel: React.FC<{
             {layerCategories.map((category) => (
               <div key={category.id} className="rounded-lg overflow-hidden">
                 <button
-                  onClick={() => toggleCategory(category.id)}
+                  onClick={() => toggleCategory(category.id!)}
                   className={`w-full flex items-center justify-between transition-all py-1.5 sm:py-2 px-2 sm:px-3 text-xs sm:text-sm text-black/90 hover:bg-white/20 ${expandedCategory === category.id ? 'bg-white/10' : '' }`}
                   aria-expanded={expandedCategory === category.id}
                   aria-controls={`category-${category.id}-layers`}
@@ -285,14 +301,14 @@ const MapComponent = () => {
     
     const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
     const [activeBaseLayer, setActiveBaseLayer] = useState<string>('satellite');
-    const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
+    const [activeOverlays, setActiveOverlays] = useState<string[]>(['Batas Desa', 'Kantor Desa']);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedFeature, setSelectedFeature] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary' | 'polygon'; } | null>(null);
     
-    const [markers, setMarkers] = useState<ExtendedMarker[]>([]);
-    const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
-    const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
-
+    const markers = dummyMarkers;
+    const polygons = dummyPolygons;
+    const layerCategories = dummyLayerCategories;
+    
     // Helper function to update feature layers on the map
     const updateFeatureLayers = (currentLayers: FeatureLayer[], currentActiveOverlays: string[], map: LeafletMap) => {
         currentLayers.forEach(({ layer, category }) => {
@@ -308,7 +324,6 @@ const MapComponent = () => {
         });
     };
     
-    // Main useEffect for map initialization and data streams
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
             const map = L.map(mapContainerRef.current, {
@@ -329,29 +344,7 @@ const MapComponent = () => {
             baseLayerRef.current = tileLayer;
         }
 
-        const map = mapInstanceRef.current;
-        if (!map) return;
-
-        const unsubCategories = getLayerCategoriesStream((data) => {
-            const categories = data as MapLayerCategory[];
-            setLayerCategories(categories);
-            // Set initial active overlays from the first layer of each category
-            const initialActive: string[] = [];
-            categories.forEach((cat) => {
-                if (cat.layers.length > 0) {
-                    initialActive.push(cat.layers[0]);
-                }
-            });
-            setActiveOverlays(initialActive);
-        });
-
-        const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
-        const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
-        
         return () => {
-            unsubCategories();
-            unsubMarkers();
-            unsubPolygons();
              if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove();
                 mapInstanceRef.current = null;
@@ -398,7 +391,7 @@ const MapComponent = () => {
                     setSelectedFeature({
                         title: polygonData.name,
                         description: polygonData.description,
-                        type: 'polygon',
+                        type: polygonData.category === 'Batas Desa' ? 'boundary' : 'polygon',
                     });
                 });
                 return { layer: polygon, category: polygonData.category };
@@ -450,5 +443,3 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
-
-    
