@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker, Layer } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -281,6 +281,7 @@ const MapComponent = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<LeafletMap | null>(null);
     const featureLayersRef = useRef<FeatureLayer[]>([]);
+    const baseLayerRef = useRef<L.TileLayer | null>(null);
     
     const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
     const [activeBaseLayer, setActiveBaseLayer] = useState<string>('satellite');
@@ -291,7 +292,6 @@ const MapComponent = () => {
     const [markers, setMarkers] = useState<ExtendedMarker[]>([]);
     const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
-
 
     // Helper function to update feature layers on the map
     const updateFeatureLayers = (currentLayers: FeatureLayer[], currentActiveOverlays: string[], map: LeafletMap) => {
@@ -320,6 +320,13 @@ const MapComponent = () => {
             });
             mapInstanceRef.current = map;
             setMapInstance(map);
+
+             // Set initial base layer
+            const baseLayerData = BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS];
+            const tileLayer = L.tileLayer(baseLayerData.url, {
+                attribution: baseLayerData.attribution
+            }).addTo(map);
+            baseLayerRef.current = tileLayer;
         }
 
         const map = mapInstanceRef.current;
@@ -354,16 +361,10 @@ const MapComponent = () => {
 
     // useEffect for updating base layer
     useEffect(() => {
-        if (mapInstance) {
-            const currentLayer = Object.values(mapInstance._layers).find(layer => layer instanceof L.TileLayer);
-            if (currentLayer) {
-              mapInstance.removeLayer(currentLayer);
-            }
-
+        if (mapInstance && baseLayerRef.current) {
             const baseLayerData = BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS];
-            L.tileLayer(baseLayerData.url, {
-                attribution: baseLayerData.attribution
-            }).addTo(mapInstance).bringToBack();
+            baseLayerRef.current.setUrl(baseLayerData.url);
+            baseLayerRef.current.options.attribution = baseLayerData.attribution;
         }
     }, [activeBaseLayer, mapInstance]);
 
@@ -449,3 +450,5 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+    
