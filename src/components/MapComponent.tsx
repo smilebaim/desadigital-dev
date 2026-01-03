@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -287,9 +287,28 @@ const MapComponent = () => {
     const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedFeature, setSelectedFeature] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary' | 'polygon'; } | null>(null);
+    
+    const [markers, setMarkers] = useState<ExtendedMarker[]>([]);
+    const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
 
 
+    // Helper function to update feature layers on the map
+    const updateFeatureLayers = (currentLayers: FeatureLayer[], currentActiveOverlays: string[], map: LeafletMap) => {
+        currentLayers.forEach(({ layer, category }) => {
+            if (currentActiveOverlays.includes(category)) {
+                if (!map.hasLayer(layer)) {
+                    layer.addTo(map);
+                }
+            } else {
+                if (map.hasLayer(layer)) {
+                    map.removeLayer(layer);
+                }
+            }
+        });
+    };
+    
+    // Main useEffect for map initialization and data streams
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
             const map = L.map(mapContainerRef.current, {
@@ -303,11 +322,15 @@ const MapComponent = () => {
             setMapInstance(map);
         }
 
+        const map = mapInstanceRef.current;
+        if (!map) return;
+
         const unsubCategories = getLayerCategoriesStream((data) => {
-            setLayerCategories(data as MapLayerCategory[]);
-             // Set initial active overlays from categories
+            const categories = data as MapLayerCategory[];
+            setLayerCategories(categories);
+            // Set initial active overlays from the first layer of each category
             const initialActive: string[] = [];
-            data.forEach((cat: any) => {
+            categories.forEach((cat) => {
                 if (cat.layers.length > 0) {
                     initialActive.push(cat.layers[0]);
                 }
@@ -315,79 +338,9 @@ const MapComponent = () => {
             setActiveOverlays(initialActive);
         });
 
-        const unsubMarkers = getMarkersStream((data) => {
-            if (mapInstanceRef.current) {
-                // Clear only markers
-                featureLayersRef.current
-                    .filter(f => f.layer instanceof LeafletMarker)
-                    .forEach(f => f.layer.remove());
-
-                featureLayersRef.current = featureLayersRef.current.filter(f => !(f.layer instanceof LeafletMarker));
-                
-                const newMarkers = (data as ExtendedMarker[]).map(markerData => {
-                    const marker = L.marker([markerData.latitude, markerData.longitude])
-                        .on('click', () => {
-                            setSelectedFeature({
-                                title: markerData.name,
-                                coordinates: [markerData.latitude, markerData.longitude],
-                                description: markerData.description,
-                                type: 'marker',
-                            });
-                        });
-                    return { layer: marker, category: markerData.category };
-                });
-                featureLayersRef.current.push(...newMarkers);
-                updateFeatureLayers();
-            }
-        });
+        const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
+        const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
         
-        const unsubPolygons = getPolygonsStream((data) => {
-             if (mapInstanceRef.current) {
-                // Clear only polygons
-                featureLayersRef.current
-                    .filter(f => f.layer instanceof LeafletPolygon)
-                    .forEach(f => f.layer.remove());
-
-                featureLayersRef.current = featureLayersRef.current.filter(f => !(f.layer instanceof LeafletPolygon));
-
-                const newPolygons = (data as ExtendedPolygon[]).map(polygonData => {
-                    try {
-                        const coordinates = JSON.parse(polygonData.coordinates) as [number, number][];
-                        const polygon = L.polygon(coordinates, getPolygonStyle(polygonData.category)).on('click', () => {
-                            setSelectedFeature({
-                                title: polygonData.name,
-                                description: polygonData.description,
-                                type: 'polygon',
-                            });
-                        });
-                        return { layer: polygon, category: polygonData.category };
-                    } catch (e) {
-                        console.error("Failed to parse polygon coordinates:", e);
-                        return null;
-                    }
-                }).filter((p): p is FeatureLayer => p !== null);
-                
-                featureLayersRef.current.push(...newPolygons);
-                updateFeatureLayers();
-            }
-        });
-        
-        const updateFeatureLayers = () => {
-            if (!mapInstanceRef.current) return;
-            const map = mapInstanceRef.current;
-            featureLayersRef.current.forEach(({ layer, category }) => {
-                if (activeOverlays.includes(category)) {
-                    if (!map.hasLayer(layer)) {
-                        layer.addTo(map);
-                    }
-                } else {
-                    if (map.hasLayer(layer)) {
-                        map.removeLayer(layer);
-                    }
-                }
-            });
-        };
-
         return () => {
             unsubCategories();
             unsubMarkers();
@@ -399,6 +352,7 @@ const MapComponent = () => {
         };
     }, []);
 
+    // useEffect for updating base layer
     useEffect(() => {
         if (mapInstance) {
             const currentLayer = Object.values(mapInstance._layers).find(layer => layer instanceof L.TileLayer);
@@ -413,21 +367,52 @@ const MapComponent = () => {
         }
     }, [activeBaseLayer, mapInstance]);
 
+    // useEffect for updating all feature layers when data or active overlays change
     useEffect(() => {
         if (!mapInstance) return;
 
-        featureLayersRef.current.forEach(({ layer, category }) => {
-            if (activeOverlays.includes(category)) {
-                if (!mapInstance.hasLayer(layer)) {
-                    layer.addTo(mapInstance);
-                }
-            } else {
-                if (mapInstance.hasLayer(layer)) {
-                    mapInstance.removeLayer(layer);
-                }
-            }
+        // Clear existing feature layers from the map
+        featureLayersRef.current.forEach(f => f.layer.remove());
+        featureLayersRef.current = [];
+
+        // Process new markers
+        const newMarkers = markers.map(markerData => {
+            const marker = L.marker([markerData.latitude, markerData.longitude])
+                .on('click', () => {
+                    setSelectedFeature({
+                        title: markerData.name,
+                        coordinates: [markerData.latitude, markerData.longitude],
+                        description: markerData.description,
+                        type: 'marker',
+                    });
+                });
+            return { layer: marker, category: markerData.category };
         });
-    }, [activeOverlays, mapInstance, layerCategories]);
+
+        // Process new polygons
+        const newPolygons = polygons.map(polygonData => {
+            try {
+                const coordinates = JSON.parse(polygonData.coordinates) as [number, number][];
+                const polygon = L.polygon(coordinates, getPolygonStyle(polygonData.category)).on('click', () => {
+                    setSelectedFeature({
+                        title: polygonData.name,
+                        description: polygonData.description,
+                        type: 'polygon',
+                    });
+                });
+                return { layer: polygon, category: polygonData.category };
+            } catch (e) {
+                console.error("Failed to parse polygon coordinates:", e);
+                return null;
+            }
+        }).filter((p): p is FeatureLayer => p !== null);
+
+        const allFeatureLayers = [...newMarkers, ...newPolygons];
+        featureLayersRef.current = allFeatureLayers;
+
+        updateFeatureLayers(allFeatureLayers, activeOverlays, mapInstance);
+
+    }, [markers, polygons, activeOverlays, mapInstance]);
 
     const handleLayerToggle = (layerName: string) => {
         setActiveOverlays(prev =>
@@ -464,5 +449,3 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
-
-    
