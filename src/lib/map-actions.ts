@@ -1,6 +1,7 @@
+
 'use server';
 import { db } from './firebase';
-import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 export interface MapMarker {
     name: string;
@@ -8,6 +9,13 @@ export interface MapMarker {
     latitude: number;
     longitude: number;
     category: string;
+}
+
+export interface MapPolygon {
+    name: string;
+    description: string;
+    category: string;
+    coordinates: string; // JSON string of LatLngTuple[]
 }
 
 export interface MapLayerCategory {
@@ -18,7 +26,6 @@ export interface MapLayerCategory {
 
 // --- Marker Actions ---
 
-// Function to add a new map marker
 export const addMarker = async (markerData: MapMarker) => {
     try {
         await addDoc(collection(db, 'mapMarkers'), {
@@ -32,7 +39,6 @@ export const addMarker = async (markerData: MapMarker) => {
     }
 };
 
-// Function to update a map marker
 export const updateMarker = async (markerId: string, data: Partial<MapMarker>) => {
     try {
         const markerRef = doc(db, 'mapMarkers', markerId);
@@ -47,7 +53,6 @@ export const updateMarker = async (markerId: string, data: Partial<MapMarker>) =
     }
 };
 
-// Function to delete a map marker
 export const deleteMarker = async (markerId: string) => {
     try {
         await deleteDoc(doc(db, 'mapMarkers', markerId));
@@ -59,8 +64,41 @@ export const deleteMarker = async (markerId: string) => {
 };
 
 
-// --- Layer Category Actions ---
+// --- Polygon Actions ---
 
-// No client-side stream functions here.
-// You can add async server actions for categories later if needed, e.g.:
-// export async function getLayerCategories() { ... }
+export const addPolygon = async (polygonData: MapPolygon) => {
+    try {
+        await addDoc(collection(db, 'mapPolygons'), {
+            ...polygonData,
+            createdAt: serverTimestamp(),
+        });
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error adding polygon: ", error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const updatePolygon = async (polygonId: string, data: Partial<MapPolygon>) => {
+    try {
+        const polygonRef = doc(db, 'mapPolygons', polygonId);
+        await updateDoc(polygonRef, {
+            ...data,
+            updatedAt: serverTimestamp(),
+        });
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error updating polygon: ", error);
+        return { success: false, error: error.message };
+    }
+};
+
+export const deletePolygon = async (polygonId: string) => {
+    try {
+        await deleteDoc(doc(db, 'mapPolygons', polygonId));
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error deleting polygon: ", error);
+        return { success: false, error: error.message };
+    }
+};

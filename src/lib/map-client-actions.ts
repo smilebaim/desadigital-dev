@@ -1,3 +1,4 @@
+
 'use client';
 
 import { db } from './firebase';
@@ -22,6 +23,27 @@ export const getMarkersStream = (callback: (markers: any[]) => void) => {
 
     return unsubscribe;
 };
+
+// Function to get map polygons in real-time
+export const getPolygonsStream = (callback: (polygons: any[]) => void) => {
+    const q = query(
+        collection(db, 'mapPolygons'),
+        orderBy('createdAt', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const polygons = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        callback(polygons);
+    }, (error) => {
+        console.error("Error getting polygons stream: ", error);
+    });
+
+    return unsubscribe;
+}
+
 
 // Function to get map layer categories in real-time
 export const getLayerCategoriesStream = (callback: (categories: any[]) => void) => {

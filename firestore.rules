@@ -35,6 +35,11 @@ service cloud.firestore {
       allow read, create, update, delete: if request.auth != null;
     }
 
+    // Allow any authenticated user to manage map polygons
+    match /mapPolygons/{polygonId} {
+      allow read, create, update, delete: if request.auth != null;
+    }
+
     // Allow any authenticated user to manage map layer categories
     match /mapLayerCategories/{categoryId} {
       allow read, create, update, delete: if request.auth != null;
