@@ -56,14 +56,13 @@ interface FeatureLayer {
 
 const getPolygonStyle = (category: string) => {
     switch (category) {
-        case 'Wilayah Administratif':
         case 'Batas Desa':
             return { color: '#ff0000', weight: 3, fillColor: '#ff0000', fillOpacity: 0.1 };
-        case 'Area Pertanian':
         case 'Bidang Tanah':
+        case 'Area Pertanian':
             return { color: '#3b82f6', weight: 2, fillColor: '#3b82f6', fillOpacity: 0.2 };
         default:
-            return { color: '#ffffff', weight: 2, fillColor: '#10b981', fillOpacity: 0.2 };
+            return { color: '#10b981', weight: 2, fillColor: '#10b981', fillOpacity: 0.2 };
     }
 };
 
@@ -301,19 +300,22 @@ const MapComponent = () => {
                 maxBoundsViscosity: 1.0,
             });
             mapInstanceRef.current = map;
-            
+
+            // Set initial base layer
             const baseLayerData = BASE_LAYERS[activeBaseLayer];
             baseLayerRef.current = L.tileLayer(baseLayerData.url, {
                 attribution: baseLayerData.attribution
             }).addTo(map);
 
+            // Subscribe to data streams
             const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
             const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
             const unsubCategories = getLayerCategoriesStream((data) => {
                 setLayerCategories(data as MapLayerCategory[]);
+                // Set initial active overlays from the first category if none are active
                 if (data.length > 0 && activeOverlays.length === 0) {
-                     const firstCategory = data[0];
-                     if (firstCategory && firstCategory.layers.length > 0) {
+                     const firstCategory = data.find(c => c.layers.length > 0);
+                     if (firstCategory) {
                          setActiveOverlays(prev => [...new Set([...prev, firstCategory.layers[0]])]);
                      }
                 }
@@ -329,11 +331,11 @@ const MapComponent = () => {
                 }
             };
         }
-    }, []); // Only runs once on mount
+    }, []); // Main initialization effect, runs only once
 
     // Effect for updating base layer
     useEffect(() => {
-        if (baseLayerRef.current) {
+        if (baseLayerRef.current && mapInstanceRef.current) {
             const baseLayerData = BASE_LAYERS[activeBaseLayer];
             baseLayerRef.current.setUrl(baseLayerData.url);
             baseLayerRef.current.options.attribution = baseLayerData.attribution;
@@ -382,22 +384,16 @@ const MapComponent = () => {
             }
         });
 
-        featureLayersRef.current = allFeatureLayers;
-
         // Add layers to the map based on activeOverlays
         allFeatureLayers.forEach(({ layer, category }) => {
             if (activeOverlays.includes(category)) {
-                if (!map.hasLayer(layer)) {
-                    layer.addTo(map);
-                }
-            } else {
-                if (map.hasLayer(layer)) {
-                    map.removeLayer(layer);
-                }
+                layer.addTo(map);
             }
         });
+        
+        featureLayersRef.current = allFeatureLayers;
 
-    }, [markers, polygons, activeOverlays]);
+    }, [markers, polygons, activeOverlays]); // Re-run when data or active overlays change
 
     const handleLayerToggle = (layerName: string) => {
         setActiveOverlays(prev =>
