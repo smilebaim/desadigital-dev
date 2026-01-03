@@ -301,19 +301,18 @@ const MapComponent = () => {
             });
             mapInstanceRef.current = map;
             setMapInstance(map);
+        }
 
+        const unsubCategories = getLayerCategoriesStream((data) => {
+            setLayerCategories(data as MapLayerCategory[]);
              // Set initial active overlays from categories
             const initialActive: string[] = [];
-            layerCategories.forEach(cat => {
+            data.forEach((cat: any) => {
                 if (cat.layers.length > 0) {
                     initialActive.push(cat.layers[0]);
                 }
             });
             setActiveOverlays(initialActive);
-        }
-
-        const unsubCategories = getLayerCategoriesStream((data) => {
-            setLayerCategories(data as MapLayerCategory[]);
         });
 
         const unsubMarkers = getMarkersStream((data) => {
@@ -338,6 +337,7 @@ const MapComponent = () => {
                     return { layer: marker, category: markerData.category };
                 });
                 featureLayersRef.current.push(...newMarkers);
+                updateFeatureLayers();
             }
         });
         
@@ -368,8 +368,25 @@ const MapComponent = () => {
                 }).filter((p): p is FeatureLayer => p !== null);
                 
                 featureLayersRef.current.push(...newPolygons);
+                updateFeatureLayers();
             }
         });
+        
+        const updateFeatureLayers = () => {
+            if (!mapInstanceRef.current) return;
+            const map = mapInstanceRef.current;
+            featureLayersRef.current.forEach(({ layer, category }) => {
+                if (activeOverlays.includes(category)) {
+                    if (!map.hasLayer(layer)) {
+                        layer.addTo(map);
+                    }
+                } else {
+                    if (map.hasLayer(layer)) {
+                        map.removeLayer(layer);
+                    }
+                }
+            });
+        };
 
         return () => {
             unsubCategories();
@@ -410,7 +427,7 @@ const MapComponent = () => {
                 }
             }
         });
-    }, [activeOverlays, mapInstance, layerCategories]); // Depend on layerCategories to re-evaluate when they change
+    }, [activeOverlays, mapInstance, layerCategories]);
 
     const handleLayerToggle = (layerName: string) => {
         setActiveOverlays(prev =>
@@ -447,3 +464,5 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+    
