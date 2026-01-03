@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker, Layer } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker, Layer, TileLayer } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -280,10 +280,9 @@ const MapComponent = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<LeafletMap | null>(null);
     const featureLayersRef = useRef<FeatureLayer[]>([]);
-    const baseLayerRef = useRef<L.TileLayer | null>(null);
+    const baseLayerRef = useRef<TileLayer | null>(null);
     
-    const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
-    const [activeBaseLayer, setActiveBaseLayer] = useState<string>('satellite');
+    const [activeBaseLayer, setActiveBaseLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
     const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedFeature, setSelectedFeature] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary' | 'polygon'; } | null>(null);
@@ -291,21 +290,6 @@ const MapComponent = () => {
     const [markers, setMarkers] = useState<ExtendedMarker[]>([]);
     const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
-    
-    // Helper function to update feature layers on the map
-    const updateFeatureLayers = (currentLayers: FeatureLayer[], currentActiveOverlays: string[], map: LeafletMap) => {
-        currentLayers.forEach(({ layer, category }) => {
-            if (currentActiveOverlays.includes(category)) {
-                if (!map.hasLayer(layer)) {
-                    layer.addTo(map);
-                }
-            } else {
-                if (map.hasLayer(layer)) {
-                    map.removeLayer(layer);
-                }
-            }
-        });
-    };
     
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
@@ -317,58 +301,58 @@ const MapComponent = () => {
                 maxBoundsViscosity: 1.0,
             });
             mapInstanceRef.current = map;
-            setMapInstance(map);
+            
+            const baseLayerData = BASE_LAYERS[activeBaseLayer];
+            baseLayerRef.current = L.tileLayer(baseLayerData.url, {
+                attribution: baseLayerData.attribution
+            }).addTo(map);
+
+            const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
+            const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
+            const unsubCategories = getLayerCategoriesStream((data) => {
+                setLayerCategories(data as MapLayerCategory[]);
+                if (data.length > 0 && activeOverlays.length === 0) {
+                     const firstCategory = data[0];
+                     if (firstCategory && firstCategory.layers.length > 0) {
+                         setActiveOverlays(prev => [...new Set([...prev, firstCategory.layers[0]])]);
+                     }
+                }
+            });
+
+            return () => {
+                unsubMarkers();
+                unsubPolygons();
+                unsubCategories();
+                if (mapInstanceRef.current) {
+                    mapInstanceRef.current.remove();
+                    mapInstanceRef.current = null;
+                }
+            };
         }
+    }, []); // Only runs once on mount
 
-        const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
-        const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
-        const unsubCategories = getLayerCategoriesStream((data) => {
-            setLayerCategories(data as MapLayerCategory[]);
-            if (data.length > 0) {
-                 // Automatically activate the first layer of the first category
-                 const firstCategory = data[0];
-                 if (firstCategory && firstCategory.layers.length > 0) {
-                     setActiveOverlays(prev => [...new Set([...prev, firstCategory.layers[0]])]);
-                 }
-            }
-        });
-
-        return () => {
-             if (mapInstanceRef.current) {
-                // mapInstanceRef.current.remove();
-                // mapInstanceRef.current = null;
-             }
-             unsubMarkers();
-             unsubPolygons();
-             unsubCategories();
-        };
-    }, []);
-
-    // useEffect for updating base layer
+    // Effect for updating base layer
     useEffect(() => {
-        if (!mapInstance) return;
-
         if (baseLayerRef.current) {
-            baseLayerRef.current.setUrl(BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].url);
-            baseLayerRef.current.options.attribution = BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].attribution;
-        } else {
-            const tileLayer = L.tileLayer(BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].url, {
-                attribution: BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].attribution
-            }).addTo(mapInstance);
-            baseLayerRef.current = tileLayer;
+            const baseLayerData = BASE_LAYERS[activeBaseLayer];
+            baseLayerRef.current.setUrl(baseLayerData.url);
+            baseLayerRef.current.options.attribution = baseLayerData.attribution;
         }
-    }, [activeBaseLayer, mapInstance]);
+    }, [activeBaseLayer]);
 
-    // useEffect for updating all feature layers when data or active overlays change
+    // Effect for updating feature layers when data or active overlays change
     useEffect(() => {
-        if (!mapInstance) return;
+        const map = mapInstanceRef.current;
+        if (!map) return;
 
         // Clear existing feature layers from the map
         featureLayersRef.current.forEach(f => f.layer.remove());
         featureLayersRef.current = [];
 
+        const allFeatureLayers: FeatureLayer[] = [];
+
         // Process new markers
-        const newMarkers = markers.map(markerData => {
+        markers.forEach(markerData => {
             const marker = L.marker([markerData.latitude, markerData.longitude])
                 .on('click', () => {
                     setSelectedFeature({
@@ -378,11 +362,11 @@ const MapComponent = () => {
                         type: 'marker',
                     });
                 });
-            return { layer: marker, category: markerData.category };
+            allFeatureLayers.push({ layer: marker, category: markerData.category });
         });
 
         // Process new polygons
-        const newPolygons = polygons.map(polygonData => {
+        polygons.forEach(polygonData => {
             try {
                 const coordinates = JSON.parse(polygonData.coordinates) as [number, number][];
                 const polygon = L.polygon(coordinates, getPolygonStyle(polygonData.category)).on('click', () => {
@@ -392,19 +376,28 @@ const MapComponent = () => {
                         type: polygonData.category === 'Batas Desa' ? 'boundary' : 'polygon',
                     });
                 });
-                return { layer: polygon, category: polygonData.category };
+                 allFeatureLayers.push({ layer: polygon, category: polygonData.category });
             } catch (e) {
-                console.error("Failed to parse polygon coordinates:", e);
-                return null;
+                console.error(`Failed to parse polygon coordinates for "${polygonData.name}":`, e);
             }
-        }).filter((p): p is FeatureLayer => p !== null);
+        });
 
-        const allFeatureLayers = [...newMarkers, ...newPolygons];
         featureLayersRef.current = allFeatureLayers;
 
-        updateFeatureLayers(allFeatureLayers, activeOverlays, mapInstance);
+        // Add layers to the map based on activeOverlays
+        allFeatureLayers.forEach(({ layer, category }) => {
+            if (activeOverlays.includes(category)) {
+                if (!map.hasLayer(layer)) {
+                    layer.addTo(map);
+                }
+            } else {
+                if (map.hasLayer(layer)) {
+                    map.removeLayer(layer);
+                }
+            }
+        });
 
-    }, [markers, polygons, activeOverlays, mapInstance]);
+    }, [markers, polygons, activeOverlays]);
 
     const handleLayerToggle = (layerName: string) => {
         setActiveOverlays(prev =>
@@ -417,13 +410,15 @@ const MapComponent = () => {
     return (
         <div className="fixed inset-0">
             <div ref={mapContainerRef} className="w-full h-full" />
-            <MapControls
-                map={mapInstance}
-                activeLayer={activeBaseLayer as keyof typeof BASE_LAYERS}
-                setActiveLayer={setActiveBaseLayer as (layer: keyof typeof BASE_LAYERS) => void}
-                layerPanelExpanded={layerPanelExpanded}
-                setLayerPanelExpanded={setLayerPanelExpanded}
-            />
+            {mapInstanceRef.current && (
+                <MapControls
+                    map={mapInstanceRef.current}
+                    activeLayer={activeBaseLayer}
+                    setActiveLayer={setActiveBaseLayer}
+                    layerPanelExpanded={layerPanelExpanded}
+                    setLayerPanelExpanded={setLayerPanelExpanded}
+                />
+            )}
             <LayerPanel
                 expanded={layerPanelExpanded}
                 onToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
