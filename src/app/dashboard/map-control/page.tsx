@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +28,8 @@ import {
   MapPin,
   Save,
   Shapes,
-  DownloadCloud
+  DownloadCloud,
+  Layers
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -54,8 +56,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/components/ui/use-toast';
-import { addMarker, updateMarker, deleteMarker, type MapMarker, addPolygon, updatePolygon, deletePolygon, type MapPolygon } from '@/lib/map-actions';
-import { getMarkersStream, getPolygonsStream } from '@/lib/map-client-actions';
+import { addMarker, updateMarker, deleteMarker, type MapMarker, addPolygon, updatePolygon, deletePolygon, type MapPolygon, addLayerCategory, updateLayerCategory, deleteLayerCategory, seedDefaultCategories, type MapLayerCategory } from '@/lib/map-actions';
+import { getMarkersStream, getPolygonsStream, getLayerCategoriesStream } from '@/lib/map-client-actions';
 import { ADMINISTRATIVE_BOUNDARY_JSON } from '@/lib/map-data';
 
 interface Marker extends MapMarker {
@@ -66,10 +68,15 @@ interface Polygon extends MapPolygon {
     id: string;
 }
 
+interface Category extends MapLayerCategory {
+    id: string;
+}
+
 const MapControlPage = () => {
     const { toast } = useToast();
     const [markers, setMarkers] = useState<Marker[]>([]);
     const [polygons, setPolygons] = useState<Polygon[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
 
     // Marker states
@@ -86,24 +93,31 @@ const MapControlPage = () => {
     const [polygonFormMode, setPolygonFormMode] = useState<'add' | 'edit'>('add');
     const [polygonFormValues, setPolygonFormValues] = useState({ name: '', description: '', category: 'Area', coordinates: '' });
 
+    // Category states
+    const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
+    const [isCategoryDeleteOpen, setIsCategoryDeleteOpen] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+    const [categoryFormMode, setCategoryFormMode] = useState<'add' | 'edit'>('add');
+    const [categoryFormValues, setCategoryFormValues] = useState({ name: '', layers: '', order: 0 });
+
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        const unsubMarkers = getMarkersStream((data) => {
-            setMarkers(data as Marker[]);
+        const unsubMarkers = getMarkersStream((data) => setMarkers(data as Marker[]));
+        const unsubPolygons = getPolygonsStream((data) => setPolygons(data as Polygon[]));
+        const unsubCategories = getLayerCategoriesStream((data) => {
+            setCategories(data as Category[]);
             setLoading(false);
-        });
-        const unsubPolygons = getPolygonsStream((data) => {
-            setPolygons(data as Polygon[]);
         });
 
         return () => {
             unsubMarkers();
             unsubPolygons();
+            unsubCategories();
         }
     }, []);
 
-    // --- Seed Data Handler ---
+    // --- Seed Handlers ---
     const handleSeedBoundary = async () => {
         const boundaryExists = polygons.some(p => p.name === 'Batas Administrasi Desa');
         if (boundaryExists) {
@@ -114,7 +128,7 @@ const MapControlPage = () => {
         const polygonData: MapPolygon = {
             name: 'Batas Administrasi Desa',
             description: 'Batas wilayah administratif resmi Desa Remau Bako Tuo.',
-            category: 'Wilayah Administratif',
+            category: 'Batas Desa', // Match with a layer name in a category
             coordinates: ADMINISTRATIVE_BOUNDARY_JSON,
         };
         
@@ -124,6 +138,15 @@ const MapControlPage = () => {
             toast({ title: `Poligon Batas Desa berhasil ditambahkan.` });
         } else {
             toast({ title: `Gagal menambahkan Poligon Batas Desa.`, description: result?.error, variant: 'destructive' });
+        }
+    };
+    
+    const handleSeedCategories = async () => {
+        const result = await seedDefaultCategories();
+        if (result.success) {
+            toast({ title: result.message });
+        } else {
+            toast({ title: 'Gagal menambahkan kategori default.', description: result.error, variant: 'destructive' });
         }
     };
 
@@ -230,12 +253,61 @@ const MapControlPage = () => {
         setIsPolygonDeleteOpen(false);
     };
 
+    // --- Category Handlers ---
+    const openAddCategoryForm = () => {
+        setCategoryFormMode('add');
+        setSelectedCategory(null);
+        setCategoryFormValues({ name: '', layers: '', order: categories.length + 1 });
+        setIsCategoryFormOpen(true);
+    };
+
+    const openEditCategoryForm = (category: Category) => {
+        setCategoryFormMode('edit');
+        setSelectedCategory(category);
+        setCategoryFormValues({ name: category.name, layers: category.layers.join(', '), order: category.order });
+        setIsCategoryFormOpen(true);
+    };
+
+    const openDeleteCategoryDialog = (category: Category) => {
+        setSelectedCategory(category);
+        setIsCategoryDeleteOpen(true);
+    };
+
+    const handleCategoryFormSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        const layersArray = categoryFormValues.layers.split(',').map(l => l.trim()).filter(Boolean);
+        if (layersArray.length === 0) {
+            toast({ title: 'Nama layer tidak boleh kosong.', variant: 'destructive' });
+            setIsSubmitting(false); return;
+        }
+        const categoryData = { name: categoryFormValues.name, layers: layersArray, order: Number(categoryFormValues.order) };
+        let result;
+        if (categoryFormMode === 'add') result = await addLayerCategory(categoryData);
+        else if (selectedCategory) result = await updateLayerCategory(selectedCategory.id, categoryData);
+        if (result?.success) {
+            toast({ title: `Kategori berhasil ${categoryFormMode === 'add' ? 'ditambahkan' : 'diperbarui'}.` });
+            setIsCategoryFormOpen(false);
+        } else {
+            toast({ title: `Gagal ${categoryFormMode === 'add' ? 'menambahkan' : 'memperbarui'} kategori.`, description: result?.error, variant: 'destructive' });
+        }
+        setIsSubmitting(false);
+    };
+
+    const handleDeleteCategory = async () => {
+        if (!selectedCategory) return;
+        const result = await deleteLayerCategory(selectedCategory.id);
+        toast({ title: result.success ? 'Kategori berhasil dihapus.' : 'Gagal menghapus kategori.', variant: result.success ? 'default' : 'destructive' });
+        setIsCategoryDeleteOpen(false);
+    };
+
+
     return (
         <div className="space-y-6">
             <div>
                 <h2 className="text-3xl font-bold tracking-tight">Kontrol Peta Interaktif</h2>
                 <p className="text-muted-foreground">
-                    Kelola penanda (marker) dan area (poligon) yang akan ditampilkan di peta tata ruang.
+                    Kelola penanda (marker), area (poligon), dan kategori lapisan yang akan ditampilkan di peta.
                 </p>
             </div>
             <Tabs defaultValue="markers">
@@ -245,6 +317,9 @@ const MapControlPage = () => {
                     </TabsTrigger>
                     <TabsTrigger value="polygons">
                         <Shapes className="h-4 w-4 mr-2"/>Poligon (Area)
+                    </TabsTrigger>
+                    <TabsTrigger value="categories">
+                        <Layers className="h-4 w-4 mr-2"/>Kategori Lapisan
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value="markers">
@@ -321,6 +396,44 @@ const MapControlPage = () => {
                         </CardContent>
                     </Card>
                 </TabsContent>
+                <TabsContent value="categories">
+                     <Card>
+                        <CardHeader className="flex flex-row justify-between items-center">
+                            <div>
+                                <CardTitle>Kategori Lapisan Peta</CardTitle>
+                                <CardDescription>Kelompokkan berbagai lapisan untuk kontrol di peta. Total kategori: {categories.length}</CardDescription>
+                            </div>
+                            <div className="flex gap-2">
+                                <Button size="sm" variant="outline" onClick={handleSeedCategories}><DownloadCloud className="h-4 w-4 mr-2" />Input Kategori Default</Button>
+                                <Button size="sm" onClick={openAddCategoryForm}><Plus className="h-4 w-4 mr-2" />Tambah Kategori</Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader><TableRow><TableHead>Urutan</TableHead><TableHead>Nama Kategori</TableHead><TableHead>Lapisan di Dalamnya</TableHead><TableHead className="text-right">Aksi</TableHead></TableRow></TableHeader>
+                                <TableBody>
+                                    {loading ? (<TableRow><TableCell colSpan={4} className="text-center">Memuat data...</TableCell></TableRow>)
+                                    : categories.length > 0 ? (categories.map((category) => (
+                                        <TableRow key={category.id}>
+                                            <TableCell>{category.order}</TableCell>
+                                            <TableCell className="font-medium">{category.name}</TableCell>
+                                            <TableCell className="text-muted-foreground">{category.layers.join(', ')}</TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end">
+                                                        <DropdownMenuItem onClick={() => openEditCategoryForm(category)}><Edit className="h-4 w-4 mr-2" />Edit</DropdownMenuItem>
+                                                        <DropdownMenuItem className="text-red-600" onClick={() => openDeleteCategoryDialog(category)}><Trash2 className="h-4 w-4 mr-2" />Hapus</DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))) : (<TableRow><TableCell colSpan={4} className="text-center">Belum ada kategori lapisan.</TableCell></TableRow>)}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
             </Tabs>
 
             {/* Marker Modals */}
@@ -330,7 +443,7 @@ const MapControlPage = () => {
                     <form onSubmit={handleMarkerFormSubmit}>
                         <div className="grid gap-4 py-4">
                             <div className="space-y-2"><Label htmlFor="name">Nama Penanda</Label><Input id="name" value={markerFormValues.name} onChange={(e) => setMarkerFormValues({...markerFormValues, name: e.target.value})} placeholder="Contoh: Kantor Desa" disabled={isSubmitting} /></div>
-                            <div className="space-y-2"><Label htmlFor="category">Kategori</Label><Input id="category" value={markerFormValues.category} onChange={(e) => setMarkerFormValues({...markerFormValues, category: e.target.value})} placeholder="Contoh: Pemerintahan" disabled={isSubmitting} /></div>
+                            <div className="space-y-2"><Label htmlFor="category">Kategori</Label><Input id="category" value={markerFormValues.category} onChange={(e) => setMarkerFormValues({...markerFormValues, category: e.target.value})} placeholder="Contoh: Fasilitas Umum" disabled={isSubmitting} /></div>
                             <div className="space-y-2"><Label htmlFor="description">Deskripsi</Label><Textarea id="description" value={markerFormValues.description} onChange={(e) => setMarkerFormValues({...markerFormValues, description: e.target.value})} placeholder="Deskripsi singkat mengenai lokasi" disabled={isSubmitting} /></div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2"><Label htmlFor="latitude">Latitude</Label><Input id="latitude" value={markerFormValues.latitude} onChange={(e) => setMarkerFormValues({...markerFormValues, latitude: e.target.value})} placeholder="-1.222418" disabled={isSubmitting} /></div>
@@ -356,7 +469,7 @@ const MapControlPage = () => {
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2"><Label htmlFor="polygon-name">Nama Poligon</Label><Input id="polygon-name" value={polygonFormValues.name} onChange={(e) => setPolygonFormValues({...polygonFormValues, name: e.target.value})} placeholder="Contoh: Zona Tambak" disabled={isSubmitting} /></div>
-                                <div className="space-y-2"><Label htmlFor="polygon-category">Kategori</Label><Input id="polygon-category" value={polygonFormValues.category} onChange={(e) => setPolygonFormValues({...polygonFormValues, category: e.target.value})} placeholder="Contoh: Perikanan" disabled={isSubmitting} /></div>
+                                <div className="space-y-2"><Label htmlFor="polygon-category">Kategori</Label><Input id="polygon-category" value={polygonFormValues.category} onChange={(e) => setPolygonFormValues({...polygonFormValues, category: e.target.value})} placeholder="Contoh: Bidang Tanah" disabled={isSubmitting} /></div>
                             </div>
                             <div className="space-y-2"><Label htmlFor="polygon-description">Deskripsi</Label><Textarea id="polygon-description" value={polygonFormValues.description} onChange={(e) => setPolygonFormValues({...polygonFormValues, description: e.target.value})} placeholder="Deskripsi singkat area" disabled={isSubmitting} /></div>
                             <div className="space-y-2">
@@ -373,6 +486,27 @@ const MapControlPage = () => {
                 <AlertDialogContent>
                     <AlertDialogHeader><AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle><AlertDialogDescription>Tindakan ini akan menghapus poligon &quot;{selectedPolygon?.name}&quot; secara permanen.</AlertDialogDescription></AlertDialogHeader>
                     <AlertDialogFooter><AlertDialogCancel>Batal</AlertDialogCancel><AlertDialogAction onClick={handleDeletePolygon}>Hapus</AlertDialogAction></AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            {/* Category Modals */}
+            <Dialog open={isCategoryFormOpen} onOpenChange={setIsCategoryFormOpen}>
+                <DialogContent>
+                    <DialogHeader><DialogTitle>{categoryFormMode === 'add' ? 'Tambah Kategori Baru' : 'Edit Kategori'}</DialogTitle><DialogDescription>Kategori mengelompokkan beberapa lapisan. Contoh: Kategori 'Batas Wilayah' bisa berisi lapisan 'Batas Desa' dan 'Batas Dusun'.</DialogDescription></DialogHeader>
+                    <form onSubmit={handleCategoryFormSubmit}>
+                        <div className="grid gap-4 py-4">
+                            <div className="space-y-2"><Label htmlFor="cat-name">Nama Kategori</Label><Input id="cat-name" value={categoryFormValues.name} onChange={(e) => setCategoryFormValues({...categoryFormValues, name: e.target.value})} placeholder="Contoh: Batas Wilayah" disabled={isSubmitting} /></div>
+                            <div className="space-y-2"><Label htmlFor="cat-layers">Nama Lapisan (pisahkan dengan koma)</Label><Input id="cat-layers" value={categoryFormValues.layers} onChange={(e) => setCategoryFormValues({...categoryFormValues, layers: e.target.value})} placeholder="Contoh: Batas Desa, Batas Dusun" disabled={isSubmitting} /></div>
+                            <div className="space-y-2"><Label htmlFor="cat-order">Urutan Tampil</Label><Input id="cat-order" type="number" value={categoryFormValues.order} onChange={(e) => setCategoryFormValues({...categoryFormValues, order: parseInt(e.target.value, 10) || 0})} disabled={isSubmitting} /></div>
+                        </div>
+                        <DialogFooter><Button type="button" variant="outline" onClick={() => setIsCategoryFormOpen(false)}>Batal</Button><Button type="submit" disabled={isSubmitting}><Save className="h-4 w-4 mr-2" />{isSubmitting ? 'Menyimpan...' : 'Simpan'}</Button></DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+            <AlertDialog open={isCategoryDeleteOpen} onOpenChange={setIsCategoryDeleteOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader><AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle><AlertDialogDescription>Tindakan ini akan menghapus kategori &quot;{selectedCategory?.name}&quot; secara permanen.</AlertDialogDescription></AlertDialogHeader>
+                    <AlertDialogFooter><AlertDialogCancel>Batal</AlertDialogCancel><AlertDialogAction onClick={handleDeleteCategory}>Hapus</AlertDialogAction></AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </div>
