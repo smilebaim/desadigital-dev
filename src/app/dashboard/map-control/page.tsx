@@ -359,7 +359,11 @@ const MapControlPage = () => {
                                 <div className="space-y-2"><Label htmlFor="polygon-category">Kategori</Label><Input id="polygon-category" value={polygonFormValues.category} onChange={(e) => setPolygonFormValues({...polygonFormValues, category: e.target.value})} placeholder="Contoh: Perikanan" disabled={isSubmitting} /></div>
                             </div>
                             <div className="space-y-2"><Label htmlFor="polygon-description">Deskripsi</Label><Textarea id="polygon-description" value={polygonFormValues.description} onChange={(e) => setPolygonFormValues({...polygonFormValues, description: e.target.value})} placeholder="Deskripsi singkat area" disabled={isSubmitting} /></div>
-                            <div className="space-y-2"><Label htmlFor="polygon-coordinates">Koordinat Poligon (JSON)</Label><Textarea id="polygon-coordinates" value={polygonFormValues.coordinates} onChange={(e) => setPolygonFormValues({...polygonFormValues, coordinates: e.target.value})} placeholder='Contoh: [[-1.22, 104.38], [-1.23, 104.39], [-1.22, 104.39]]' disabled={isSubmitting} rows={6} /><p className="text-xs text-muted-foreground">Format: Array dari array `[latitude, longitude]`.</p></div>
+                            <div className="space-y-2">
+                                <Label htmlFor="polygon-coordinates">Koordinat Poligon (JSON)</Label>
+                                <Textarea id="polygon-coordinates" value={polygonFormValues.coordinates} onChange={(e) => setPolygonFormValues({...polygonFormValues, coordinates: e.target.value})} placeholder='Contoh: [[-1.22, 104.38], [-1.23, 104.39], [-1.22, 104.39]]' disabled={isSubmitting} rows={6} />
+                                <p className="text-xs text-muted-foreground">Format: Array dari array `[latitude, longitude]`. Pastikan urutannya benar.</p>
+                            </div>
                         </div>
                         <DialogFooter><Button type="button" variant="outline" onClick={() => setIsPolygonFormOpen(false)}>Batal</Button><Button type="submit" disabled={isSubmitting}><Save className="h-4 w-4 mr-2" />{isSubmitting ? 'Menyimpan...' : 'Simpan'}</Button></DialogFooter>
                     </form>
@@ -376,3 +380,5 @@ const MapControlPage = () => {
 };
 
 export default MapControlPage;
+
+    
