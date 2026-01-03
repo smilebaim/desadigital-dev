@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap, Polygon } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -49,6 +49,10 @@ interface ExtendedPolygon extends MapPolygon {
   id: string;
 }
 
+interface FeatureLayer {
+    layer: LeafletMarker | LeafletPolygon;
+    category: string;
+}
 
 const LayerPanel: React.FC<{
   expanded: boolean;
@@ -263,11 +267,11 @@ const MapControls: React.FC<{
 const MapComponent = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<LeafletMap | null>(null);
-    const markersRef = useRef<L.Marker[]>([]);
-    const polygonsRef = useRef<L.Polygon[]>([]);
+    const featureLayersRef = useRef<FeatureLayer[]>([]);
+    
     const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
     const [activeBaseLayer, setActiveBaseLayer] = useState<string>('satellite');
-    const [activeOverlays, setActiveOverlays] = useState<string[]>(['Peta Administrasi']);
+    const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedFeature, setSelectedFeature] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary' | 'polygon'; } | null>(null);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
@@ -284,19 +288,30 @@ const MapComponent = () => {
             });
             mapInstanceRef.current = map;
             setMapInstance(map);
+
+             // Set initial active overlays from categories
+            const initialActive: string[] = [];
+            layerCategories.forEach(cat => {
+                if (cat.layers.length > 0) {
+                    initialActive.push(cat.layers[0]);
+                }
+            });
+            setActiveOverlays(initialActive);
         }
 
-        // Fetch layer categories
-        const unsubscribeCategories = getLayerCategoriesStream((data) => {
+        const unsubCategories = getLayerCategoriesStream((data) => {
             setLayerCategories(data as MapLayerCategory[]);
         });
 
-        // Fetch markers
-        const unsubscribeMarkers = getMarkersStream((data) => {
+        const unsubMarkers = getMarkersStream((data) => {
             if (mapInstanceRef.current) {
-                markersRef.current.forEach(marker => marker.remove());
-                markersRef.current = [];
+                // Clear only markers
+                featureLayersRef.current
+                    .filter(f => f.layer instanceof LeafletMarker)
+                    .forEach(f => f.layer.remove());
 
+                featureLayersRef.current = featureLayersRef.current.filter(f => !(f.layer instanceof LeafletMarker));
+                
                 const newMarkers = (data as ExtendedMarker[]).map(markerData => {
                     const marker = L.marker([markerData.latitude, markerData.longitude])
                         .on('click', () => {
@@ -307,24 +322,25 @@ const MapComponent = () => {
                                 type: 'marker',
                             });
                         });
-                    return marker;
+                    return { layer: marker, category: markerData.category };
                 });
-                
-                newMarkers.forEach(marker => marker.addTo(mapInstanceRef.current!));
-                markersRef.current = newMarkers;
+                featureLayersRef.current.push(...newMarkers);
             }
         });
         
-        // Fetch polygons
-        const unsubscribePolygons = getPolygonsStream((data) => {
-            if (mapInstanceRef.current) {
-                polygonsRef.current.forEach(polygon => polygon.remove());
-                polygonsRef.current = [];
+        const unsubPolygons = getPolygonsStream((data) => {
+             if (mapInstanceRef.current) {
+                // Clear only polygons
+                featureLayersRef.current
+                    .filter(f => f.layer instanceof LeafletPolygon)
+                    .forEach(f => f.layer.remove());
+
+                featureLayersRef.current = featureLayersRef.current.filter(f => !(f.layer instanceof LeafletPolygon));
 
                 const newPolygons = (data as ExtendedPolygon[]).map(polygonData => {
                     try {
                         const coordinates = JSON.parse(polygonData.coordinates) as [number, number][];
-                         const polygon = L.polygon(coordinates, {
+                        const polygon = L.polygon(coordinates, {
                             color: 'white', weight: 2, fillColor: '#10b981', fillOpacity: 0.2, opacity: 0.8,
                         }).on('click', () => {
                             setSelectedFeature({
@@ -333,27 +349,25 @@ const MapComponent = () => {
                                 type: 'polygon',
                             });
                         });
-                        return polygon;
+                        return { layer: polygon, category: polygonData.category };
                     } catch (e) {
                         console.error("Failed to parse polygon coordinates:", e);
                         return null;
                     }
-                }).filter((p): p is Polygon => p !== null);
+                }).filter((p): p is FeatureLayer => p !== null);
                 
-                newPolygons.forEach(p => p.addTo(mapInstanceRef.current!));
-                polygonsRef.current = newPolygons;
+                featureLayersRef.current.push(...newPolygons);
             }
         });
 
-
         return () => {
-            if (mapInstanceRef.current) {
+            unsubCategories();
+            unsubMarkers();
+            unsubPolygons();
+             if (mapInstanceRef.current) {
                 mapInstanceRef.current.remove();
                 mapInstanceRef.current = null;
             }
-            unsubscribeCategories();
-            unsubscribeMarkers();
-            unsubscribePolygons();
         };
     }, []);
 
@@ -372,18 +386,20 @@ const MapComponent = () => {
     }, [activeBaseLayer, mapInstance]);
 
     useEffect(() => {
-        // This effect will now be driven by the state of activeOverlays and dynamic polygon data
-        // For simplicity, we'll keep the logic to show/hide based on a predefined name for now
-        // In a more advanced setup, you'd match category names or layer IDs
-        polygonsRef.current.forEach(p => {
-             if (activeOverlays.includes('Peta Administrasi')) {
-                if(!mapInstance?.hasLayer(p)) p.addTo(mapInstance!);
+        if (!mapInstance) return;
+
+        featureLayersRef.current.forEach(({ layer, category }) => {
+            if (activeOverlays.includes(category)) {
+                if (!mapInstance.hasLayer(layer)) {
+                    layer.addTo(mapInstance);
+                }
             } else {
-                 if(mapInstance?.hasLayer(p)) mapInstance.removeLayer(p);
+                if (mapInstance.hasLayer(layer)) {
+                    mapInstance.removeLayer(layer);
+                }
             }
         });
-
-    }, [activeOverlays, mapInstance]);
+    }, [activeOverlays, mapInstance, layerCategories]); // Depend on layerCategories to re-evaluate when they change
 
     const handleLayerToggle = (layerName: string) => {
         setActiveOverlays(prev =>
@@ -420,3 +436,5 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+    
