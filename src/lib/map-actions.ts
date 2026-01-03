@@ -178,4 +178,3 @@ export const seedDefaultCategories = async () => {
         return { success: false, error: error.message };
     }
 };
-

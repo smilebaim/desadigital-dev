@@ -10,7 +10,6 @@ import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
 import { getMarkersStream, getLayerCategoriesStream, getPolygonsStream } from '@/lib/map-client-actions';
 import type { MapLayerCategory, MapMarker, MapPolygon } from '@/lib/map-actions';
-import { ADMINISTRATIVE_BOUNDARY } from '@/lib/map-data';
 
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
 const DEFAULT_ZOOM = 16;
@@ -67,22 +66,6 @@ const getPolygonStyle = (category: string) => {
             return { color: '#ffffff', weight: 2, fillColor: '#10b981', fillOpacity: 0.2 };
     }
 };
-
-// --- DUMMY DATA ---
-const dummyLayerCategories: MapLayerCategory[] = [
-    { id: 'cat1', name: 'Batas Wilayah', layers: ['Batas Desa', 'Batas Dusun'], order: 1 },
-    { id: 'cat2', name: 'Penggunaan Lahan', layers: ['Bidang Tanah', 'Area Pertanian', 'Kawasan Lindung'], order: 2 },
-    { id: 'cat3', name: 'Fasilitas Umum', layers: ['Kantor Desa', 'Sekolah', 'Masjid'], order: 4 },
-];
-
-const dummyMarkers: ExtendedMarker[] = [
-    { id: 'marker1', name: 'Kantor Desa', description: 'Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo.', latitude: -1.222418, longitude: 104.383073, category: 'Kantor Desa' }
-];
-
-const dummyPolygons: ExtendedPolygon[] = [
-    { id: 'polygon1', name: 'Batas Administrasi Desa', description: 'Batas wilayah administratif resmi Desa Remau Bako Tuo.', category: 'Batas Desa', coordinates: JSON.stringify(ADMINISTRATIVE_BOUNDARY) }
-];
-
 
 const LayerPanel: React.FC<{
   expanded: boolean;
@@ -301,13 +284,13 @@ const MapComponent = () => {
     
     const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
     const [activeBaseLayer, setActiveBaseLayer] = useState<string>('satellite');
-    const [activeOverlays, setActiveOverlays] = useState<string[]>(['Batas Desa', 'Kantor Desa']);
+    const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
     const [selectedFeature, setSelectedFeature] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary' | 'polygon'; } | null>(null);
     
-    const markers = dummyMarkers;
-    const polygons = dummyPolygons;
-    const layerCategories = dummyLayerCategories;
+    const [markers, setMarkers] = useState<ExtendedMarker[]>([]);
+    const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
+    const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
     
     // Helper function to update feature layers on the map
     const updateFeatureLayers = (currentLayers: FeatureLayer[], currentActiveOverlays: string[], map: LeafletMap) => {
@@ -335,29 +318,44 @@ const MapComponent = () => {
             });
             mapInstanceRef.current = map;
             setMapInstance(map);
-
-             // Set initial base layer
-            const baseLayerData = BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS];
-            const tileLayer = L.tileLayer(baseLayerData.url, {
-                attribution: baseLayerData.attribution
-            }).addTo(map);
-            baseLayerRef.current = tileLayer;
         }
+
+        const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
+        const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
+        const unsubCategories = getLayerCategoriesStream((data) => {
+            setLayerCategories(data as MapLayerCategory[]);
+            if (data.length > 0) {
+                 // Automatically activate the first layer of the first category
+                 const firstCategory = data[0];
+                 if (firstCategory && firstCategory.layers.length > 0) {
+                     setActiveOverlays(prev => [...new Set([...prev, firstCategory.layers[0]])]);
+                 }
+            }
+        });
 
         return () => {
              if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-                mapInstanceRef.current = null;
-            }
+                // mapInstanceRef.current.remove();
+                // mapInstanceRef.current = null;
+             }
+             unsubMarkers();
+             unsubPolygons();
+             unsubCategories();
         };
     }, []);
 
     // useEffect for updating base layer
     useEffect(() => {
-        if (mapInstance && baseLayerRef.current) {
-            const baseLayerData = BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS];
-            baseLayerRef.current.setUrl(baseLayerData.url);
-            baseLayerRef.current.options.attribution = baseLayerData.attribution;
+        if (!mapInstance) return;
+
+        if (baseLayerRef.current) {
+            baseLayerRef.current.setUrl(BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].url);
+            baseLayerRef.current.options.attribution = BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].attribution;
+        } else {
+            const tileLayer = L.tileLayer(BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].url, {
+                attribution: BASE_LAYERS[activeBaseLayer as keyof typeof BASE_LAYERS].attribution
+            }).addTo(mapInstance);
+            baseLayerRef.current = tileLayer;
         }
     }, [activeBaseLayer, mapInstance]);
 
