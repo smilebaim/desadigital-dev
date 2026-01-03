@@ -1,16 +1,15 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap, Polygon } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
-import { getMarkersStream, getLayerCategoriesStream } from '@/lib/map-client-actions';
-import type { MapLayerCategory, MapMarker } from '@/lib/map-actions';
+import { getMarkersStream, getLayerCategoriesStream, getPolygonsStream } from '@/lib/map-client-actions';
+import type { MapLayerCategory, MapMarker, MapPolygon } from '@/lib/map-actions';
 
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
 const DEFAULT_ZOOM = 16;
@@ -41,109 +40,15 @@ const BASE_LAYERS = {
   }
 };
 
-const ADMINISTRATIVE_BOUNDARY: [number, number][] = [
-    [-1.19066, 104.394354], [-1.190292, 104.392146], [-1.190158, 104.39068],
-    [-1.190254, 104.387615], [-1.190234, 104.386759], [-1.190596, 104.386264],
-    [-1.191624, 104.385274], [-1.193102, 104.383846], [-1.198456, 104.383289],
-    [-1.201169, 104.382903], [-1.203091, 104.382385], [-1.204668, 104.379232],
-    [-1.207582, 104.375544], [-1.208891, 104.374265], [-1.212728, 104.369209],
-    [-1.214483, 104.367692], [-1.215302, 104.333421], [-1.216666, 104.327944],
-    [-1.216666, 104.323756], [-1.215904, 104.315761], [-1.214572, 104.309099],
-    [-1.21362, 104.301104], [-1.215523, 104.291586], [-1.219331, 104.287969],
-    [-1.221044, 104.282259], [-1.220282, 104.275596], [-1.21895, 104.270647],
-    [-1.217808, 104.264175], [-1.214952, 104.257322], [-1.212858, 104.252944],
-    [-1.211716, 104.247804], [-1.210193, 104.244949], [-1.207355, 104.240891],
-    [-1.209233, 104.234249], [-1.208903, 104.228119], [-1.208854, 104.227201],
-    [-1.208183, 104.214739], [-1.20942, 104.208641], [-1.210426, 104.203686],
-    [-1.223677, 104.195429], [-1.225255, 104.194446], [-1.235852, 104.188874],
-    [-1.235959, 104.188995], [-1.235965, 104.188993], [-1.243688, 104.186813],
-    [-1.245032, 104.185539], [-1.246932, 104.190887], [-1.249597, 104.195266],
-    [-1.252643, 104.197359], [-1.255689, 104.202118], [-1.25645, 104.205735],
-    [-1.260067, 104.212398], [-1.258925, 104.21887], [-1.255879, 104.22439],
-    [-1.251501, 104.22991], [-1.249597, 104.236573], [-1.25093, 104.243235],
-    [-1.252643, 104.248946], [-1.252643, 104.253324], [-1.253214, 104.259987],
-    [-1.255689, 104.263223], [-1.256069, 104.269505], [-1.255498, 104.27255],
-    [-1.256831, 104.278451], [-1.261019, 104.284353], [-1.265397, 104.290444],
-    [-1.266729, 104.297678], [-1.268252, 104.303959], [-1.269014, 104.310241],
-    [-1.268443, 104.31481], [-1.269394, 104.319759], [-1.271679, 104.324137],
-    [-1.27244, 104.331561], [-1.274344, 104.33632], [-1.274344, 104.339937],
-    [-1.273952, 104.343623], [-1.27389, 104.349936], [-1.273033, 104.355818],
-    [-1.272062, 104.358274], [-1.267836, 104.359816], [-1.262297, 104.36347],
-    [-1.258242, 104.367582], [-1.259556, 104.373921], [-1.263896, 104.378033],
-    [-1.267737, 104.38161], [-1.26955, 104.386256], [-1.270006, 104.390768],
-    [-1.268978, 104.39545], [-1.266254, 104.402923], [-1.262411, 104.40982],
-    [-1.262161, 104.410462], [-1.261162, 104.411105], [-1.260519, 104.411212],
-    [-1.260333, 104.411135], [-1.260116, 104.411043], [-1.259451, 104.410741],
-    [-1.259115, 104.410565], [-1.258782, 104.410392], [-1.258342, 104.410169],
-    [-1.258035, 104.400073], [-1.257842, 104.409991], [-1.257638, 104.409915],
-    [-1.257493, 104.409843], [-1.257364, 104.409782], [-1.257233, 104.409719],
-    [-1.257052, 104.409618], [-1.257013, 104.409601], [-1.256893, 104.409547],
-    [-1.256733, 104.409489], [-1.256573, 104.409437], [-1.256451, 104.409404],
-    [-1.256288, 104.409357], [-1.256138, 104.40931], [-1.25596, 104.409264],
-    [-1.255694, 104.40914], [-1.255535, 104.409052], [-1.255389, 104.408969],
-    [-1.255222, 104.408862], [-1.254921, 104.408722], [-1.254803, 104.408671],
-    [-1.254754, 104.40865], [-1.2546, 104.408586], [-1.254481, 104.408535],
-    [-1.254321, 104.408463], [-1.254162, 104.408406], [-1.254021, 104.408355],
-    [-1.253878, 104.408303], [-1.253733, 104.408236], [-1.253602, 104.408165],
-    [-1.253477, 104.408101], [-1.253072, 104.407892], [-1.252907, 104.407799],
-    [-1.252749, 104.407678], [-1.252564, 104.407566], [-1.25229, 104.407405],
-    [-1.252141, 104.407314], [-1.25203, 104.407243], [-1.251932, 104.407185],
-    [-1.251833, 104.407126], [-1.251716, 104.407069], [-1.251572, 104.407003],
-    [-1.251272, 104.406843], [-1.251105, 104.406742], [-1.250934, 104.406647],
-    [-1.2508, 104.406579], [-1.250622, 104.406481], [-1.250475, 104.406403],
-    [-1.250322, 104.406316], [-1.250184, 104.406201], [-1.250097, 104.40612],
-    [-1.250003, 104.406039], [-1.25, 104.406037], [-1.249684, 104.405802],
-    [-1.249342, 104.40558], [-1.248998, 104.405406], [-1.24839, 104.405111],
-    [-1.247903, 104.404862], [-1.247502, 104.404713], [-1.247005, 104.404454],
-    [-1.246594, 104.404227], [-1.246448, 104.404159], [-1.246274, 104.404092],
-    [-1.246235, 104.404079], [-1.246189, 104.404063], [-1.246136, 104.404045],
-    [-1.246002, 104.403995], [-1.245853, 104.403924], [-1.245723, 104.403864],
-    [-1.245582, 104.403783], [-1.245448, 104.403708], [-1.245269, 104.403635],
-    [-1.244452, 104.3033], [-1.243198, 104.402724], [-1.242704, 104.402505],
-    [-1.242362, 104.402362], [-1.242156, 104.402267], [-1.241985, 104.402192],
-    [-1.241187, 104.401864], [-1.240184, 104.40142], [-1.239954, 104.401309],
-    [-1.239734, 104.40122], [-1.23955, 104.401153], [-1.238844, 104.400908],
-    [-1.23849, 104.400781], [-1.238185, 104.400664], [-1.237973, 104.400565],
-    [-1.237771, 104.400458], [-1.237608, 104.400361], [-1.237462, 104.40027],
-    [-1.237319, 104.400179], [-1.237203, 104.400071], [-1.237096, 104.399906],
-    [-1.237053, 104.399828], [-1.236996, 104.39979], [-1.236929, 104.399753],
-    [-1.236882, 104.399705], [-1.236832, 104.39966], [-1.236786, 104.399624],
-    [-1.236712, 104.399603], [-1.23663, 104.399596], [-1.236496, 104.399603],
-    [-1.23632, 104.399626], [-1.236134, 104.399639], [-1.235964, 104.39964],
-    [-1.235824, 104.399643], [-1.235705, 104.399641], [-1.235572, 104.399626],
-    [-1.235438, 104.399608], [-1.235343, 104.399578], [-1.235269, 104.399542],
-    [-1.235156, 104.399494], [-1.235024, 104.399458], [-1.234848, 104.399429],
-    [-1.234679, 104.399385], [-1.234494, 104.39932], [-1.234344, 104.399255],
-    [-1.23422, 104.399204], [-1.234112, 104.399172], [-1.234025, 104.399145],
-    [-1.233888, 104.399121], [-1.233731, 104.39908], [-1.233589, 104.399035],
-    [-1.233473, 104.398988], [-1.233118, 104.398838], [-1.232983, 104.398771],
-    [-1.232058, 104.398443], [-1.231243, 104.398089], [-1.23076, 104.397858],
-    [-1.230417, 104.397676], [-1.230072, 104.397518], [-1.229913, 104.397463],
-    [-1.22974, 104.397403], [-1.229405, 104.397298], [-1.229235, 104.397244],
-    [-1.228971, 104.397161], [-1.228561, 104.397031], [-1.228127, 104.396926],
-    [-1.227649, 104.396776], [-1.226977, 104.396565], [-1.225782, 104.39609],
-    [-1.225369, 104.395859], [-1.225312, 104.395839], [-1.225259, 104.395827],
-    [-1.225178, 104.395827], [-1.225074, 104.395832], [-1.224945, 104.395839],
-    [-1.224635, 104.395782], [-1.224489, 104.395723], [-1.224406, 104.395674],
-    [-1.224363, 104.395632], [-1.224179, 104.395462], [-1.22399, 104.395376],
-    [-1.223746, 104.395307], [-1.223059, 104.395071], [-1.22248, 104.394835],
-    [-1.222066, 104.394672], [-1.221995, 104.394663], [-1.221882, 104.394653],
-    [-1.221776, 104.394655], [-1.221742, 104.394652], [-1.221642, 104.394645],
-    [-1.221544, 104.39463], [-1.221495, 104.394623], [-1.221361, 104.394591],
-    [-1.221225, 104.394545], [-1.221096, 104.394493], [-1.220986, 104.394446],
-    [-1.22086, 104.394412], [-1.22065, 104.39436], [-1.220346, 104.394261],
-    [-1.220192, 104.394187], [-1.220027, 104.394097], [-1.219929, 104.394027],
-    [-1.219814, 104.393966], [-1.219666, 104.393934], [-1.219527, 104.393905],
-    [-1.219381, 104.39387], [-1.219038, 104.393725], [-1.218921, 104.393655],
-    [-1.218859, 104.393617], [-1.218672, 104.393515], [-1.218521, 104.393456],
-    [-1.218394, 104.393422], [-1.218243, 104.39337], [-1.218078, 104.393296],
-    [-1.217948, 104.393215], [-1.217848, 104.393136], [-1.217771, 104.393072],
-    [-1.217517, 104.39295], [-1.217408, 104.392888], [-1.217323, 104.392787]
-].map(([lat, lng]) => [lat, lng] as [number, number]);
 
 interface ExtendedMarker extends MapMarker {
   id: string;
 }
+
+interface ExtendedPolygon extends MapPolygon {
+  id: string;
+}
+
 
 const LayerPanel: React.FC<{
   expanded: boolean;
@@ -220,7 +125,7 @@ const LayerPanel: React.FC<{
 const LayerInfo: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  markerInfo: { title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary'; } | null;
+  markerInfo: { title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary' | 'polygon'; } | null;
 }> = ({ isOpen, onClose, markerInfo }) => {
   if (!markerInfo) return null;
   const stats = [
@@ -245,15 +150,15 @@ const LayerInfo: React.FC<{
               {markerInfo.coordinates && (
                 <div className="flex items-center space-x-2 text-black/80">
                   <Layers className="h-4 w-4" />
-                  <p className="text-xs sm:text-sm">{markerInfo.coordinates[0]}, {markerInfo.coordinates[1]}</p>
+                  <p className="text-xs sm:text-sm">{markerInfo.coordinates[0].toFixed(6)}, {markerInfo.coordinates[1].toFixed(6)}</p>
                 </div>
               )}
               <p className="text-xs sm:text-sm text-black/80">{markerInfo.description}</p>
             </div>
-            {markerInfo.type === 'boundary' ? (
+            {markerInfo.type === 'boundary' || markerInfo.type === 'polygon' ? (
               <>
                 <div className="border-t border-white/20 pt-4">
-                  <h4 className="font-medium text-base mb-2 text-black/90">Informasi Batas Wilayah</h4>
+                  <h4 className="font-medium text-base mb-2 text-black/90">Informasi Area</h4>
                   <div className="space-y-2">
                     <p className="text-xs sm:text-sm text-black/80"><span className="font-medium text-black/90">Utara:</span> Desa Teluk</p>
                     <p className="text-xs sm:text-sm text-black/80"><span className="font-medium text-black/90">Selatan:</span> Desa Sungai Rengit</p>
@@ -359,11 +264,12 @@ const MapComponent = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<LeafletMap | null>(null);
     const markersRef = useRef<L.Marker[]>([]);
+    const polygonsRef = useRef<L.Polygon[]>([]);
     const [mapInstance, setMapInstance] = useState<LeafletMap | null>(null);
     const [activeBaseLayer, setActiveBaseLayer] = useState<string>('satellite');
     const [activeOverlays, setActiveOverlays] = useState<string[]>(['Peta Administrasi']);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
-    const [selectedMarker, setSelectedMarker] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary'; } | null>(null);
+    const [selectedFeature, setSelectedFeature] = useState<{ title: string; coordinates?: LatLngTuple; description: string; type?: 'marker' | 'boundary' | 'polygon'; } | null>(null);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
 
 
@@ -388,14 +294,13 @@ const MapComponent = () => {
         // Fetch markers
         const unsubscribeMarkers = getMarkersStream((data) => {
             if (mapInstanceRef.current) {
-                 // Clear existing markers
                 markersRef.current.forEach(marker => marker.remove());
                 markersRef.current = [];
 
                 const newMarkers = (data as ExtendedMarker[]).map(markerData => {
                     const marker = L.marker([markerData.latitude, markerData.longitude])
                         .on('click', () => {
-                            setSelectedMarker({
+                            setSelectedFeature({
                                 title: markerData.name,
                                 coordinates: [markerData.latitude, markerData.longitude],
                                 description: markerData.description,
@@ -409,6 +314,36 @@ const MapComponent = () => {
                 markersRef.current = newMarkers;
             }
         });
+        
+        // Fetch polygons
+        const unsubscribePolygons = getPolygonsStream((data) => {
+            if (mapInstanceRef.current) {
+                polygonsRef.current.forEach(polygon => polygon.remove());
+                polygonsRef.current = [];
+
+                const newPolygons = (data as ExtendedPolygon[]).map(polygonData => {
+                    try {
+                        const coordinates = JSON.parse(polygonData.coordinates) as [number, number][];
+                         const polygon = L.polygon(coordinates, {
+                            color: 'white', weight: 2, fillColor: '#10b981', fillOpacity: 0.2, opacity: 0.8,
+                        }).on('click', () => {
+                            setSelectedFeature({
+                                title: polygonData.name,
+                                description: polygonData.description,
+                                type: 'polygon',
+                            });
+                        });
+                        return polygon;
+                    } catch (e) {
+                        console.error("Failed to parse polygon coordinates:", e);
+                        return null;
+                    }
+                }).filter((p): p is Polygon => p !== null);
+                
+                newPolygons.forEach(p => p.addTo(mapInstanceRef.current!));
+                polygonsRef.current = newPolygons;
+            }
+        });
 
 
         return () => {
@@ -418,6 +353,7 @@ const MapComponent = () => {
             }
             unsubscribeCategories();
             unsubscribeMarkers();
+            unsubscribePolygons();
         };
     }, []);
 
@@ -436,26 +372,17 @@ const MapComponent = () => {
     }, [activeBaseLayer, mapInstance]);
 
     useEffect(() => {
-        if (mapInstance) {
-            Object.values(mapInstance._layers).forEach(layer => {
-                if (layer instanceof L.Polygon) {
-                    mapInstance.removeLayer(layer);
-                }
-            });
-
-            if (activeOverlays.includes('Peta Administrasi')) {
-                const adminBoundary = L.polygon(ADMINISTRATIVE_BOUNDARY as LatLngTuple[], {
-                    color: 'white', weight: 2, fillColor: '#10b981', fillOpacity: 0.2, opacity: 0.8,
-                }).on('click', () => {
-                    setSelectedMarker({
-                        title: 'Batas Administrasi Desa Remau Bako Tuo',
-                        description: 'Batas wilayah administratif resmi Desa Remau Bako Tuo yang telah ditetapkan sesuai dengan peraturan yang berlaku.',
-                        type: 'boundary',
-                    });
-                });
-                adminBoundary.addTo(mapInstance);
+        // This effect will now be driven by the state of activeOverlays and dynamic polygon data
+        // For simplicity, we'll keep the logic to show/hide based on a predefined name for now
+        // In a more advanced setup, you'd match category names or layer IDs
+        polygonsRef.current.forEach(p => {
+             if (activeOverlays.includes('Peta Administrasi')) {
+                if(!mapInstance?.hasLayer(p)) p.addTo(mapInstance!);
+            } else {
+                 if(mapInstance?.hasLayer(p)) mapInstance.removeLayer(p);
             }
-        }
+        });
+
     }, [activeOverlays, mapInstance]);
 
     const handleLayerToggle = (layerName: string) => {
@@ -484,9 +411,9 @@ const MapComponent = () => {
                 layerCategories={layerCategories}
             />
             <LayerInfo
-                isOpen={!!selectedMarker}
-                onClose={() => setSelectedMarker(null)}
-                markerInfo={selectedMarker}
+                isOpen={!!selectedFeature}
+                onClose={() => setSelectedFeature(null)}
+                markerInfo={selectedFeature}
             />
         </div>
     );

@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +26,8 @@ import {
   Trash2, 
   MapPin,
   Save,
-  Shapes
+  Shapes,
+  DownloadCloud
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -56,6 +56,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { addMarker, updateMarker, deleteMarker, type MapMarker, addPolygon, updatePolygon, deletePolygon, type MapPolygon } from '@/lib/map-actions';
 import { getMarkersStream, getPolygonsStream } from '@/lib/map-client-actions';
+import { ADMINISTRATIVE_BOUNDARY_JSON } from '@/lib/map-data';
 
 interface Marker extends MapMarker {
     id: string;
@@ -101,6 +102,30 @@ const MapControlPage = () => {
             unsubPolygons();
         }
     }, []);
+
+    // --- Seed Data Handler ---
+    const handleSeedBoundary = async () => {
+        const boundaryExists = polygons.some(p => p.name === 'Batas Administrasi Desa');
+        if (boundaryExists) {
+            toast({ title: 'Data Batas Desa sudah ada.', variant: 'default' });
+            return;
+        }
+
+        const polygonData: MapPolygon = {
+            name: 'Batas Administrasi Desa',
+            description: 'Batas wilayah administratif resmi Desa Remau Bako Tuo.',
+            category: 'Wilayah Administratif',
+            coordinates: ADMINISTRATIVE_BOUNDARY_JSON,
+        };
+        
+        const result = await addPolygon(polygonData);
+
+        if (result?.success) {
+            toast({ title: `Poligon Batas Desa berhasil ditambahkan.` });
+        } else {
+            toast({ title: `Gagal menambahkan Poligon Batas Desa.`, description: result?.error, variant: 'destructive' });
+        }
+    };
 
     // --- Marker Handlers ---
     const openAddMarkerForm = () => {
@@ -265,7 +290,10 @@ const MapControlPage = () => {
                                 <CardTitle>Daftar Poligon Peta</CardTitle>
                                 <CardDescription>Total poligon: {polygons.length}</CardDescription>
                             </div>
-                            <Button size="sm" onClick={openAddPolygonForm}><Plus className="h-4 w-4 mr-2" />Tambah Poligon</Button>
+                            <div className="flex gap-2">
+                                <Button size="sm" variant="outline" onClick={handleSeedBoundary}><DownloadCloud className="h-4 w-4 mr-2" />Input Batas Desa</Button>
+                                <Button size="sm" onClick={openAddPolygonForm}><Plus className="h-4 w-4 mr-2" />Tambah Poligon</Button>
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <Table>
