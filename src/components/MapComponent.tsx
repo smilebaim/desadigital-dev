@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker, Layer, TileLayer } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker, Layer, TileLayer, LayerGroup } from 'leaflet';
 import { Map as MapIcon, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -276,10 +276,10 @@ const MapControls: React.FC<{
 
 const MapComponent = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
-    const [map, setMap] = useState<LeafletMap | null>(null);
+    const mapRef = useRef<LeafletMap | null>(null);
     const baseLayerRef = useRef<TileLayer | null>(null);
-    const featureLayersRef = useRef<L.LayerGroup>(L.layerGroup());
-    
+    const featureLayersRef = useRef<LayerGroup>(L.layerGroup());
+
     const [activeBaseLayer, setActiveBaseLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
     const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
     const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
@@ -288,46 +288,43 @@ const MapComponent = () => {
     const [markers, setMarkers] = useState<ExtendedMarker[]>([]);
     const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
-    
-    // Effect for map initialization
+
+    // Effect for ONE-TIME map initialization
     useEffect(() => {
-        let mapInstance: LeafletMap | null = null;
-        if (mapContainerRef.current) {
-             mapInstance = L.map(mapContainerRef.current, {
+        if (mapContainerRef.current && !mapRef.current) {
+            const mapInstance = L.map(mapContainerRef.current, {
                 center: DESA_CENTER,
                 zoom: DEFAULT_ZOOM,
                 zoomControl: false,
                 maxBounds: DESA_BOUNDS,
                 maxBoundsViscosity: 1.0,
             });
-            setMap(mapInstance);
+
+            // Set base layer
+            baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
+                attribution: BASE_LAYERS[activeBaseLayer].attribution
+            }).addTo(mapInstance);
+
+            // Add feature group to map
+            featureLayersRef.current.addTo(mapInstance);
+            
+            mapRef.current = mapInstance;
         }
 
         return () => {
-            if (mapInstance) {
-                mapInstance.remove();
+            if (mapRef.current) {
+                mapRef.current.remove();
+                mapRef.current = null;
             }
-            setMap(null);
         };
-    }, []);
+    }, []); // Empty dependency array ensures this runs only once
 
-
-    // Effect to set up base layer and feature layer group once map is initialized
+    // Effect for updating BASE layer when activeBaseLayer changes
     useEffect(() => {
-        if (!map) return;
-        
-        if (baseLayerRef.current) {
-            map.removeLayer(baseLayerRef.current);
+        if (mapRef.current && baseLayerRef.current) {
+            baseLayerRef.current.setUrl(BASE_LAYERS[activeBaseLayer].url);
         }
-        baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
-            attribution: BASE_LAYERS[activeBaseLayer].attribution
-        }).addTo(map);
-
-        if (!map.hasLayer(featureLayersRef.current)) {
-            featureLayersRef.current.addTo(map);
-        }
-    }, [map, activeBaseLayer]);
-
+    }, [activeBaseLayer]);
 
     // Effect for fetching data from Firestore
     useEffect(() => {
@@ -337,10 +334,11 @@ const MapComponent = () => {
             const categories = data as MapLayerCategory[];
             setLayerCategories(categories);
             
-            if (categories.length > 0 && activeOverlays.length === 0) {
+            // Set initial active overlay if not already set
+            if (activeOverlays.length === 0 && categories.length > 0) {
                  const firstCategoryWithLayers = categories.find(c => c.layers.length > 0);
                  if (firstCategoryWithLayers) {
-                     setActiveOverlays(prev => [...new Set([...prev, firstCategoryWithLayers.layers[0]])]);
+                     setActiveOverlays([firstCategoryWithLayers.layers[0]]);
                  }
             }
         });
@@ -350,15 +348,17 @@ const MapComponent = () => {
             unsubPolygons();
             unsubCategories();
         };
-    }, [activeOverlays.length]);
+    }, []); // Empty dependency array to run only once for fetching
 
-    // Effect for updating feature layers when data or active overlays change
+    // The MAIN effect for drawing features on the map
     useEffect(() => {
+        const map = mapRef.current;
         if (!map) return;
 
+        // 1. Clear existing features
         featureLayersRef.current.clearLayers();
 
-        // Process polygons
+        // 2. Draw polygons
         polygons.forEach(polygonData => {
             if (activeOverlays.includes(polygonData.category)) {
                 try {
@@ -377,7 +377,7 @@ const MapComponent = () => {
             }
         });
 
-        // Process markers
+        // 3. Draw markers
         markers.forEach(markerData => {
             if (activeOverlays.includes(markerData.category)) {
                 const marker = L.marker([markerData.latitude, markerData.longitude])
@@ -393,7 +393,7 @@ const MapComponent = () => {
             }
         });
 
-    }, [map, markers, polygons, activeOverlays]); 
+    }, [markers, polygons, activeOverlays]); // Re-run this effect when data or active overlays change
 
     const handleLayerToggle = (layerName: string) => {
         setActiveOverlays(prev =>
@@ -406,15 +406,13 @@ const MapComponent = () => {
     return (
         <div className="fixed inset-0">
             <div ref={mapContainerRef} className="w-full h-full" />
-            {map && (
-                <MapControls
-                    map={map}
-                    activeLayer={activeBaseLayer}
-                    setActiveLayer={setActiveBaseLayer}
-                    layerPanelExpanded={layerPanelExpanded}
-                    setLayerPanelExpanded={setLayerPanelExpanded}
-                />
-            )}
+            <MapControls
+                map={mapRef.current}
+                activeLayer={activeBaseLayer}
+                setActiveLayer={setActiveBaseLayer}
+                layerPanelExpanded={layerPanelExpanded}
+                setLayerPanelExpanded={setLayerPanelExpanded}
+            />
             <LayerPanel
                 expanded={layerPanelExpanded}
                 onToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
@@ -432,5 +430,3 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
-
-    
