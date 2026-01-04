@@ -290,6 +290,7 @@ const MapComponent = () => {
     const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
     
+    // Effect for map initialization and data fetching
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
             const map = L.map(mapContainerRef.current, {
@@ -301,22 +302,20 @@ const MapComponent = () => {
             });
             mapInstanceRef.current = map;
 
-            // Set initial base layer
-            const baseLayerData = BASE_LAYERS[activeBaseLayer];
-            baseLayerRef.current = L.tileLayer(baseLayerData.url, {
-                attribution: baseLayerData.attribution
+            baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
+                attribution: BASE_LAYERS[activeBaseLayer].attribution
             }).addTo(map);
 
-            // Subscribe to data streams
             const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
             const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
             const unsubCategories = getLayerCategoriesStream((data) => {
-                setLayerCategories(data as MapLayerCategory[]);
-                // Set initial active overlays from the first category if none are active
-                if (data.length > 0 && activeOverlays.length === 0) {
-                     const firstCategory = data.find(c => c.layers.length > 0);
-                     if (firstCategory) {
-                         setActiveOverlays(prev => [...new Set([...prev, firstCategory.layers[0]])]);
+                const categories = data as MapLayerCategory[];
+                setLayerCategories(categories);
+                
+                if (categories.length > 0 && activeOverlays.length === 0) {
+                     const firstCategoryWithLayers = categories.find(c => c.layers.length > 0);
+                     if (firstCategoryWithLayers) {
+                         setActiveOverlays(prev => [...new Set([...prev, firstCategoryWithLayers.layers[0]])]);
                      }
                 }
             });
@@ -331,11 +330,11 @@ const MapComponent = () => {
                 }
             };
         }
-    }, []); // Main initialization effect, runs only once
+    }, []);
 
     // Effect for updating base layer
     useEffect(() => {
-        if (baseLayerRef.current && mapInstanceRef.current) {
+        if (baseLayerRef.current) {
             const baseLayerData = BASE_LAYERS[activeBaseLayer];
             baseLayerRef.current.setUrl(baseLayerData.url);
             baseLayerRef.current.options.attribution = baseLayerData.attribution;
@@ -351,47 +350,46 @@ const MapComponent = () => {
         featureLayersRef.current.forEach(f => f.layer.remove());
         featureLayersRef.current = [];
 
-        const allFeatureLayers: FeatureLayer[] = [];
+        const newFeatureLayers: FeatureLayer[] = [];
 
-        // Process new markers
+        // Process markers
         markers.forEach(markerData => {
-            const marker = L.marker([markerData.latitude, markerData.longitude])
-                .on('click', () => {
-                    setSelectedFeature({
-                        title: markerData.name,
-                        coordinates: [markerData.latitude, markerData.longitude],
-                        description: markerData.description,
-                        type: 'marker',
+            if (activeOverlays.includes(markerData.category)) {
+                const marker = L.marker([markerData.latitude, markerData.longitude])
+                    .on('click', () => {
+                        setSelectedFeature({
+                            title: markerData.name,
+                            coordinates: [markerData.latitude, markerData.longitude],
+                            description: markerData.description,
+                            type: 'marker',
+                        });
                     });
-                });
-            allFeatureLayers.push({ layer: marker, category: markerData.category });
+                marker.addTo(map);
+                newFeatureLayers.push({ layer: marker, category: markerData.category });
+            }
         });
 
-        // Process new polygons
+        // Process polygons
         polygons.forEach(polygonData => {
-            try {
-                const coordinates = JSON.parse(polygonData.coordinates) as [number, number][];
-                const polygon = L.polygon(coordinates, getPolygonStyle(polygonData.category)).on('click', () => {
-                    setSelectedFeature({
-                        title: polygonData.name,
-                        description: polygonData.description,
-                        type: polygonData.category === 'Batas Desa' ? 'boundary' : 'polygon',
+            if (activeOverlays.includes(polygonData.category)) {
+                try {
+                    const coordinates = JSON.parse(polygonData.coordinates) as [number, number][];
+                    const polygon = L.polygon(coordinates, getPolygonStyle(polygonData.category)).on('click', () => {
+                        setSelectedFeature({
+                            title: polygonData.name,
+                            description: polygonData.description,
+                            type: polygonData.category === 'Batas Desa' ? 'boundary' : 'polygon',
+                        });
                     });
-                });
-                 allFeatureLayers.push({ layer: polygon, category: polygonData.category });
-            } catch (e) {
-                console.error(`Failed to parse polygon coordinates for "${polygonData.name}":`, e);
+                    polygon.addTo(map);
+                    newFeatureLayers.push({ layer: polygon, category: polygonData.category });
+                } catch (e) {
+                    console.error(`Failed to parse polygon coordinates for "${polygonData.name}":`, e);
+                }
             }
         });
 
-        // Add layers to the map based on activeOverlays
-        allFeatureLayers.forEach(({ layer, category }) => {
-            if (activeOverlays.includes(category)) {
-                layer.addTo(map);
-            }
-        });
-        
-        featureLayersRef.current = allFeatureLayers;
+        featureLayersRef.current = newFeatureLayers;
 
     }, [markers, polygons, activeOverlays]); // Re-run when data or active overlays change
 
