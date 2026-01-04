@@ -118,7 +118,7 @@ const LayerPanel: React.FC<{
                       >
                         <input
                           type="checkbox"
-                          checked={activeOverlays.includes(layer)}
+                          checked={activeLayers.includes(layer)}
                           onChange={() => onLayerToggle(layer)}
                           className="rounded border-black/30 text-emerald-500 focus:ring-emerald-500 bg-white/20"
                         />
