@@ -71,9 +71,13 @@ const LayerPanel: React.FC<{
 
   useEffect(() => {
     if (layerCategories.length > 0 && !expandedCategory) {
-      setExpandedCategory(layerCategories[0].id!);
+      const firstCategory = layerCategories.find(c => c.layers.length > 0);
+      if (firstCategory?.id) {
+        setExpandedCategory(firstCategory.id);
+      }
     }
   }, [layerCategories, expandedCategory]);
+
 
   const toggleCategory = (categoryId: string) => {
     setExpandedCategory(expandedCategory === categoryId ? null : categoryId);
@@ -284,10 +288,11 @@ const MapComponent = () => {
     const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
     
-    // Effect for map initialization (runs only once)
+    // Effect for map initialization
     useEffect(() => {
+        let mapInstance: LeafletMap | null = null;
         if (mapContainerRef.current && !map) {
-            const mapInstance = L.map(mapContainerRef.current, {
+             mapInstance = L.map(mapContainerRef.current, {
                 center: DESA_CENTER,
                 zoom: DEFAULT_ZOOM,
                 zoomControl: false,
@@ -298,32 +303,29 @@ const MapComponent = () => {
         }
 
         return () => {
-            if (map) {
-                map.remove();
-                setMap(null);
+            if (mapInstance) {
+                mapInstance.remove();
             }
         };
-    }, []);
+    }, [map]);
+
 
     // Effect to set up base layer and feature layer group once map is initialized
     useEffect(() => {
         if (map) {
+            if (baseLayerRef.current) {
+                map.removeLayer(baseLayerRef.current);
+            }
             baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
                 attribution: BASE_LAYERS[activeBaseLayer].attribution
             }).addTo(map);
 
-            featureLayersRef.current.addTo(map);
+            if (!map.hasLayer(featureLayersRef.current)) {
+              featureLayersRef.current.addTo(map);
+            }
         }
-    }, [map]);
+    }, [map, activeBaseLayer]);
 
-    // Effect for updating base layer
-    useEffect(() => {
-        if (baseLayerRef.current) {
-            const baseLayerData = BASE_LAYERS[activeBaseLayer];
-            baseLayerRef.current.setUrl(baseLayerData.url);
-            baseLayerRef.current.options.attribution = baseLayerData.attribution;
-        }
-    }, [activeBaseLayer]);
 
     // Effect for fetching data from Firestore
     useEffect(() => {
@@ -333,7 +335,7 @@ const MapComponent = () => {
             const categories = data as MapLayerCategory[];
             setLayerCategories(categories);
             
-            // Set initial active overlay if not already set
+            // Set initial active overlay if not already set and there are categories
             if (categories.length > 0 && activeOverlays.length === 0) {
                  const firstCategoryWithLayers = categories.find(c => c.layers.length > 0);
                  if (firstCategoryWithLayers) {
@@ -347,7 +349,7 @@ const MapComponent = () => {
             unsubPolygons();
             unsubCategories();
         };
-    }, []);
+    }, [activeOverlays.length]);
 
     // Effect for updating feature layers when data or active overlays change
     useEffect(() => {
