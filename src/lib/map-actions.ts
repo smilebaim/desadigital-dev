@@ -1,6 +1,7 @@
 'use server';
 import { db } from './firebase';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDocs, where, query, writeBatch } from 'firebase/firestore';
+import { ADMINISTRATIVE_BOUNDARY_JSON } from './map-data';
 
 export interface MapMarker {
     name: string;
