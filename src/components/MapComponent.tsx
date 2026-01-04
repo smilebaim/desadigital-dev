@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker, Layer, TileLayer, LayerGroup } from 'leaflet';
+import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, LayerGroup } from 'leaflet';
 import { Map as MapIcon, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -277,7 +277,6 @@ const MapControls: React.FC<{
 const MapComponent = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<LeafletMap | null>(null);
-    const baseLayerRef = useRef<TileLayer | null>(null);
     const featureLayersRef = useRef<LayerGroup>(L.layerGroup());
 
     const [activeBaseLayer, setActiveBaseLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
@@ -291,9 +290,8 @@ const MapComponent = () => {
 
     // Effect for ONE-TIME map initialization
     useEffect(() => {
-        let mapInstance: LeafletMap;
         if (mapContainerRef.current && !mapRef.current) {
-            mapInstance = L.map(mapContainerRef.current, {
+            const mapInstance = L.map(mapContainerRef.current, {
                 center: DESA_CENTER,
                 zoom: DEFAULT_ZOOM,
                 zoomControl: false,
@@ -301,12 +299,11 @@ const MapComponent = () => {
                 maxBoundsViscosity: 1.0,
             });
 
-            baseLayerRef.current = L.tileLayer(BASE_LAYERS.satellite.url, {
+            L.tileLayer(BASE_LAYERS.satellite.url, {
                 attribution: BASE_LAYERS.satellite.attribution,
             }).addTo(mapInstance);
 
             featureLayersRef.current.addTo(mapInstance);
-            
             mapRef.current = mapInstance;
         }
 
@@ -320,8 +317,16 @@ const MapComponent = () => {
 
     // Effect for updating BASE layer when activeBaseLayer changes
     useEffect(() => {
-        if (mapRef.current && baseLayerRef.current) {
-            baseLayerRef.current.setUrl(BASE_LAYERS[activeBaseLayer].url);
+        const map = mapRef.current;
+        if (map) {
+            map.eachLayer((layer) => {
+                if (layer instanceof L.TileLayer) {
+                    layer.remove();
+                }
+            });
+            L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
+                attribution: BASE_LAYERS[activeBaseLayer].attribution,
+            }).addTo(map);
         }
     }, [activeBaseLayer]);
 
@@ -333,7 +338,6 @@ const MapComponent = () => {
             const categories = data as MapLayerCategory[];
             setLayerCategories(categories);
             
-            // Set initial active overlay only once after categories are loaded
             if (activeOverlays.length === 0 && categories.length > 0) {
                  const firstCategoryWithLayers = categories.find(c => c.layers.length > 0);
                  if (firstCategoryWithLayers) {
@@ -347,6 +351,7 @@ const MapComponent = () => {
             unsubPolygons();
             unsubCategories();
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // Run only once
 
     // The MAIN effect for drawing features on the map
@@ -354,7 +359,7 @@ const MapComponent = () => {
         const map = mapRef.current;
         if (!map) return;
 
-        // Clear existing features
+        // Clear existing features from the feature group
         featureLayersRef.current.clearLayers();
 
         // Draw polygons
@@ -429,3 +434,5 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+    
