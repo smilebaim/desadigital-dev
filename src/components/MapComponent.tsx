@@ -1,9 +1,8 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import L, { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon as LeafletPolygon, Marker as LeafletMarker, Layer, TileLayer } from 'leaflet';
-import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
+import { Map as MapIcon, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -25,7 +24,7 @@ const BASE_LAYERS = {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     name: 'Street',
-    icon: Map
+    icon: MapIcon
   },
   satellite: {
     url: 'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',
@@ -41,18 +40,12 @@ const BASE_LAYERS = {
   }
 };
 
-
 interface ExtendedMarker extends MapMarker {
   id: string;
 }
 
 interface ExtendedPolygon extends MapPolygon {
   id: string;
-}
-
-interface FeatureLayer {
-    layer: LeafletMarker | LeafletPolygon;
-    category: string;
 }
 
 const getPolygonStyle = (category: string) => {
@@ -278,9 +271,9 @@ const MapControls: React.FC<{
 
 const MapComponent = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
-    const mapInstanceRef = useRef<LeafletMap | null>(null);
-    const featureLayersRef = useRef<FeatureLayer[]>([]);
+    const [map, setMap] = useState<LeafletMap | null>(null);
     const baseLayerRef = useRef<TileLayer | null>(null);
+    const featureLayersRef = useRef<L.LayerGroup>(L.layerGroup());
     
     const [activeBaseLayer, setActiveBaseLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
     const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
@@ -291,23 +284,49 @@ const MapComponent = () => {
     const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
     
-    // Effect for map initialization
+    // Effect for map initialization (runs only once)
     useEffect(() => {
-        if (mapContainerRef.current && !mapInstanceRef.current) {
-            const map = L.map(mapContainerRef.current, {
+        if (mapContainerRef.current && !map) {
+            const mapInstance = L.map(mapContainerRef.current, {
                 center: DESA_CENTER,
                 zoom: DEFAULT_ZOOM,
                 zoomControl: false,
                 maxBounds: DESA_BOUNDS,
                 maxBoundsViscosity: 1.0,
             });
-            mapInstanceRef.current = map;
+            setMap(mapInstance);
+        }
 
+        return () => {
+            if (map) {
+                map.remove();
+                setMap(null);
+            }
+        };
+    }, []);
+
+    // Effect to set up base layer and feature layer group once map is initialized
+    useEffect(() => {
+        if (map) {
             baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
                 attribution: BASE_LAYERS[activeBaseLayer].attribution
             }).addTo(map);
-        }
 
+            featureLayersRef.current.addTo(map);
+        }
+    }, [map]);
+
+    // Effect for updating base layer
+    useEffect(() => {
+        if (baseLayerRef.current) {
+            const baseLayerData = BASE_LAYERS[activeBaseLayer];
+            baseLayerRef.current.setUrl(baseLayerData.url);
+            baseLayerRef.current.options.attribution = baseLayerData.attribution;
+        }
+    }, [activeBaseLayer]);
+
+    // Effect for fetching data from Firestore
+    useEffect(() => {
         const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
         const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
         const unsubCategories = getLayerCategoriesStream((data) => {
@@ -327,32 +346,14 @@ const MapComponent = () => {
             unsubMarkers();
             unsubPolygons();
             unsubCategories();
-            if (mapInstanceRef.current) {
-                mapInstanceRef.current.remove();
-                mapInstanceRef.current = null;
-            }
         };
     }, []);
 
-    // Effect for updating base layer
-    useEffect(() => {
-        if (baseLayerRef.current) {
-            const baseLayerData = BASE_LAYERS[activeBaseLayer];
-            baseLayerRef.current.setUrl(baseLayerData.url);
-            baseLayerRef.current.options.attribution = baseLayerData.attribution;
-        }
-    }, [activeBaseLayer]);
-
     // Effect for updating feature layers when data or active overlays change
     useEffect(() => {
-        const map = mapInstanceRef.current;
         if (!map) return;
 
-        // Clear existing feature layers from the map
-        featureLayersRef.current.forEach(f => f.layer.remove());
-        featureLayersRef.current = [];
-
-        const newFeatureLayers: FeatureLayer[] = [];
+        featureLayersRef.current.clearLayers();
 
         // Process polygons
         polygons.forEach(polygonData => {
@@ -366,7 +367,7 @@ const MapComponent = () => {
                             type: polygonData.category === 'Batas Desa' ? 'boundary' : 'polygon',
                         });
                     });
-                    newFeatureLayers.push({ layer: polygon, category: polygonData.category });
+                    featureLayersRef.current.addLayer(polygon);
                 } catch (e) {
                     console.error(`Failed to parse polygon coordinates for "${polygonData.name}":`, e);
                 }
@@ -385,15 +386,11 @@ const MapComponent = () => {
                             type: 'marker',
                         });
                     });
-                newFeatureLayers.push({ layer: marker, category: markerData.category });
+                featureLayersRef.current.addLayer(marker);
             }
         });
-        
-        // Add the new layers to the map
-        newFeatureLayers.forEach(f => f.layer.addTo(map));
-        featureLayersRef.current = newFeatureLayers;
 
-    }, [markers, polygons, activeOverlays]); 
+    }, [map, markers, polygons, activeOverlays]); 
 
     const handleLayerToggle = (layerName: string) => {
         setActiveOverlays(prev =>
@@ -406,9 +403,9 @@ const MapComponent = () => {
     return (
         <div className="fixed inset-0">
             <div ref={mapContainerRef} className="w-full h-full" />
-            {mapInstanceRef.current && (
+            {map && (
                 <MapControls
-                    map={mapInstanceRef.current}
+                    map={map}
                     activeLayer={activeBaseLayer}
                     setActiveLayer={setActiveBaseLayer}
                     layerPanelExpanded={layerPanelExpanded}
