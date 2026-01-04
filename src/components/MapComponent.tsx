@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -290,7 +291,7 @@ const MapComponent = () => {
     const [polygons, setPolygons] = useState<ExtendedPolygon[]>([]);
     const [layerCategories, setLayerCategories] = useState<MapLayerCategory[]>([]);
     
-    // Effect for map initialization and data fetching
+    // Effect for map initialization
     useEffect(() => {
         if (mapContainerRef.current && !mapInstanceRef.current) {
             const map = L.map(mapContainerRef.current, {
@@ -306,30 +307,37 @@ const MapComponent = () => {
                 attribution: BASE_LAYERS[activeBaseLayer].attribution
             }).addTo(map);
 
-            const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
-            const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
-            const unsubCategories = getLayerCategoriesStream((data) => {
-                const categories = data as MapLayerCategory[];
-                setLayerCategories(categories);
-                
-                if (categories.length > 0 && activeOverlays.length === 0) {
-                     const firstCategoryWithLayers = categories.find(c => c.layers.length > 0);
-                     if (firstCategoryWithLayers) {
-                         setActiveOverlays(prev => [...new Set([...prev, firstCategoryWithLayers.layers[0]])]);
-                     }
-                }
-            });
-
             return () => {
-                unsubMarkers();
-                unsubPolygons();
-                unsubCategories();
                 if (mapInstanceRef.current) {
                     mapInstanceRef.current.remove();
                     mapInstanceRef.current = null;
                 }
             };
         }
+    }, []);
+    
+    // Effect for data fetching
+    useEffect(() => {
+      const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
+      const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
+      const unsubCategories = getLayerCategoriesStream((data) => {
+          const categories = data as MapLayerCategory[];
+          setLayerCategories(categories);
+          
+          // Set initial active overlay if not already set
+          if (categories.length > 0 && activeOverlays.length === 0) {
+               const firstCategoryWithLayers = categories.find(c => c.layers.length > 0);
+               if (firstCategoryWithLayers) {
+                   setActiveOverlays(prev => [...new Set([...prev, firstCategoryWithLayers.layers[0]])]);
+               }
+          }
+      });
+
+      return () => {
+          unsubMarkers();
+          unsubPolygons();
+          unsubCategories();
+      };
     }, []);
 
     // Effect for updating base layer
@@ -352,23 +360,6 @@ const MapComponent = () => {
 
         const newFeatureLayers: FeatureLayer[] = [];
 
-        // Process markers
-        markers.forEach(markerData => {
-            if (activeOverlays.includes(markerData.category)) {
-                const marker = L.marker([markerData.latitude, markerData.longitude])
-                    .on('click', () => {
-                        setSelectedFeature({
-                            title: markerData.name,
-                            coordinates: [markerData.latitude, markerData.longitude],
-                            description: markerData.description,
-                            type: 'marker',
-                        });
-                    });
-                marker.addTo(map);
-                newFeatureLayers.push({ layer: marker, category: markerData.category });
-            }
-        });
-
         // Process polygons
         polygons.forEach(polygonData => {
             if (activeOverlays.includes(polygonData.category)) {
@@ -386,6 +377,23 @@ const MapComponent = () => {
                 } catch (e) {
                     console.error(`Failed to parse polygon coordinates for "${polygonData.name}":`, e);
                 }
+            }
+        });
+
+        // Process markers
+        markers.forEach(markerData => {
+            if (activeOverlays.includes(markerData.category)) {
+                const marker = L.marker([markerData.latitude, markerData.longitude])
+                    .on('click', () => {
+                        setSelectedFeature({
+                            title: markerData.name,
+                            coordinates: [markerData.latitude, markerData.longitude],
+                            description: markerData.description,
+                            type: 'marker',
+                        });
+                    });
+                marker.addTo(map);
+                newFeatureLayers.push({ layer: marker, category: markerData.category });
             }
         });
 
@@ -430,3 +438,5 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+    
