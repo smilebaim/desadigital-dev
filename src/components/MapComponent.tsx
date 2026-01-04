@@ -291,8 +291,9 @@ const MapComponent = () => {
 
     // Effect for ONE-TIME map initialization
     useEffect(() => {
+        let mapInstance: LeafletMap;
         if (mapContainerRef.current && !mapRef.current) {
-            const mapInstance = L.map(mapContainerRef.current, {
+            mapInstance = L.map(mapContainerRef.current, {
                 center: DESA_CENTER,
                 zoom: DEFAULT_ZOOM,
                 zoomControl: false,
@@ -300,12 +301,10 @@ const MapComponent = () => {
                 maxBoundsViscosity: 1.0,
             });
 
-            // Set base layer
-            baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
-                attribution: BASE_LAYERS[activeBaseLayer].attribution
+            baseLayerRef.current = L.tileLayer(BASE_LAYERS.satellite.url, {
+                attribution: BASE_LAYERS.satellite.attribution,
             }).addTo(mapInstance);
 
-            // Add feature group to map
             featureLayersRef.current.addTo(mapInstance);
             
             mapRef.current = mapInstance;
@@ -317,7 +316,7 @@ const MapComponent = () => {
                 mapRef.current = null;
             }
         };
-    }, []); // Empty dependency array ensures this runs only once
+    }, []);
 
     // Effect for updating BASE layer when activeBaseLayer changes
     useEffect(() => {
@@ -326,7 +325,7 @@ const MapComponent = () => {
         }
     }, [activeBaseLayer]);
 
-    // Effect for fetching data from Firestore
+    // Effect for fetching data from Firestore and setting initial overlay
     useEffect(() => {
         const unsubMarkers = getMarkersStream((data) => setMarkers(data as ExtendedMarker[]));
         const unsubPolygons = getPolygonsStream((data) => setPolygons(data as ExtendedPolygon[]));
@@ -334,7 +333,7 @@ const MapComponent = () => {
             const categories = data as MapLayerCategory[];
             setLayerCategories(categories);
             
-            // Set initial active overlay if not already set
+            // Set initial active overlay only once after categories are loaded
             if (activeOverlays.length === 0 && categories.length > 0) {
                  const firstCategoryWithLayers = categories.find(c => c.layers.length > 0);
                  if (firstCategoryWithLayers) {
@@ -348,17 +347,17 @@ const MapComponent = () => {
             unsubPolygons();
             unsubCategories();
         };
-    }, []); // Empty dependency array to run only once for fetching
+    }, []); // Run only once
 
     // The MAIN effect for drawing features on the map
     useEffect(() => {
         const map = mapRef.current;
         if (!map) return;
 
-        // 1. Clear existing features
+        // Clear existing features
         featureLayersRef.current.clearLayers();
 
-        // 2. Draw polygons
+        // Draw polygons
         polygons.forEach(polygonData => {
             if (activeOverlays.includes(polygonData.category)) {
                 try {
@@ -377,7 +376,7 @@ const MapComponent = () => {
             }
         });
 
-        // 3. Draw markers
+        // Draw markers
         markers.forEach(markerData => {
             if (activeOverlays.includes(markerData.category)) {
                 const marker = L.marker([markerData.latitude, markerData.longitude])
