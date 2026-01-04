@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -291,7 +292,7 @@ const MapComponent = () => {
     // Effect for map initialization
     useEffect(() => {
         let mapInstance: LeafletMap | null = null;
-        if (mapContainerRef.current && !map) {
+        if (mapContainerRef.current) {
              mapInstance = L.map(mapContainerRef.current, {
                 center: DESA_CENTER,
                 zoom: DEFAULT_ZOOM,
@@ -306,23 +307,24 @@ const MapComponent = () => {
             if (mapInstance) {
                 mapInstance.remove();
             }
+            setMap(null);
         };
-    }, [map]);
+    }, []);
 
 
     // Effect to set up base layer and feature layer group once map is initialized
     useEffect(() => {
-        if (map) {
-            if (baseLayerRef.current) {
-                map.removeLayer(baseLayerRef.current);
-            }
-            baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
-                attribution: BASE_LAYERS[activeBaseLayer].attribution
-            }).addTo(map);
+        if (!map) return;
+        
+        if (baseLayerRef.current) {
+            map.removeLayer(baseLayerRef.current);
+        }
+        baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
+            attribution: BASE_LAYERS[activeBaseLayer].attribution
+        }).addTo(map);
 
-            if (!map.hasLayer(featureLayersRef.current)) {
-              featureLayersRef.current.addTo(map);
-            }
+        if (!map.hasLayer(featureLayersRef.current)) {
+            featureLayersRef.current.addTo(map);
         }
     }, [map, activeBaseLayer]);
 
@@ -335,7 +337,6 @@ const MapComponent = () => {
             const categories = data as MapLayerCategory[];
             setLayerCategories(categories);
             
-            // Set initial active overlay if not already set and there are categories
             if (categories.length > 0 && activeOverlays.length === 0) {
                  const firstCategoryWithLayers = categories.find(c => c.layers.length > 0);
                  if (firstCategoryWithLayers) {
@@ -431,3 +432,5 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+    
