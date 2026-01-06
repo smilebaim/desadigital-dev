@@ -8,7 +8,7 @@ import {
   signOut,
   User as FirebaseUser
 } from "firebase/auth";
-import { auth } from '@/lib/firebase';
+import { auth } from '@/firebase/config';
 
 interface User {
   email: string | null;
