@@ -202,7 +202,7 @@ const LayerPanel: React.FC<{
 
 const MapComponent = () => {
   const { firestore } = useFirebase();
-  const [map, setMap] = useState<LeafletMap | null>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   
   const [activeBaseLayer, setActiveBaseLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
@@ -218,25 +218,30 @@ const MapComponent = () => {
 
   // Initialize Map
   useEffect(() => {
-    if (mapContainerRef.current && !map) {
+    if (mapContainerRef.current && !mapRef.current) {
       const mapInstance = L.map(mapContainerRef.current, {
         center: DESA_CENTER,
         zoom: DEFAULT_ZOOM,
         zoomControl: false,
         maxBounds: DESA_BOUNDS,
       });
-      setMap(mapInstance);
+      mapRef.current = mapInstance;
+      
+      // Add feature layer group to map
+      featureLayersRef.current.addTo(mapInstance);
       
       // Cleanup function to remove map on component unmount
       return () => {
         mapInstance.remove();
+        mapRef.current = null;
       };
     }
-  }, [mapContainerRef, map]);
+  }, []);
 
   // Handle Base Layer Changes
   useEffect(() => {
-    if (!map) return; // Don't run if map is not initialized
+    const map = mapRef.current;
+    if (!map) return;
 
     if (baseLayerRef.current) {
         map.removeLayer(baseLayerRef.current);
@@ -245,10 +250,7 @@ const MapComponent = () => {
         attribution: BASE_LAYERS[activeBaseLayer].attribution
     }).addTo(map);
 
-    if (!map.hasLayer(featureLayersRef.current)) {
-      featureLayersRef.current.addTo(map);
-    }
-  }, [map, activeBaseLayer]);
+  }, [activeBaseLayer]);
 
   // Fetch data from Firestore
   useEffect(() => {
@@ -257,6 +259,7 @@ const MapComponent = () => {
     const unsubCategories = onSnapshot(query(collection(firestore, 'tata_ruang_kategori')), (snapshot) => {
         const cats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as LayerCategory));
         setLayerCategories(cats);
+        // Set an initial active layer if none is selected
         if (cats.length > 0 && cats[0].layers.length > 0 && activeOverlays.length === 0) {
             setActiveOverlays([cats[0].layers[0]]);
         }
@@ -275,12 +278,14 @@ const MapComponent = () => {
         unsubMarkers();
         unsubPolygons();
     };
-  }, [firestore, activeOverlays.length]);
+  }, [firestore]);
 
 
   // Update map features when data or active overlays change
   useEffect(() => {
+      const map = mapRef.current;
       if (!map) return;
+      
       const featureLayer = featureLayersRef.current;
       featureLayer.clearLayers();
 
@@ -295,7 +300,7 @@ const MapComponent = () => {
               L.marker(m.position).bindPopup(`<b>${m.title}</b><br>${m.description}`).addTo(featureLayer);
           }
       });
-  }, [map, markers, polygons, activeOverlays]);
+  }, [markers, polygons, activeOverlays]);
 
   const handleLayerToggle = (layerName: string) => {
     setActiveOverlays(prev =>
@@ -309,7 +314,7 @@ const MapComponent = () => {
     <>
       <div id="map" ref={mapContainerRef} className="w-full h-full" />
       <MapControls
-        map={map}
+        map={mapRef.current}
         activeBaseLayer={activeBaseLayer}
         setActiveBaseLayer={setActiveBaseLayer}
         onLayerPanelToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
