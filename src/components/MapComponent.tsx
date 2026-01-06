@@ -1,10 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, useMap, Marker, Polygon } from 'react-leaflet';
+import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap, LayerGroup } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
-import { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap, LayerGroup } from 'leaflet';
-import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, Warehouse, Ruler, MapPin } from 'lucide-react';
+import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -67,12 +66,13 @@ interface MapPolygon {
 }
 
 const MapControls: React.FC<{
+  map: LeafletMap | null;
   activeBaseLayer: keyof typeof BASE_LAYERS;
   setActiveBaseLayer: (layer: keyof typeof BASE_LAYERS) => void;
   onLayerPanelToggle: () => void;
   layerPanelExpanded: boolean;
-}> = ({ activeBaseLayer, setActiveBaseLayer, onLayerPanelToggle, layerPanelExpanded }) => {
-  const map = useMap();
+}> = ({ map, activeBaseLayer, setActiveBaseLayer, onLayerPanelToggle, layerPanelExpanded }) => {
+  if (!map) return null;
   return (
      <div className="absolute left-2 top-20 z-[999]">
       <div className="space-y-2">
@@ -201,6 +201,9 @@ const LayerPanel: React.FC<{
 
 const MapComponent = () => {
   const { firestore } = useFirebase();
+  const [map, setMap] = useState<LeafletMap | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  
   const [activeBaseLayer, setActiveBaseLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
   const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
 
@@ -208,9 +211,43 @@ const MapComponent = () => {
   const [polygons, setPolygons] = useState<MapPolygon[]>([]);
   const [layerCategories, setLayerCategories] = useState<LayerCategory[]>([]);
   const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
-
-  const mapRef = useRef<LeafletMap | null>(null);
+  
+  const baseLayerRef = useRef<L.TileLayer | null>(null);
   const featureLayersRef = useRef<LayerGroup>(L.layerGroup());
+
+  // Initialize Map
+  useEffect(() => {
+    if (mapContainerRef.current && !map) {
+      const mapInstance = L.map(mapContainerRef.current, {
+        center: DESA_CENTER,
+        zoom: DEFAULT_ZOOM,
+        zoomControl: false,
+        maxBounds: DESA_BOUNDS,
+      });
+      setMap(mapInstance);
+      
+      // Cleanup function to remove map on component unmount
+      return () => {
+        mapInstance.remove();
+      };
+    }
+  }, [mapContainerRef, map]);
+
+  // Handle Base Layer Changes
+  useEffect(() => {
+    if (map) {
+        if (baseLayerRef.current) {
+            map.removeLayer(baseLayerRef.current);
+        }
+        baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
+            attribution: BASE_LAYERS[activeBaseLayer].attribution
+        }).addTo(map);
+
+        if (!map.hasLayer(featureLayersRef.current)) {
+          featureLayersRef.current.addTo(map);
+        }
+    }
+  }, [map, activeBaseLayer]);
 
   // Fetch data from Firestore
   useEffect(() => {
@@ -219,7 +256,6 @@ const MapComponent = () => {
     const unsubCategories = onSnapshot(query(collection(firestore, 'tata_ruang_kategori')), (snapshot) => {
         const cats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as LayerCategory));
         setLayerCategories(cats);
-        // Activate the first layer of the first category by default
         if (cats.length > 0 && cats[0].layers.length > 0 && activeOverlays.length === 0) {
             setActiveOverlays([cats[0].layers[0]]);
         }
@@ -243,11 +279,9 @@ const MapComponent = () => {
 
   // Update map features when data or active overlays change
   useEffect(() => {
-      const map = mapRef.current;
       if (!map) return;
-
       const featureLayer = featureLayersRef.current;
-      featureLayer.clearLayers(); // Clear previous features
+      featureLayer.clearLayers();
 
       polygons.forEach(p => {
           if (activeOverlays.includes(p.category)) {
@@ -260,11 +294,7 @@ const MapComponent = () => {
               L.marker(m.position).bindPopup(`<b>${m.title}</b><br>${m.description}`).addTo(featureLayer);
           }
       });
-
-      if (!map.hasLayer(featureLayer)) {
-          featureLayer.addTo(map);
-      }
-  }, [markers, polygons, activeOverlays, mapRef.current]);
+  }, [map, markers, polygons, activeOverlays]);
 
   const handleLayerToggle = (layerName: string) => {
     setActiveOverlays(prev =>
@@ -274,29 +304,16 @@ const MapComponent = () => {
     );
   };
 
-
   return (
     <>
-      <MapContainer
-        whenCreated={mapInstance => { mapRef.current = mapInstance; }}
-        center={DESA_CENTER}
-        zoom={DEFAULT_ZOOM}
-        className="w-full h-full"
-        zoomControl={false}
-        maxBounds={DESA_BOUNDS}
-        maxBoundsViscosity={1.0}
-      >
-        <TileLayer
-          attribution={BASE_LAYERS[activeBaseLayer].attribution}
-          url={BASE_LAYERS[activeBaseLayer].url}
-        />
-        <MapControls
-          activeBaseLayer={activeBaseLayer}
-          setActiveBaseLayer={setActiveBaseLayer}
-          onLayerPanelToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
-          layerPanelExpanded={layerPanelExpanded}
-        />
-      </MapContainer>
+      <div id="map" ref={mapContainerRef} className="w-full h-full" />
+      <MapControls
+        map={map}
+        activeBaseLayer={activeBaseLayer}
+        setActiveBaseLayer={setActiveBaseLayer}
+        onLayerPanelToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
+        layerPanelExpanded={layerPanelExpanded}
+      />
       <LayerPanel
         expanded={layerPanelExpanded}
         onToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
