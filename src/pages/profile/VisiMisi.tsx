@@ -125,7 +125,7 @@ const VisiMisi = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
+    <div className="container mx-auto px-4 py-8">
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Visi dan Misi Desa</h2>
@@ -143,7 +143,7 @@ const VisiMisi = () => {
           </TabsList>
 
           <TabsContent value="visi" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <Target className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -188,7 +188,7 @@ const VisiMisi = () => {
           </TabsContent>
 
           <TabsContent value="misi" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <ListChecks className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -233,7 +233,7 @@ const VisiMisi = () => {
           </TabsContent>
 
           <TabsContent value="strategi" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <ArrowRight className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -278,7 +278,7 @@ const VisiMisi = () => {
           </TabsContent>
 
           <TabsContent value="dokumen" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <FileText className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -313,4 +313,4 @@ const VisiMisi = () => {
   );
 };
 
-export default VisiMisi; 
+export default VisiMisi;

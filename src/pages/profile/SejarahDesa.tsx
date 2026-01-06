@@ -130,7 +130,7 @@ const SejarahDesa = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
+    <div className="container mx-auto px-4 py-8">
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Sejarah Desa</h2>
@@ -148,7 +148,7 @@ const SejarahDesa = () => {
           </TabsList>
 
           <TabsContent value="asal" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <History className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -193,7 +193,7 @@ const SejarahDesa = () => {
           </TabsContent>
 
           <TabsContent value="perkembangan" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <Calendar className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -241,7 +241,7 @@ const SejarahDesa = () => {
           </TabsContent>
 
           <TabsContent value="tokoh" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <Users className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -289,7 +289,7 @@ const SejarahDesa = () => {
           </TabsContent>
 
           <TabsContent value="dokumen" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <FileText className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -324,4 +324,4 @@ const SejarahDesa = () => {
   );
 };
 
-export default SejarahDesa; 
+export default SejarahDesa;

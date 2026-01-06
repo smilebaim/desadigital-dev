@@ -116,7 +116,7 @@ const ArahKebijakan = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
+    <div className="container mx-auto px-4 py-8">
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Arah Kebijakan Desa</h2>
@@ -134,7 +134,7 @@ const ArahKebijakan = () => {
           </TabsList>
 
           <TabsContent value="arah" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <Compass className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -170,7 +170,7 @@ const ArahKebijakan = () => {
           </TabsContent>
 
           <TabsContent value="prioritas" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <Target className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -204,7 +204,7 @@ const ArahKebijakan = () => {
           </TabsContent>
 
           <TabsContent value="strategi" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <ArrowRight className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -238,7 +238,7 @@ const ArahKebijakan = () => {
           </TabsContent>
 
           <TabsContent value="dokumen" className="space-y-4">
-            <Card className="border-none bg-transparent shadow-none">
+            <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <FileText className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -273,4 +273,4 @@ const ArahKebijakan = () => {
   );
 };
 
-export default ArahKebijakan; 
+export default ArahKebijakan;
