@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { MapContainer, TileLayer, useMap, Marker, Polygon } from 'react-leaflet';
+import L, { MapContainer, TileLayer, useMap, Marker, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
 import { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap } from 'leaflet';
@@ -715,64 +715,71 @@ const MapComponent = () => {
     description: string;
     type?: 'marker' | 'boundary';
   } | null>(null);
+  
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
 
-  const handleLayerToggle = (layer: string) => {
-    setActiveLayers(prev =>
-      prev.includes(layer)
-        ? prev.filter(l => l !== layer)
-        : [...prev, layer]
-    );
-  };
+  useEffect(() => {
+    if (mapContainerRef.current && !mapRef.current) {
+      mapRef.current = L.map(mapContainerRef.current, {
+        center: DESA_CENTER,
+        zoom: DEFAULT_ZOOM,
+        zoomControl: false,
+        maxBounds: DESA_BOUNDS,
+      });
+    }
+    
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
   
-  const mapDisplay = useMemo(() => (
-    <MapContainer 
-      center={DESA_CENTER} 
-      zoom={DEFAULT_ZOOM} 
-      className="w-full h-full"
-      zoomControl={false}
-      maxBounds={DESA_BOUNDS}
-      maxBoundsViscosity={1.0}
-      whenCreated={mapInstance => { mapRef.current = mapInstance; }}
-    >
-      <TileLayer
-        attribution={BASE_LAYERS[activeLayer].attribution}
-        url={BASE_LAYERS[activeLayer].url}
-      />
-      {activeLayers.includes('Peta Administrasi') && (
-        <Polygon
-          positions={ADMINISTRATIVE_BOUNDARY}
-          pathOptions={{
-            color: 'white',
-            weight: 2,
-            fillColor: '#10b981',
-            fillOpacity: 0.2,
-            opacity: 0.8
-          }}
-          eventHandlers={{
-            click: () => {
-              setSelectedMarker({
-                title: "Batas Administrasi Desa Remau Bako Tuo",
-                description: "Batas wilayah administratif resmi Desa Remau Bako Tuo yang telah ditetapkan sesuai dengan peraturan yang berlaku.",
-                type: 'boundary'
-              });
-            }
-          }}
-        />
-      )}
-      <Marker 
-        position={DESA_CENTER}
-        eventHandlers={{
-          click: () => {
-            setSelectedMarker({
-              title: "Kantor Desa Remau Bako Tuo",
-              coordinates: DESA_CENTER,
-              description: "Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo. Melayani berbagai kebutuhan administratif warga desa.",
-              type: 'marker'
-            });
-          }
-        }}
-      />
+  useEffect(() => {
+    if (!mapRef.current) return;
+    
+    const map = mapRef.current;
+    
+    L.tileLayer(BASE_LAYERS[activeLayer].url, {
+      attribution: BASE_LAYERS[activeLayer].attribution,
+    }).addTo(map);
+
+    // This logic needs to be adapted for programmatic layer management
+    if (activeLayers.includes('Peta Administrasi')) {
+      const polygon = L.polygon(ADMINISTRATIVE_BOUNDARY, {
+        color: 'white',
+        weight: 2,
+        fillColor: '#10b981',
+        fillOpacity: 0.2,
+        opacity: 0.8
+      }).addTo(map);
+      
+      polygon.on('click', () => {
+        setSelectedMarker({
+          title: "Batas Administrasi Desa Remau Bako Tuo",
+          description: "Batas wilayah administratif resmi Desa Remau Bako Tuo yang telah ditetapkan sesuai dengan peraturan yang berlaku.",
+          type: 'boundary'
+        });
+      });
+    }
+    
+    const marker = L.marker(DESA_CENTER).addTo(map);
+    marker.on('click', () => {
+      setSelectedMarker({
+        title: "Kantor Desa Remau Bako Tuo",
+        coordinates: DESA_CENTER,
+        description: "Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo. Melayani berbagai kebutuhan administratif warga desa.",
+        type: 'marker'
+      });
+    });
+
+  }, [activeLayer, activeLayers]);
+
+  return (
+    <>
+      <div id="map" ref={mapContainerRef} className="w-full h-full" />
       <MapControls 
         mapRef={mapRef}
         activeLayer={activeLayer} 
@@ -780,17 +787,17 @@ const MapComponent = () => {
         layerPanelExpanded={layerPanelExpanded}
         setLayerPanelExpanded={setLayerPanelExpanded}
       />
-    </MapContainer>
-  ), [activeLayer, activeLayers]);
-
-  return (
-    <>
-      {mapDisplay}
       <LayerPanel 
         expanded={layerPanelExpanded}
         onToggle={() => setLayerPanelExpanded(!layerPanelExpanded)}
         activeLayers={activeLayers}
-        onLayerToggle={handleLayerToggle}
+        onLayerToggle={(layer) => {
+          setActiveLayers(prev => 
+            prev.includes(layer) 
+              ? prev.filter(l => l !== layer) 
+              : [...prev, layer]
+          );
+        }}
       />
       <LayerInfo 
         isOpen={!!selectedMarker}
