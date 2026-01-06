@@ -1,11 +1,10 @@
-'use client';
-import KalenderPangan from "@/components/pages/informasi/KalenderPangan";
+import KalenderPangan from "@/pages/informasi/KalenderPangan";
 import PublicLayout from "@/layouts/PublicLayout";
 
-export default function KalenderPanganPage() {
-    return (
-        <PublicLayout>
-            <KalenderPangan />
-        </PublicLayout>
-    )
+export default function Page() {
+  return (
+    <PublicLayout>
+      <KalenderPangan />
+    </PublicLayout>
+  );
 }

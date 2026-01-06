@@ -1,11 +1,10 @@
-'use client';
-import LKMD from "@/components/pages/kelembagaan/LKMD";
+import LKMD from "@/pages/kelembagaan/LKMD";
 import PublicLayout from "@/layouts/PublicLayout";
 
-export default function LKMDPage() {
-    return (
-        <PublicLayout>
-            <LKMD />
-        </PublicLayout>
-    )
+export default function Page() {
+  return (
+    <PublicLayout>
+      <LKMD />
+    </PublicLayout>
+  );
 }

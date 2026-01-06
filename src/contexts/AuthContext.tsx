@@ -1,27 +1,24 @@
-'use client';
+"use client";
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useToast } from "@/components/ui/use-toast";
-import { auth, db } from '@/lib/firebase';
 import { 
+  getAuth, 
   onAuthStateChanged, 
   signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
   signOut,
   User as FirebaseUser
 } from "firebase/auth";
-import { doc, setDoc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase';
 
 interface User {
   email: string | null;
   uid: string;
-  displayName?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  register: (email: string, password: string, displayName: string) => Promise<boolean>;
   isAuthenticated: boolean;
   loading: boolean;
 }
@@ -36,11 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
-        setUser({ 
-          email: firebaseUser.email, 
-          uid: firebaseUser.uid, 
-          displayName: firebaseUser.displayName || undefined 
-        });
+        setUser({ email: firebaseUser.email, uid: firebaseUser.uid });
       } else {
         setUser(null);
       }
@@ -70,37 +63,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return false;
     }
   };
-  
-  const register = async (email: string, password: string, displayName: string): Promise<boolean> => {
-    setLoading(true);
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const newUser = userCredential.user;
-
-      // Create a user profile in Firestore
-      await setDoc(doc(db, "users", newUser.uid), {
-        uid: newUser.uid,
-        email: newUser.email,
-        displayName: displayName,
-        photoURL: newUser.photoURL
-      });
-
-      toast({
-        title: "Registrasi Berhasil",
-        description: "Akun Anda telah berhasil dibuat. Silakan login.",
-      });
-      setLoading(false);
-      return true;
-    } catch (error: any) {
-      toast({
-        title: "Registrasi Gagal",
-        description: error.message || "Terjadi kesalahan saat mendaftar.",
-        variant: "destructive",
-      });
-      setLoading(false);
-      return false;
-    }
-  };
 
   const logout = async () => {
     setLoading(true);
@@ -108,12 +70,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await signOut(auth);
       toast({
         title: "Logout Berhasil",
-        description: "Anda telah keluar dari sistem.",
+        description: "Anda telah keluar dari sistem!",
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: "Logout Gagal",
-        description: error.message || "Terjadi kesalahan saat keluar.",
+        description: "Terjadi kesalahan saat keluar.",
         variant: "destructive",
       });
     } finally {
@@ -124,7 +86,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value = {
     user,
     login,
-    register,
     logout,
     isAuthenticated: !!user,
     loading,

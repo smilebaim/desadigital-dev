@@ -1,12 +1,10 @@
-
-'use client';
-import KetahananLingkungan from "@/components/pages/pembangunan/KetahananLingkungan";
+import KetahananLingkungan from "@/pages/indeks/KetahananLingkungan";
 import PublicLayout from "@/layouts/PublicLayout";
 
-export default function KetahananLingkunganPage() {
-    return (
-        <PublicLayout>
-            <KetahananLingkungan />
-        </PublicLayout>
-    )
+export default function Page() {
+  return (
+    <PublicLayout>
+      <KetahananLingkungan />
+    </PublicLayout>
+  );
 }

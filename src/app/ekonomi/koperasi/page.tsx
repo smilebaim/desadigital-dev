@@ -1,11 +1,10 @@
-'use client';
-import Koperasi from "@/components/pages/ekonomi/Koperasi";
+import Koperasi from "@/pages/ekonomi/Koperasi";
 import PublicLayout from "@/layouts/PublicLayout";
 
-export default function KoperasiPage() {
-    return (
-        <PublicLayout>
-            <Koperasi />
-        </PublicLayout>
-    )
+export default function Page() {
+  return (
+    <PublicLayout>
+      <Koperasi />
+    </PublicLayout>
+  );
 }

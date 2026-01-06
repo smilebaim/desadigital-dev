@@ -1,7 +1,7 @@
-'use client';
-import { useRouter, usePathname } from 'next/navigation';
+"use client";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import React, { useEffect } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -10,20 +10,19 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
-    if (!loading && !isAuthenticated && pathname.startsWith('/dashboard')) {
+    if (!loading && !isAuthenticated) {
       router.replace("/login");
     }
-  }, [isAuthenticated, loading, router, pathname]);
+  }, [isAuthenticated, loading, router]);
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Memuat...</div>;
-  }
-  
-  if (!isAuthenticated && pathname.startsWith('/dashboard')) {
-    return null;
+  if (loading || !isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   return <>{children}</>;

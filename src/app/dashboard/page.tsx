@@ -1,6 +1,11 @@
-'use client';
-import DashboardHome from "@/components/pages/dashboard/DashboardHome";
+"use client";
+import DashboardHome from "@/pages/dashboard/DashboardHome";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 export default function DashboardPage() {
-    return <DashboardHome />;
+  return (
+    <ProtectedRoute>
+      <DashboardHome />
+    </ProtectedRoute>
+  );
 }

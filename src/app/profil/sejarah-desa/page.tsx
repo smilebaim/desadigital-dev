@@ -1,11 +1,10 @@
-'use client';
-import SejarahDesa from "@/components/pages/profile/SejarahDesa";
+import SejarahDesa from "@/pages/profile/SejarahDesa";
 import PublicLayout from "@/layouts/PublicLayout";
 
-export default function SejarahDesaPage() {
-    return (
-        <PublicLayout>
-            <SejarahDesa />
-        </PublicLayout>
-    )
+export default function Page() {
+  return (
+    <PublicLayout>
+      <SejarahDesa />
+    </PublicLayout>
+  );
 }

@@ -1,11 +1,10 @@
-'use client';
-import UMKM from "@/components/pages/ekonomi/UMKM";
+import UMKM from "@/pages/ekonomi/UMKM";
 import PublicLayout from "@/layouts/PublicLayout";
 
-export default function UMKMPage() {
-    return (
-        <PublicLayout>
-            <UMKM />
-        </PublicLayout>
-    )
+export default function Page() {
+  return (
+    <PublicLayout>
+      <UMKM />
+    </PublicLayout>
+  );
 }

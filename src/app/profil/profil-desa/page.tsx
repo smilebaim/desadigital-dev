@@ -1,11 +1,10 @@
-'use client';
-import ProfilDesa from "@/components/pages/profile/ProfilDesa";
+import ProfilDesa from "@/pages/profile/ProfilDesa";
 import PublicLayout from "@/layouts/PublicLayout";
 
-export default function ProfilDesaPage() {
-    return (
-        <PublicLayout>
-            <ProfilDesa />
-        </PublicLayout>
-    )
+export default function Page() {
+  return (
+    <PublicLayout>
+      <ProfilDesa />
+    </PublicLayout>
+  );
 }
