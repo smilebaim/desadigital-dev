@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
-import type { LatLngTuple, LatLngBounds, Map as LeafletMap } from 'leaflet';
+import type { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, MapPin } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
@@ -710,6 +710,9 @@ const ADMINISTRATIVE_BOUNDARY: [number, number][] = [
 const MapComponent = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const administrationLayerRef = useRef<Polygon | null>(null);
+  
   const [activeLayer, setActiveLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
   const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
@@ -729,9 +732,19 @@ const MapComponent = () => {
         maxBounds: DESA_BOUNDS,
       });
 
-      L.tileLayer(BASE_LAYERS[activeLayer].url, {
+      tileLayerRef.current = L.tileLayer(BASE_LAYERS[activeLayer].url, {
         attribution: BASE_LAYERS[activeLayer].attribution,
       }).addTo(mapRef.current);
+
+      const marker = L.marker(DESA_CENTER).addTo(mapRef.current);
+      marker.on('click', () => {
+        setSelectedMarker({
+          title: "Kantor Desa Remau Bako Tuo",
+          coordinates: DESA_CENTER,
+          description: "Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo. Melayani berbagai kebutuhan administratif warga desa.",
+          type: 'marker'
+        });
+      });
     }
     
     return () => {
@@ -743,51 +756,41 @@ const MapComponent = () => {
   }, []);
 
   useEffect(() => {
-    if (!mapRef.current) return;
-    
-    const map = mapRef.current;
-    
-    // Remove existing tile layer before adding a new one
-    map.eachLayer((layer) => {
-      if (layer instanceof L.TileLayer) {
-        map.removeLayer(layer);
-      }
-    });
-
-    L.tileLayer(BASE_LAYERS[activeLayer].url, {
-      attribution: BASE_LAYERS[activeLayer].attribution,
-    }).addTo(map);
-
-    // This logic needs to be adapted for programmatic layer management
-    if (activeLayers.includes('Peta Administrasi')) {
-      const polygon = L.polygon(ADMINISTRATIVE_BOUNDARY, {
-        color: 'white',
-        weight: 2,
-        fillColor: '#10b981',
-        fillOpacity: 0.2,
-        opacity: 0.8
-      }).addTo(map);
-      
-      polygon.on('click', () => {
-        setSelectedMarker({
-          title: "Batas Administrasi Desa Remau Bako Tuo",
-          description: "Batas wilayah administratif resmi Desa Remau Bako Tuo yang telah ditetapkan sesuai dengan peraturan yang berlaku.",
-          type: 'boundary'
-        });
-      });
+    if (tileLayerRef.current) {
+      tileLayerRef.current.setUrl(BASE_LAYERS[activeLayer].url);
     }
-    
-    const marker = L.marker(DESA_CENTER).addTo(map);
-    marker.on('click', () => {
-      setSelectedMarker({
-        title: "Kantor Desa Remau Bako Tuo",
-        coordinates: DESA_CENTER,
-        description: "Pusat administrasi dan pelayanan masyarakat Desa Remau Bako Tuo. Melayani berbagai kebutuhan administratif warga desa.",
-        type: 'marker'
-      });
-    });
+  }, [activeLayer]);
+  
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
 
-  }, [activeLayer, activeLayers]);
+    if (activeLayers.includes('Peta Administrasi')) {
+      if (!administrationLayerRef.current) {
+        const polygon = L.polygon(ADMINISTRATIVE_BOUNDARY, {
+          color: 'white',
+          weight: 2,
+          fillColor: '#10b981',
+          fillOpacity: 0.2,
+          opacity: 0.8
+        });
+        
+        polygon.on('click', () => {
+          setSelectedMarker({
+            title: "Batas Administrasi Desa Remau Bako Tuo",
+            description: "Batas wilayah administratif resmi Desa Remau Bako Tuo yang telah ditetapkan sesuai dengan peraturan yang berlaku.",
+            type: 'boundary'
+          });
+        });
+        administrationLayerRef.current = polygon;
+      }
+      administrationLayerRef.current.addTo(map);
+    } else {
+      if (administrationLayerRef.current) {
+        administrationLayerRef.current.remove();
+      }
+    }
+  }, [activeLayers]);
 
   return (
     <>
@@ -821,5 +824,3 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
-
-    
