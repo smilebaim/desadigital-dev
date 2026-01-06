@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import L, { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap, LayerGroup } from 'leaflet';
@@ -235,17 +236,17 @@ const MapComponent = () => {
 
   // Handle Base Layer Changes
   useEffect(() => {
-    if (map) {
-        if (baseLayerRef.current) {
-            map.removeLayer(baseLayerRef.current);
-        }
-        baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
-            attribution: BASE_LAYERS[activeBaseLayer].attribution
-        }).addTo(map);
+    if (!map) return; // Don't run if map is not initialized
 
-        if (!map.hasLayer(featureLayersRef.current)) {
-          featureLayersRef.current.addTo(map);
-        }
+    if (baseLayerRef.current) {
+        map.removeLayer(baseLayerRef.current);
+    }
+    baseLayerRef.current = L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
+        attribution: BASE_LAYERS[activeBaseLayer].attribution
+    }).addTo(map);
+
+    if (!map.hasLayer(featureLayersRef.current)) {
+      featureLayersRef.current.addTo(map);
     }
   }, [map, activeBaseLayer]);
 
@@ -326,3 +327,5 @@ const MapComponent = () => {
 };
 
 export default MapComponent;
+
+    
