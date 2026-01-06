@@ -1,81 +1,8 @@
-/**
- * This ruleset provides security for a Firestore database designed to store public
- * information about a single village.
- *
- * Core Philosophy:
- * The security model is built on the principle of "public read, no writes".
- * The application's purpose is to display information, so all data is made
- * publicly accessible for reading. To prevent unauthorized modifications, all
- * write operations (create, update, delete) are explicitly denied. This creates
- * a secure, read-only data source. Future administrative functionality will
- * require implementing a role-based access control system.
- *
- * Data Structure:
- * The data is stored in a single document at a fixed path: `/village/village_data`.
- * This singleton pattern simplifies data retrieval and management, as all
- * configuration and content resides in one known location.
- *
- * Key Security Decisions:
- * - Public Read Access: The `/village/village_data` document is readable by
- *   anyone, including unauthenticated users, to ensure the app can display
- *   village information to all visitors.
- * - Write Denial: All write operations are disabled by default (`if false`).
- *   This is the most secure posture, as the provided application schema does
- *   not define any user roles (e.g., 'admin') that could be used to grant
- *   write permissions.
- *
- * Denormalization for Authorization:
- * This principle is not applicable here due to the simple, single-document structure.
- * There are no relationships that would require denormalizing data for security checks.
- *
- * Structural Segregation:
- * This principle is not applicable, as all data is public and stored within a single
- * document.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Helper Functions
-    /**
-     * Checks if the user is authenticated.
-     */
-    // function isSignedIn() {
-    //   return request.auth != null;
-    // }
-
-    /**
-     * @description
-     * Provides public, read-only access to the single document containing all
-     * village information.
-     *
-     * @path
-     * /village/{docId} (e.g., /village/village_data)
-     *
-     * @allow
-     * Any user, authenticated or not, can read the village data.
-     * (get) /village/village_data
-     *
-     * @deny
-     * No user, authenticated or not, can write to the village data.
-     * (create) /village/village_data with { name: 'New Village' }
-     *
-     * @principle
-     * Secures singleton configuration data by making it publicly readable but
-     * immutable through security rules. This prevents any client-side changes.
-     * Writes should be handled by a trusted server environment or after
-     * implementing a specific admin role system.
-     */
-    match /village/{docId} {
-      // Allow public read access for anyone to view village information.
-      allow get: if true;
-      allow list: if true;
-
-      // Deny all write operations. There is no concept of an owner or admin role
-      // in the schema, so writes are disabled for security.
-      allow create: if false;
-      allow update: if false;
-      allow delete: if false;
+    match /{document=**} {
+      allow read, write: if true;
     }
   }
 }

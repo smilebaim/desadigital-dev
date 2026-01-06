@@ -1,71 +1,148 @@
 {
   "entities": {
-    "Village": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Village",
+    "ProfilDesa": {
+      "title": "Profil Desa",
       "type": "object",
-      "description": "Represents the village information.",
+      "description": "Informasi umum mengenai desa.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for the Village entity."
-        },
-        "name": {
-          "type": "string",
-          "description": "The name of the village."
-        },
-        "description": {
-          "type": "string",
-          "description": "A detailed description of the village, including its history, culture, and economy."
-        },
-        "welcomeMessage": {
-          "type": "string",
-          "description": "The welcome message displayed to the user."
-        },
-        "primaryColor": {
-          "type": "string",
-          "description": "The primary color of the village theme."
-        },
-        "backgroundColor": {
-          "type": "string",
-          "description": "The background color of the village theme."
-        },
-        "accentColor": {
-          "type": "string",
-          "description": "The accent color of the village theme."
-        },
-        "font": {
-          "type": "string",
-          "description": "The font used for the village theme."
-        }
-      },
-      "required": [
-        "id",
-        "name",
-        "description",
-        "welcomeMessage"
-      ]
+        "nama": { "type": "string", "description": "Nama desa" },
+        "kecamatan": { "type": "string", "description": "Kecamatan" },
+        "kabupaten": { "type": "string", "description": "Kabupaten" },
+        "provinsi": { "type": "string", "description": "Provinsi" },
+        "luas": { "type": "string", "description": "Luas wilayah desa" },
+        "penduduk": { "type": "string", "description": "Jumlah penduduk" },
+        "kepalaDesa": { "type": "string", "description": "Nama kepala desa" },
+        "periode": { "type": "string", "description": "Periode jabatan kepala desa" }
+      }
+    },
+    "Pembangunan": {
+      "title": "Pembangunan",
+      "type": "object",
+      "description": "Informasi mengenai program pembangunan di desa.",
+      "properties": {
+        "judul": { "type": "string", "description": "Judul program pembangunan" },
+        "deskripsi": { "type": "string", "description": "Deskripsi program" },
+        "kegiatan": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "DanaDesa": {
+      "title": "Dana Desa",
+      "type": "object",
+      "description": "Informasi mengenai dana desa.",
+      "properties": {
+        "tahun": { "type": "string" },
+        "total": { "type": "string" },
+        "deskripsi": { "type": "string" }
+      }
+    },
+    "Indeks": {
+      "title": "Indeks",
+      "type": "object",
+      "description": "Informasi mengenai berbagai indeks desa.",
+      "properties": {
+        "nama": { "type": "string" },
+        "nilai": { "type": "string" },
+        "status": { "type": "string" }
+      }
+    },
+    "TataRuang": {
+      "title": "Tata Ruang",
+      "type": "object",
+      "description": "Informasi mengenai tata ruang desa.",
+      "properties": {
+        "nama": { "type": "string" },
+        "deskripsi": { "type": "string" }
+      }
+    },
+    "Layanan": {
+      "title": "Layanan",
+      "type": "object",
+      "description": "Informasi mengenai layanan yang tersedia di desa.",
+      "properties": {
+        "nama": { "type": "string" },
+        "deskripsi": { "type": "string" }
+      }
+    },
+    "Sejarah": {
+      "title": "Sejarah",
+      "type": "object",
+      "description": "Informasi mengenai sejarah desa.",
+      "properties": {
+        "judul": { "type": "string" },
+        "deskripsi": { "type": "string" },
+        "tahun": { "type": "string" }
+      }
+    },
+    "VisiMisi": {
+      "title": "Visi Misi",
+      "type": "object",
+      "description": "Visi dan Misi desa.",
+      "properties": {
+        "visi": { "type": "string" },
+        "misi": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "Pemerintahan": {
+      "title": "Pemerintahan",
+      "type": "object",
+      "description": "Struktur pemerintahan desa.",
+      "properties": {
+        "jabatan": { "type": "string" },
+        "nama": { "type": "string" },
+        "periode": { "type": "string" }
+      }
     }
-  },
-  "auth": {
-    "providers": [
-      "password",
-      "anonymous"
-    ]
   },
   "firestore": {
     "structure": [
       {
-        "path": "/village/village_data",
-        "definition": {
-          "entityName": "Village",
-          "schema": {
-            "$ref": "#/backend/entities/Village"
-          },
-          "description": "Stores the information for the village.  All data related to the village (name, description, welcome message, theme colors, font) is stored within this single document for easy retrieval.  There are no authorization independence concerns, as there are no subcollections."
-        }
+        "path": "/profil_desa/{profilId}",
+        "schema": { "$ref": "#/entities/ProfilDesa" },
+        "description": "Koleksi untuk menyimpan profil desa."
+      },
+      {
+        "path": "/pembangunan/{pembangunanId}",
+        "schema": { "$ref": "#/entities/Pembangunan" },
+        "description": "Koleksi untuk menyimpan data program pembangunan."
+      },
+      {
+        "path": "/dana_desa/{danaId}",
+        "schema": { "$ref": "#/entities/DanaDesa" },
+        "description": "Koleksi untuk menyimpan informasi dana desa."
+      },
+      {
+        "path": "/indeks/{indeksId}",
+        "schema": { "$ref": "#/entities/Indeks" },
+        "description": "Koleksi untuk menyimpan data indeks desa."
+      },
+      {
+        "path": "/tata_ruang/{tataRuangId}",
+        "schema": { "$ref": "#/entities/TataRuang" },
+        "description": "Koleksi untuk menyimpan data tata ruang."
+      },
+      {
+        "path": "/layanan/{layananId}",
+        "schema": { "$ref": "#/entities/Layanan" },
+        "description": "Koleksi untuk menyimpan informasi layanan desa."
+      },
+      {
+        "path": "/sejarah/{sejarahId}",
+        "schema": { "$ref": "#/entities/Sejarah" },
+        "description": "Koleksi untuk menyimpan sejarah desa."
+      },
+      {
+        "path": "/visi_misi/{visiMisiId}",
+        "schema": { "$ref": "#/entities/VisiMisi" },
+        "description": "Koleksi untuk menyimpan visi dan misi desa."
+      },
+      {
+        "path": "/pemerintahan/{pemerintahanId}",
+        "schema": { "$ref": "#/entities/Pemerintahan" },
+        "description": "Koleksi untuk menyimpan struktur pemerintahan desa."
       }
-    ],
-    "reasoning": "The database structure is designed to store information about a single village. It prioritizes simplicity and ease of management. Since the application focuses on presenting information about one village, a single document is used to store all relevant data. This approach avoids the need for complex queries or relationships. By storing all the data in one document, retrieval is efficient and straightforward.\n\nThis structure inherently achieves Authorization Independence, as there are no subcollections or parent-child relationships that require `get()` calls in security rules. The single document contains all the data necessary for rendering the UI, eliminating the need to fetch related data. Since all data is contained within a single document, list operations are not applicable in this case.\n\nThe security rules for this configuration will simply validate that the authenticated user has the appropriate role to read/write to the village document. The simplicity of this design supports ease of debugging and maintenance."
+    ]
+  },
+  "auth": {
+    "providers": ["anonymous", "password"]
   }
 }
