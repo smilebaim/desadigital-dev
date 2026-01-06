@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, Users, Home, School, Factory } from "lucide-react";
+import { FileText, TrendingUp, Users, Building2, School, Factory } from "lucide-react";
 
 const Perkembangan = () => {
   const perkembanganData = {
@@ -46,7 +46,7 @@ const Perkembangan = () => {
     },
     infrastruktur: {
       title: "Perkembangan Infrastruktur",
-      icon: Home,
+      icon: Building2,
       content: {
         data: [
           {
@@ -131,7 +131,7 @@ const Perkembangan = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Perkembangan Desa</h2>
@@ -150,7 +150,7 @@ const Perkembangan = () => {
           </TabsList>
 
           <TabsContent value="umum" className="space-y-4">
-            <Card>
+            <Card className="border-none bg-transparent shadow-none">
               <CardHeader className="flex flex-row items-center gap-4">
                 <TrendingUp className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -173,7 +173,7 @@ const Perkembangan = () => {
 
           <TabsContent value="demografi" className="space-y-4">
             {perkembanganData.demografi.content.data.map((item, index) => (
-              <Card key={index}>
+              <Card key={index} className="border-none bg-transparent shadow-none">
                 <CardHeader className="flex flex-row items-center gap-4">
                   <Users className="h-8 w-8 text-emerald-600" />
                   <div>
@@ -201,9 +201,9 @@ const Perkembangan = () => {
 
           <TabsContent value="infrastruktur" className="space-y-4">
             {perkembanganData.infrastruktur.content.data.map((item, index) => (
-              <Card key={index}>
+              <Card key={index} className="border-none bg-transparent shadow-none">
                 <CardHeader className="flex flex-row items-center gap-4">
-                  <Home className="h-8 w-8 text-emerald-600" />
+                  <Building2 className="h-8 w-8 text-emerald-600" />
                   <div>
                     <CardTitle>Tahun {item.tahun}</CardTitle>
                     <p className="text-sm text-muted-foreground">
@@ -222,7 +222,7 @@ const Perkembangan = () => {
 
           <TabsContent value="pendidikan" className="space-y-4">
             {perkembanganData.pendidikan.content.data.map((item, index) => (
-              <Card key={index}>
+              <Card key={index} className="border-none bg-transparent shadow-none">
                 <CardHeader className="flex flex-row items-center gap-4">
                   <School className="h-8 w-8 text-emerald-600" />
                   <div>
@@ -243,7 +243,7 @@ const Perkembangan = () => {
 
           <TabsContent value="ekonomi" className="space-y-4">
             {perkembanganData.ekonomi.content.data.map((item, index) => (
-              <Card key={index}>
+              <Card key={index} className="border-none bg-transparent shadow-none">
                 <CardHeader className="flex flex-row items-center gap-4">
                   <Factory className="h-8 w-8 text-emerald-600" />
                   <div>
@@ -267,4 +267,4 @@ const Perkembangan = () => {
   );
 };
 
-export default Perkembangan;
+export default Perkembangan; 

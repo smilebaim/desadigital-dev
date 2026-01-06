@@ -79,3 +79,38 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+@layer components {
+  .page-container {
+    @apply container mx-auto px-4 py-8 bg-gradient-to-b from-gray-900 to-gray-800 text-white;
+  }
+
+  .page-container h1,
+  .page-container h2,
+  .page-container h3,
+  .page-container h4,
+  .page-container h5,
+  .page-container h6 {
+    @apply text-white;
+  }
+
+  .page-container p {
+    @apply text-gray-300;
+  }
+
+  .page-container .text-muted-foreground {
+    @apply text-gray-400;
+  }
+
+  .page-container .card {
+    @apply bg-gray-800/50 border-gray-700;
+  }
+
+  .page-container .tabs-list {
+    @apply bg-gray-800/50 border-gray-700;
+  }
+
+  .page-container .tabs-trigger {
+    @apply text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white;
+  }
+}

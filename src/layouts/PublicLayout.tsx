@@ -43,7 +43,7 @@ const PublicLayout = ({
   return (
     <div className="flex flex-col min-h-screen">
       <TopNav hasNewNews={false} />
-      <main className={`flex-grow pt-16 pb-20 ${needsSidebar ? 'md:pl-72 pl-12' : ''}`}>
+      <main className={`flex-grow ${needsSidebar ? 'md:pl-72 pl-12' : ''}`}>
         {children}
       </main>
       <BottomNav />

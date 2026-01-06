@@ -154,7 +154,7 @@ const StrukturPemerintah = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
       <div className="space-y-6">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Struktur Pemerintahan Desa</h2>
@@ -172,7 +172,7 @@ const StrukturPemerintah = () => {
           </TabsList>
 
           <TabsContent value="pemerintahan" className="space-y-4">
-            <Card>
+            <Card className="border-none bg-transparent shadow-none">
               <CardHeader className="flex flex-row items-center gap-4">
                 <Building2 className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -217,7 +217,7 @@ const StrukturPemerintah = () => {
           </TabsContent>
 
           <TabsContent value="bpd" className="space-y-4">
-            <Card>
+            <Card className="border-none bg-transparent shadow-none">
               <CardHeader className="flex flex-row items-center gap-4">
                 <Users className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -262,7 +262,7 @@ const StrukturPemerintah = () => {
           </TabsContent>
 
           <TabsContent value="lembaga" className="space-y-4">
-            <Card>
+            <Card className="border-none bg-transparent shadow-none">
               <CardHeader className="flex flex-row items-center gap-4">
                 <Award className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -307,7 +307,7 @@ const StrukturPemerintah = () => {
           </TabsContent>
 
           <TabsContent value="dokumen" className="space-y-4">
-            <Card>
+            <Card className="border-none bg-transparent shadow-none">
               <CardHeader className="flex flex-row items-center gap-4">
                 <FileText className="h-8 w-8 text-emerald-600" />
                 <div>
@@ -342,4 +342,4 @@ const StrukturPemerintah = () => {
   );
 };
 
-export default StrukturPemerintah;
+export default StrukturPemerintah; 

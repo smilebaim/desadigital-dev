@@ -8,7 +8,7 @@ import {
   signOut,
   User as FirebaseUser
 } from "firebase/auth";
-import { useFirebase } from '@/firebase';
+import { auth } from '@/lib/firebase';
 
 interface User {
   email: string | null;
@@ -26,7 +26,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { auth } = useFirebase();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -42,7 +41,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     return () => unsubscribe();
-  }, [auth]);
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     setLoading(true);
