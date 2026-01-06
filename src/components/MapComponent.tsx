@@ -1,10 +1,10 @@
 'use client';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import L, { MapContainer, TileLayer, useMap, Marker, Polygon } from 'react-leaflet';
+import React, { useState, useEffect, useRef } from 'react';
+import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
-import { LatLngTuple, LatLngBounds, Icon, Map as LeafletMap } from 'leaflet';
-import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, Warehouse, Ruler, MapPin } from 'lucide-react';
+import type { LatLngTuple, LatLngBounds, Map as LeafletMap } from 'leaflet';
+import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -14,17 +14,19 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-delete (Icon.Default.prototype as any)._getIconUrl;
-Icon.Default.mergeOptions({
+// This is required to make marker icons work with Webpack
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
   iconUrl: markerIcon.src,
   iconRetinaUrl: markerIcon2x.src,
   shadowUrl: markerShadow.src,
 });
 
+
 const DESA_CENTER: LatLngTuple = [-1.2224187831143103, 104.38307336564955];
 const DEFAULT_ZOOM = 16;
 
-const DESA_BOUNDS = new LatLngBounds(
+const DESA_BOUNDS: LatLngBounds = L.latLngBounds(
   [-1.2324187831143103, 104.37307336564955],
   [-1.2124187831143103, 104.39307336564955]
 );
@@ -706,6 +708,8 @@ const ADMINISTRATIVE_BOUNDARY: [number, number][] = [
 ].map(([lng, lat]) => [lat, lng] as [number, number]);
 
 const MapComponent = () => {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
   const [activeLayer, setActiveLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
   const [activeLayers, setActiveLayers] = useState<string[]>([]);
   const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
@@ -715,9 +719,6 @@ const MapComponent = () => {
     description: string;
     type?: 'marker' | 'boundary';
   } | null>(null);
-  
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<LeafletMap | null>(null);
 
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
@@ -727,6 +728,10 @@ const MapComponent = () => {
         zoomControl: false,
         maxBounds: DESA_BOUNDS,
       });
+
+      L.tileLayer(BASE_LAYERS[activeLayer].url, {
+        attribution: BASE_LAYERS[activeLayer].attribution,
+      }).addTo(mapRef.current);
     }
     
     return () => {
@@ -736,12 +741,19 @@ const MapComponent = () => {
       }
     };
   }, []);
-  
+
   useEffect(() => {
     if (!mapRef.current) return;
     
     const map = mapRef.current;
     
+    // Remove existing tile layer before adding a new one
+    map.eachLayer((layer) => {
+      if (layer instanceof L.TileLayer) {
+        map.removeLayer(layer);
+      }
+    });
+
     L.tileLayer(BASE_LAYERS[activeLayer].url, {
       attribution: BASE_LAYERS[activeLayer].attribution,
     }).addTo(map);
