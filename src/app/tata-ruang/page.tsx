@@ -13,9 +13,7 @@ const MapComponent = dynamic(() => import('@/components/MapComponent'), {
 export default function Page() {
   return (
     <PublicLayout>
-      <div className="fixed inset-0">
         <MapComponent />
-      </div>
     </PublicLayout>
   );
 }
