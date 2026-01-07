@@ -41,6 +41,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface TopNavProps {
   className?: string;
@@ -95,6 +96,7 @@ const menuItems = [
 const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
 
   const SidebarLayanan = () => {
     const isLayananRoute = pathname.startsWith('/layanan');
@@ -156,7 +158,7 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
-                        className={`w-full justify-center md:justify-start text-emerald-50 hover:text-emerald-50 hover:bg-emerald-700/50 transition-all py-3 md:py-2.5 px-1 md:px-3 text-sm ${
+                        className={`w-full justify-center md:justify-start text-emerald-50 hover:text-emerald-50 hover:bg-emerald-700/_50 transition-all py-3 md:py-2.5 px-1 md:px-3 text-sm ${
                           pathname === item.path ? 'bg-emerald-700/70' : ''
                         }`}
                         asChild
@@ -389,16 +391,29 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
                         )}
                       </Link>
                     </Button>
-                    <Button 
-                      asChild
-                      variant="ghost" 
-                      className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
-                    >
-                      <Link href="/login" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
-                        <User className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
-                        <span>Masuk</span>
-                      </Link>
-                    </Button>
+                    {isAuthenticated ? (
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
+                      >
+                        <Link href="/dashboard" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
+                          <User className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
+                          <span>Dashboard</span>
+                        </Link>
+                      </Button>
+                    ) : (
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
+                      >
+                        <Link href="/login" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
+                          <User className="h-7 w-7 sm:h-9 sm:w-9 mr-2" />
+                          <span>Masuk</span>
+                        </Link>
+                      </Button>
+                    )}
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-black/10">
                     <p className="text-[10px] sm:text-xs text-black/40 italic font-bold">
@@ -420,4 +435,4 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false }) => {
   );
 };
 
-export default TopNav; 
+export default TopNav;
