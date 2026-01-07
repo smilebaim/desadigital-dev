@@ -609,7 +609,7 @@ const BIDANG_TANAH_DATA: [number, number][][] = [
 export const MapComponent: React.FC = () => {
   const mapRef = useRef<LeafletMap | null>(null);
   const [activeLayer, setActiveLayer] = useState<keyof typeof BASE_LAYERS>('street');
-  const [activeLayers, setActiveLayers] = useState<string[]>(['Peta Administrasi']);
+  const [activeLayers, setActiveLayers] = useState<string[]>(['Peta Administrasi', 'Bidang Tanah']);
   const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
   const [infoPanelExpanded, setInfoPanelExpanded] = useState(false);
   const [markerInfo, setMarkerInfo] = useState<LayerInfoProps['markerInfo']>(null);
@@ -678,7 +678,7 @@ export const MapComponent: React.FC = () => {
     // Bidang Tanah
     if (activeLayers.includes('Bidang Tanah')) {
         if (bidangTanahLayersRef.current.length === 0) {
-            const colors = ['red', 'green', 'purple', 'orange'];
+            const colors = ['red', 'green', 'purple', 'orange', 'cyan', 'magenta', 'yellow', 'lime', 'navy', 'olive', 'maroon', 'teal', 'aqua', 'fuchsia'];
             BIDANG_TANAH_DATA.forEach((polygonData, index) => {
                 const polygon = L.polygon(polygonData, { color: colors[index % colors.length] })
                     .bindPopup(`<b>Bidang Tanah ${index + 1}</b>`)
