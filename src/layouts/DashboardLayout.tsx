@@ -37,7 +37,8 @@ import {
   Library,
   FileSpreadsheet,
   ScrollText,
-  ChevronDown
+  ChevronDown,
+  LayoutTemplate
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -235,6 +236,27 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
               </Link>
 
               <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="display" className="border-none">
+                  <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <LayoutTemplate size={18} className="text-white" />
+                      <span className="text-white">Kontrol Tampilan</span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-1 pl-4">
+                      <Link href="/dashboard/display/top-nav" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                        <span>Kontrol TopNav</span>
+                      </Link>
+                      <Link href="/dashboard/display/bottom-nav" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
+                        <span>Kontrol BottomNav</span>
+                      </Link>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
+              <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="settings" className="border-none">
                   <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
                     <div className="flex items-center gap-2">
@@ -322,4 +344,5 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
 export default DashboardLayout;
 
+    
     
