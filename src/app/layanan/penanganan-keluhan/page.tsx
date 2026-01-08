@@ -1,5 +1,7 @@
-import PenangananKeluhan from "@/pages/layanan/PenangananKeluhan";
+
+'use client';
 import PublicLayout from "@/layouts/PublicLayout";
+import PenangananKeluhan from "@/pages/layanan/PenangananKeluhan";
 
 export default function Page() {
   return (
