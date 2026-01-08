@@ -80,6 +80,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const displayControlMenuItems = [
       { title: "Kontrol Hero", path: "/dashboard/display/hero", icon: ImageIcon },
       { title: "Kontrol Logo", path: "/dashboard/display/logo", icon: ImageIcon },
+  ];
+  
+  const menuControlMenuItems = [
       { title: "Kontrol TopNav", path: "/dashboard/display/top-nav", icon: LayoutTemplate },
       { title: "Kontrol BottomNav", path: "/dashboard/display/bottom-nav", icon: LayoutTemplate }
   ];
@@ -133,6 +136,30 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                                         <span>{item.title}</span>
                                       </Link>
                                     ))}
+                                     <Accordion type="single" collapsible className="w-full">
+                                        <AccordionItem value="menu-control" className="border-none">
+                                            <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                                                <div className="flex items-center gap-2">
+                                                  <LayoutTemplate size={18} className="text-white" />
+                                                  <span className="text-white">Kontrol Menu</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent>
+                                                <div className="space-y-1 pl-4">
+                                                    {menuControlMenuItems.map((item, itemIndex) => (
+                                                        <Link
+                                                            key={itemIndex}
+                                                            href={item.path}
+                                                            className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
+                                                        >
+                                                            <item.icon size={16} className="text-white" />
+                                                            <span>{item.title}</span>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                     </Accordion>
                                   </div>
                                 </AccordionContent>
                             </AccordionItem>
