@@ -10,14 +10,14 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 
 const initialPages = [
-  { id: 1, title: "Beranda", path: "/", status: "Published", lastModified: "2024-07-28" },
-  { id: 2, title: "Profil Desa", path: "/profil/profil-desa", status: "Published", lastModified: "2024-07-28" },
-  { id: 3, title: "Visi & Misi", path: "/profil/visi-misi", status: "Published", lastModified: "2024-07-27" },
-  { id: 4, title: "Sejarah Desa", path: "/profil/sejarah-desa", status: "Published", lastModified: "2024-07-26" },
-  { id: 5, title: "Berita", path: "/berita", status: "Published", lastModified: "2024-07-28" },
-  { id: 6, title: "Tata Ruang", path: "/tata-ruang", status: "Published", lastModified: "2024-07-25" },
-  { id: 7, title: "Layanan Persuratan", path: "/layanan/persuratan", status: "Published", lastModified: "2024-07-24" },
-  { id: 8, title: "Kontak", path: "/kontak", status: "Draft", lastModified: "2024-07-20" },
+  { id: 1, title: "Beranda", path: "/", status: "Published", lastModified: "2024-07-28", kategori: "Utama" },
+  { id: 2, title: "Profil Desa", path: "/profil/profil-desa", status: "Published", lastModified: "2024-07-28", kategori: "Profil" },
+  { id: 3, title: "Visi & Misi", path: "/profil/visi-misi", status: "Published", lastModified: "2024-07-27", kategori: "Profil" },
+  { id: 4, title: "Sejarah Desa", path: "/profil/sejarah-desa", status: "Published", lastModified: "2024-07-26", kategori: "Profil" },
+  { id: 5, title: "Berita", path: "/berita", status: "Published", lastModified: "2024-07-28", kategori: "Informasi" },
+  { id: 6, title: "Tata Ruang", path: "/tata-ruang", status: "Published", lastModified: "2024-07-25", kategori: "Peta" },
+  { id: 7, title: "Layanan Persuratan", path: "/layanan/persuratan", status: "Published", lastModified: "2024-07-24", kategori: "Layanan" },
+  { id: 8, title: "Kontak", path: "/kontak", status: "Draft", lastModified: "2024-07-20", kategori: "Utama" },
 ];
 
 export default function Page() {
@@ -61,6 +61,7 @@ export default function Page() {
             <TableHeader>
               <TableRow>
                 <TableHead>Judul Halaman</TableHead>
+                <TableHead>Kategori</TableHead>
                 <TableHead>Path URL</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Terakhir Diubah</TableHead>
@@ -71,6 +72,7 @@ export default function Page() {
               {pages.map((page) => (
                 <TableRow key={page.id}>
                   <TableCell className="font-medium">{page.title}</TableCell>
+                  <TableCell>{page.kategori}</TableCell>
                   <TableCell>
                     <Link href={page.path} target="_blank" className="text-blue-600 hover:underline flex items-center gap-1">
                       {page.path} <LinkIcon className="h-3 w-3" />
