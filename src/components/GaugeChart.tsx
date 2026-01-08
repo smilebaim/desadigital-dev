@@ -1,3 +1,4 @@
+import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Label } from 'recharts';
 
 interface GaugeChartProps {
@@ -10,15 +11,9 @@ interface GaugeChartProps {
 interface ViewBox {
   cx: number;
   cy: number;
-  innerRadius: number;
-  outerRadius: number;
-  startAngle: number;
-  endAngle: number;
-  width: number;
-  height: number;
 }
 
-const GaugeChart = ({ value, status, size = 'md', showLabel = true }: GaugeChartProps) => {
+const GaugeChart: React.FC<GaugeChartProps> = ({ value, status, size = 'md', showLabel = true }) => {
   const data = [
     { name: 'score', value: value },
     { name: 'remainder', value: 1 - value }
@@ -27,13 +22,13 @@ const GaugeChart = ({ value, status, size = 'md', showLabel = true }: GaugeChart
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
       case "maju":
-        return "#22c55e";
+        return "#22c55e"; // green-500
       case "berkembang":
-        return "#eab308";
+        return "#eab308"; // yellow-500
       case "tertinggal":
-        return "#ef4444";
+        return "#ef4444"; // red-500
       default:
-        return "#6b7280";
+        return "#6b7280"; // gray-500
     }
   };
 
@@ -64,7 +59,7 @@ const GaugeChart = ({ value, status, size = 'md', showLabel = true }: GaugeChart
   };
 
   return (
-    <div className={`relative h-[${getChartHeight()}px]`}>
+    <div className={`relative`} style={{height: `${getChartHeight()}px`}}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -83,7 +78,8 @@ const GaugeChart = ({ value, status, size = 'md', showLabel = true }: GaugeChart
             <Cell fill="#e5e7eb" />
             {showLabel && (
               <Label
-                content={({ viewBox }: { viewBox: any }) => {
+                content={({ viewBox }: { viewBox?: ViewBox }) => {
+                  if (!viewBox) return null;
                   const { cx, cy } = viewBox;
                   return (
                     <>
@@ -117,4 +113,4 @@ const GaugeChart = ({ value, status, size = 'md', showLabel = true }: GaugeChart
   );
 };
 
-export default GaugeChart; 
+export default GaugeChart;
