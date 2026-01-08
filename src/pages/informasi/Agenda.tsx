@@ -1,53 +1,55 @@
-import React from "react";
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar } from "@/components/ui/calendar";
+import { useState } from 'react';
 
 const Agenda = () => {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
+  const events = {
+    "2024-07-20": "Rapat Koordinasi Perangkat Desa",
+    "2024-07-25": "Penyuluhan Kesehatan Masyarakat",
+    "2024-08-17": "Perayaan HUT Kemerdekaan RI",
+  };
+
+  const selectedDateString = date ? date.toISOString().split('T')[0] : '';
+  const eventForSelectedDate = events[selectedDateString as keyof typeof events];
+
   return (
-    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
-      <h1 className="text-3xl font-bold mb-6">Agenda</h1>
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="jadwal">Jadwal</TabsTrigger>
-          <TabsTrigger value="detail">Detail</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Agenda Desa</h1>
+      <div className="grid md:grid-cols-2 gap-8">
+        <div>
           <Card>
-            <CardHeader>
-              <CardTitle>Overview Agenda</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Informasi umum tentang agenda kegiatan di Desa Remau Bakotuo.</p>
-              {/* Add more content here */}
+            <CardContent className="p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                className="rounded-md border"
+              />
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="jadwal">
+        </div>
+        <div>
           <Card>
             <CardHeader>
-              <CardTitle>Jadwal Agenda</CardTitle>
+              <CardTitle>
+                Kegiatan pada {date ? date.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : ''}
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p>Jadwal agenda kegiatan yang akan datang.</p>
-              {/* Add calendar or schedule content here */}
+              {eventForSelectedDate ? (
+                <p>{eventForSelectedDate}</p>
+              ) : (
+                <p className="text-muted-foreground">Tidak ada kegiatan yang dijadwalkan.</p>
+              )}
             </CardContent>
           </Card>
-        </TabsContent>
-        <TabsContent value="detail">
-          <Card>
-            <CardHeader>
-              <CardTitle>Detail Agenda</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Detail lengkap tentang agenda kegiatan.</p>
-              {/* Add detailed information here */}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </div>
   );
 };
 
-export default Agenda; 
+export default Agenda;

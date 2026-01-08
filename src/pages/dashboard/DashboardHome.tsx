@@ -1,216 +1,159 @@
-import { Button } from "@/components/ui/button";
+'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Users, Activity, Map, Globe, AppWindow, Settings2, Home, Building2, HeartHandshake, Store } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, FileText, Settings, BarChart3, Map } from "lucide-react";
 import Link from "next/link";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+
+const data = [
+  { name: "Jan", visitors: 400, pageViews: 2400 },
+  { name: "Feb", visitors: 300, pageViews: 1398 },
+  { name: "Mar", visitors: 200, pageViews: 9800 },
+  { name: "Apr", visitors: 278, pageViews: 3908 },
+  { name: "Mei", visitors: 189, pageViews: 4800 },
+  { name: "Jun", visitors: 239, pageViews: 3800 },
+  { name: "Jul", visitors: 349, pageViews: 4300 },
+];
 
 const DashboardHome = () => {
-  const statsItems = [
-    {
-      title: "Total Surat",
-      value: "156",
-      icon: FileText,
-      color: "text-blue-600"
-    },
-    {
-      title: "Pengguna Aktif",
-      value: "12",
-      icon: Users,
-      color: "text-green-600"
-    },
-    {
-      title: "Aktivitas Hari Ini",
-      value: "24",
-      icon: Activity,
-      color: "text-purple-600"
-    }
-  ];
-
-  const pendudukData = [
-    { name: '0-14', value: 450 },
-    { name: '15-24', value: 380 },
-    { name: '25-54', value: 620 },
-    { name: '55-64', value: 180 },
-    { name: '65+', value: 120 },
-  ];
-
-  const ekonomiData = [
-    { name: 'Pertanian', value: 45 },
-    { name: 'Perdagangan', value: 25 },
-    { name: 'Jasa', value: 20 },
-    { name: 'Industri', value: 10 },
-  ];
-
-  const fasilitasData = [
-    { name: 'Jan', value: 4 },
-    { name: 'Feb', value: 3 },
-    { name: 'Mar', value: 5 },
-    { name: 'Apr', value: 2 },
-    { name: 'Mei', value: 6 },
-    { name: 'Jun', value: 4 },
-  ];
-
-  const layananData = [
-    { name: 'Surat Keterangan', value: 65 },
-    { name: 'Surat Nikah', value: 25 },
-    { name: 'Surat Domisili', value: 45 },
-    { name: 'Surat Usaha', value: 30 },
-  ];
-
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Selamat Datang di Dasbor</h1>
-          <p className="text-black/60">
-            Kelola informasi dan layanan desa dari sini.
-          </p>
-        </div>
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <p className="text-muted-foreground">
+          Selamat datang di panel admin Desa Remau Bakotuo.
+        </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {statsItems.map((item, index) => (
-          <Card key={index} className="shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-black">
-                {item.title}
-              </CardTitle>
-              <item.icon className={`h-4 w-4 ${item.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-black">{item.value}</div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-black text-sm">Demografi Penduduk</CardTitle>
-            <CardDescription className="text-black/60 text-xs">
-              Distribusi penduduk berdasarkan usia
-            </CardDescription>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Pengunjung Hari Ini
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={pendudukData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#8884d8" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <div className="text-2xl font-bold">1,250</div>
+            <p className="text-xs text-muted-foreground">
+              +10% dari kemarin
+            </p>
           </CardContent>
         </Card>
-
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-black text-sm">Sektor Ekonomi</CardTitle>
-            <CardDescription className="text-black/60 text-xs">
-              Distribusi sektor ekonomi desa
-            </CardDescription>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Berita
+            </CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={ekonomiData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={60}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${(percent * 100).toFixed(0)}%`}
-                  >
-                    {ekonomiData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            <div className="text-2xl font-bold">54</div>
+            <p className="text-xs text-muted-foreground">
+              +2 berita baru bulan ini
+            </p>
           </CardContent>
         </Card>
-
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-black text-sm">Fasilitas Desa</CardTitle>
-            <CardDescription className="text-black/60 text-xs">
-              Jumlah fasilitas yang dibangun per bulan
-            </CardDescription>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Permintaan Surat
+            </CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={fasilitasData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#00C49F" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <div className="text-2xl font-bold">12</div>
+            <p className="text-xs text-muted-foreground">
+              Menunggu persetujuan
+            </p>
           </CardContent>
         </Card>
-
-        <Card className="shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-black text-sm">Layanan Desa</CardTitle>
-            <CardDescription className="text-black/60 text-xs">
-              Jumlah layanan yang diberikan
-            </CardDescription>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Data Penduduk
+            </CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="h-[200px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={layananData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                  <YAxis tick={{ fontSize: 10 }} />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="#FF8042" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <div className="text-2xl font-bold">2,500</div>
+            <p className="text-xs text-muted-foreground">
+              Total penduduk terdaftar
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="shadow-sm">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-black">Aktivitas Terbaru</CardTitle>
-          <CardDescription className="text-black/60">
-            Daftar aktivitas terakhir di sistem
+          <CardTitle>Analitik Pengunjung</CardTitle>
+          <CardDescription>
+            Data pengunjung website dalam 7 bulan terakhir.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {[1, 2, 3].map((_, index) => (
-              <div key={index} className="flex items-center gap-4">
-                <div className="h-2 w-2 rounded-full bg-black" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-black">
-                    Surat keterangan baru telah dibuat
-                  </p>
-                  <p className="text-sm text-black/60">
-                    2 menit yang lalu
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="visitors"
+                  stroke="#8884d8"
+                  activeDot={{ r: 8 }}
+                />
+                <Line type="monotone" dataKey="pageViews" stroke="#82ca9d" />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </CardContent>
       </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Akses Cepat</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Button variant="outline" asChild>
+                <Link href="/dashboard/info" className="flex flex-col h-24 justify-center items-center">
+                    <FileText className="h-6 w-6 mb-2" />
+                    <span>Info & Berita</span>
+                </Link>
+            </Button>
+            <Button variant="outline" asChild>
+                <Link href="/dashboard/penduduk" className="flex flex-col h-24 justify-center items-center">
+                    <Users className="h-6 w-6 mb-2" />
+                    <span>Data Penduduk</span>
+                </Link>
+            </Button>
+            <Button variant="outline" asChild>
+                <Link href="/dashboard/map-control" className="flex flex-col h-24 justify-center items-center">
+                    <Map className="h-6 w-6 mb-2" />
+                    <span>Kontrol Peta</span>
+                </Link>
+            </Button>
+             <Button variant="outline" asChild>
+                <Link href="/dashboard/pengaturan" className="flex flex-col h-24 justify-center items-center">
+                    <Settings className="h-6 w-6 mb-2" />
+                    <span>Pengaturan</span>
+                </Link>
+            </Button>
+        </CardContent>
+      </Card>
+
     </div>
   );
 };

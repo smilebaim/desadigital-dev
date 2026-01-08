@@ -1,53 +1,41 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+'use client';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+
+const publikasiData = [
+  { judul: "Laporan Pertanggungjawaban APBDes 2023", deskripsi: "Dokumen laporan realisasi Anggaran Pendapatan dan Belanja Desa tahun 2023.", tanggal: "15 Januari 2024", file: "/dokumen/lpj-2023.pdf" },
+  { judul: "Rencana Kerja Pemerintah Desa (RKPDes) 2024", deskripsi: "Dokumen perencanaan pembangunan tahunan untuk tahun 2024.", tanggal: "10 Desember 2023", file: "/dokumen/rkpdes-2024.pdf" },
+  { judul: "Profil Desa dan Potensi Desa 2024", deskripsi: "Gambaran umum kondisi desa, potensi sumber daya alam, dan sumber daya manusia.", tanggal: "20 Februari 2024", file: "/dokumen/profil-desa-2024.pdf" },
+];
 
 const Publikasi = () => {
   return (
-    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
-      <h1 className="text-3xl font-bold mb-6">Publikasi</h1>
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="berita">Berita</TabsTrigger>
-          <TabsTrigger value="pengumuman">Pengumuman</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">
-          <Card>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Publikasi Desa</h1>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {publikasiData.map((item, index) => (
+          <Card key={index} className="flex flex-col">
             <CardHeader>
-              <CardTitle>Overview Publikasi</CardTitle>
+              <CardTitle>{item.judul}</CardTitle>
+              <CardDescription>{item.tanggal}</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p>Informasi umum tentang publikasi dan berita di Desa Remau Bakotuo.</p>
-              {/* Add more content here */}
+            <CardContent className="flex-grow">
+              <p className="text-sm text-muted-foreground">{item.deskripsi}</p>
             </CardContent>
+            <CardFooter>
+              <Button className="w-full" asChild>
+                <a href={item.file} download>
+                  <Download className="mr-2 h-4 w-4" />
+                  Unduh Dokumen
+                </a>
+              </Button>
+            </CardFooter>
           </Card>
-        </TabsContent>
-        <TabsContent value="berita">
-          <Card>
-            <CardHeader>
-              <CardTitle>Berita Desa</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Berita terbaru dan artikel tentang kegiatan di Desa Remau Bakotuo.</p>
-              {/* Add news list here */}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="pengumuman">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pengumuman</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Pengumuman resmi dan informasi penting dari pemerintah desa.</p>
-              {/* Add announcements here */}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        ))}
+      </div>
     </div>
   );
 };
 
-export default Publikasi; 
+export default Publikasi;

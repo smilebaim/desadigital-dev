@@ -1,53 +1,47 @@
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+'use client';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+const panganData = [
+  { komoditas: 'Padi', masaTanam: 'Oktober - Desember', masaPanen: 'Februari - April' },
+  { komoditas: 'Jagung', masaTanam: 'April - Juni', masaPanen: 'Juli - September' },
+  { komoditas: 'Kacang Tanah', masaTanam: 'Mei - Juli', masaPanen: 'Agustus - Oktober' },
+  { komoditas: 'Ubi Kayu', masaTanam: 'Sepanjang Tahun', masaPanen: '8-12 bulan setelah tanam' },
+  { komoditas: 'Cabai', masaTanam: 'Maret - Mei', masaPanen: 'Juni - Agustus' },
+];
 
 const KalenderPangan = () => {
   return (
-    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
-      <h1 className="text-3xl font-bold mb-6">Kalender Pangan</h1>
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="jadwal">Jadwal</TabsTrigger>
-          <TabsTrigger value="informasi">Informasi</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">
-          <Card>
-            <CardHeader>
-              <CardTitle>Overview Kalender Pangan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Informasi umum tentang kalender pangan di Desa Remau Bakotuo.</p>
-              {/* Add more content here */}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="jadwal">
-          <Card>
-            <CardHeader>
-              <CardTitle>Jadwal Pangan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Jadwal musim tanam dan panen berbagai jenis pangan.</p>
-              {/* Add calendar or schedule content here */}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="informasi">
-          <Card>
-            <CardHeader>
-              <CardTitle>Informasi Tambahan</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Informasi tambahan terkait kalender pangan.</p>
-              {/* Add additional information here */}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Kalender Pangan Desa</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Jadwal Tanam dan Panen</CardTitle>
+          <CardDescription>Perkiraan waktu tanam dan panen untuk komoditas utama di desa.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Komoditas</TableHead>
+                <TableHead>Masa Tanam</TableHead>
+                <TableHead>Masa Panen</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {panganData.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{item.komoditas}</TableCell>
+                  <TableCell>{item.masaTanam}</TableCell>
+                  <TableCell>{item.masaPanen}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
 
-export default KalenderPangan; 
+export default KalenderPangan;
