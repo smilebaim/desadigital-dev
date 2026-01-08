@@ -38,7 +38,8 @@ import {
   FileSpreadsheet,
   ScrollText,
   ChevronDown,
-  LayoutTemplate
+  LayoutTemplate,
+  Image as ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -128,14 +129,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         { title: "Pustaka Desa", path: "/dashboard/pustaka/pustaka-desa", icon: Library },
         { title: "Publikasi", path: "/dashboard/pustaka/publikasi", icon: FileSpreadsheet }
       ]
-    },
-    {
-      title: "Kontrol Tampilan",
-      items: [
-        { title: "Kontrol TopNav", path: "/dashboard/display/top-nav", icon: LayoutTemplate },
-        { title: "Kontrol BottomNav", path: "/dashboard/display/bottom-nav", icon: LayoutTemplate }
-      ]
     }
+  ];
+
+  const displayControlMenuItems = [
+      { title: "Kontrol Hero", path: "/dashboard/display/hero", icon: ImageIcon },
+      { title: "Kontrol Logo", path: "/dashboard/display/logo", icon: ImageIcon },
+      { title: "Kontrol TopNav", path: "/dashboard/display/top-nav", icon: LayoutTemplate },
+      { title: "Kontrol BottomNav", path: "/dashboard/display/bottom-nav", icon: LayoutTemplate }
   ];
 
   return (
@@ -178,6 +179,25 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </AccordionContent>
                       </AccordionItem>
                     ))}
+                     <AccordionItem value="display-control" className="border-none">
+                        <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                          <span className="text-white">Kontrol Tampilan</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="space-y-1 pl-4">
+                            {displayControlMenuItems.map((item, itemIndex) => (
+                              <Link
+                                key={itemIndex}
+                                href={item.path}
+                                className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
+                              >
+                                <item.icon size={16} className="text-white" />
+                                <span>{item.title}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
                   </Accordion>
                 </div>
               </div>
