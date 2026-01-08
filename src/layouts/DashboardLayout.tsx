@@ -128,6 +128,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         { title: "Pustaka Desa", path: "/dashboard/pustaka/pustaka-desa", icon: Library },
         { title: "Publikasi", path: "/dashboard/pustaka/publikasi", icon: FileSpreadsheet }
       ]
+    },
+    {
+      title: "Kontrol Tampilan",
+      items: [
+        { title: "Kontrol TopNav", path: "/dashboard/display/top-nav", icon: LayoutTemplate },
+        { title: "Kontrol BottomNav", path: "/dashboard/display/bottom-nav", icon: LayoutTemplate }
+      ]
     }
   ];
 
@@ -234,28 +241,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 <Map size={18} className="text-white" />
                 <span>Kontrol Peta</span>
               </Link>
-
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="display" className="border-none">
-                  <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
-                    <div className="flex items-center gap-2">
-                      <LayoutTemplate size={18} className="text-white" />
-                      <span className="text-white">Kontrol Tampilan</span>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-1 pl-4">
-                      <Link href="/dashboard/display/top-nav" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                        <span>Kontrol TopNav</span>
-                      </Link>
-                      <Link href="/dashboard/display/bottom-nav" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                        <span>Kontrol BottomNav</span>
-                      </Link>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-
+              
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="settings" className="border-none">
                   <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
@@ -345,4 +331,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 export default DashboardLayout;
 
     
+    
+
     
