@@ -136,34 +136,34 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                                         <span>{item.title}</span>
                                       </Link>
                                     ))}
-                                     <Accordion type="single" collapsible className="w-full">
-                                        <AccordionItem value="menu-control" className="border-none">
-                                            <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
-                                                <div className="flex items-center gap-2">
-                                                  <LayoutTemplate size={18} className="text-white" />
-                                                  <span className="text-white">Kontrol Menu</span>
-                                                </div>
-                                            </AccordionTrigger>
-                                            <AccordionContent>
-                                                <div className="space-y-1 pl-4">
-                                                    {menuControlMenuItems.map((item, itemIndex) => (
-                                                        <Link
-                                                            key={itemIndex}
-                                                            href={item.path}
-                                                            className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
-                                                        >
-                                                            <item.icon size={16} className="text-white" />
-                                                            <span>{item.title}</span>
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                     </Accordion>
                                   </div>
                                 </AccordionContent>
                             </AccordionItem>
                           </Accordion>
+                          <Accordion type="single" collapsible className="w-full">
+                              <AccordionItem value="menu-control" className="border-none">
+                                  <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                                      <div className="flex items-center gap-2">
+                                        <LayoutTemplate size={18} className="text-white" />
+                                        <span className="text-white">Kontrol Menu</span>
+                                      </div>
+                                  </AccordionTrigger>
+                                  <AccordionContent>
+                                      <div className="space-y-1 pl-4">
+                                          {menuControlMenuItems.map((item, itemIndex) => (
+                                              <Link
+                                                  key={itemIndex}
+                                                  href={item.path}
+                                                  className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
+                                              >
+                                                  <item.icon size={16} className="text-white" />
+                                                  <span>{item.title}</span>
+                                              </Link>
+                                          ))}
+                                      </div>
+                                  </AccordionContent>
+                              </AccordionItem>
+                           </Accordion>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
