@@ -680,7 +680,7 @@ export const MapComponent: React.FC = () => {
         if (bidangTanahLayersRef.current.length === 0) {
             const colors = ['red', 'green', 'purple', 'orange', 'cyan', 'magenta', 'yellow', 'lime', 'navy', 'olive', 'maroon', 'teal', 'aqua', 'fuchsia'];
             BIDANG_TANAH_DATA.forEach((polygonData, index) => {
-                const polygon = L.polygon(polygonData, { color: colors[index % colors.length] })
+                const polygon = L.polygon(polygonData as LatLngTuple[], { color: colors[index % colors.length] })
                     .bindPopup(`<b>Bidang Tanah ${index + 1}</b>`)
                     .on('click', () => {
                         setMarkerInfo({
