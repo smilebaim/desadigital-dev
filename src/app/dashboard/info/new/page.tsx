@@ -38,7 +38,7 @@ const NewPostPage = () => {
 
         setIsSubmitting(true);
 
-        const postData: PostData = {
+        const postData: Omit<PostData, 'createdAt' | 'views'> = {
             title,
             category,
             content,

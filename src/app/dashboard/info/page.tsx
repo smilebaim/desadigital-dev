@@ -39,7 +39,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getPostsStream, deletePost, type PostData } from "@/lib/posts-actions";
+import { deletePost, type PostData } from "@/lib/posts-actions";
+import { getPostsStream } from "@/lib/posts-client-actions";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 

@@ -35,9 +35,9 @@ const EditPostPage = () => {
             const post = await getPost(postId);
             if (post) {
                 setTitle(post.title);
-                setCategory(post.category);
+                setCategory(post.category as 'Berita' | 'Pengumuman');
                 setContent(post.content);
-                setStatus(post.status);
+                setStatus(post.status as 'Published' | 'Draft');
             } else {
                 toast({ title: "Artikel tidak ditemukan.", variant: "destructive" });
                 router.push('/dashboard/info');
