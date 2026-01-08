@@ -622,7 +622,14 @@ export const MapComponent: React.FC = () => {
     const map = L.map('map', {
       center: DESA_CENTER,
       zoom: DEFAULT_ZOOM,
-      zoomControl: false
+      zoomControl: false,
+      dragging: false,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      boxZoom: false,
+      keyboard: false,
+      tap: false,
+      touchZoom: false,
     });
     mapRef.current = map;
 
