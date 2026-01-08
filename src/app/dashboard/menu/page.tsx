@@ -28,41 +28,31 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState, useEffect } from "react";
-import Link from "next/link";
 import { getMenus } from "@/lib/menu-actions";
-import type { Menu, MenuItem } from "@/lib/menu-data";
+import type { Menu } from "@/lib/menu-data";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-const PagesPage = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [allPages, setAllPages] = useState<MenuItem[]>([]);
+const MenuPage = () => {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPages = async () => {
-      setLoading(true);
-      const menusData = await getMenus();
-      const pagesFromMenus = menusData.flatMap(menu => (menu as Menu).items);
-      setAllPages(pagesFromMenus);
-      setMenus(menusData as Menu[]);
+    const fetchMenus = async () => {
+      const data = await getMenus();
+      setMenus(data as Menu[]);
       setLoading(false);
-    }
-    fetchPages();
+    };
+    fetchMenus();
   }, []);
-
-  const filteredPages = allPages.filter(page => 
-    page.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    page.path.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Kelola Halaman</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Kelola Menu</h2>
           <p className="text-muted-foreground">
-            Buat dan edit konten untuk setiap halaman publik
+            Atur menu navigasi publik dari sini
           </p>
         </div>
         <div className="flex gap-2">
@@ -72,7 +62,7 @@ const PagesPage = () => {
           </Button>
           <Button size="sm" disabled>
             <Plus className="h-4 w-4 mr-2" />
-            Tambah Halaman
+            Tambah Menu
           </Button>
         </div>
       </div>
@@ -81,19 +71,18 @@ const PagesPage = () => {
         <CardHeader>
           <div className="flex justify-between items-center">
             <div>
-              <CardTitle>Daftar Halaman</CardTitle>
+              <CardTitle>Daftar Menu</CardTitle>
               <CardDescription>
-                Total halaman: {filteredPages.length}
+                Total menu: {menus.length}
               </CardDescription>
             </div>
             <div className="flex items-center gap-4">
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Cari halaman..."
+                  placeholder="Cari menu..."
                   className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  disabled
                 />
               </div>
             </div>
@@ -103,33 +92,23 @@ const PagesPage = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Judul Halaman</TableHead>
-                <TableHead>Path</TableHead>
-                <TableHead>Menu</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Nama Menu</TableHead>
+                <TableHead>Jumlah Item</TableHead>
+                <TableHead>Deskripsi</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
-                 <TableRow>
-                    <TableCell colSpan={5} className="text-center">Memuat data halaman...</TableCell>
-                  </TableRow>
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">Memuat data menu...</TableCell>
+                </TableRow>
               ) : (
-                filteredPages.map((page) => (
-                  <TableRow key={page.id}>
-                    <TableCell className="font-medium">{page.title}</TableCell>
-                    <TableCell>
-                      <Link href={page.path} className="text-blue-600 hover:underline" target="_blank">
-                        {page.path}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{menus.find(m => m.id === page.menuId)?.name || '-'}</TableCell>
-                    <TableCell>
-                      <span className={'px-2 py-1 rounded-full text-xs bg-green-100 text-green-800'}>
-                        Published
-                      </span>
-                    </TableCell>
+                menus.map((menu) => (
+                  <TableRow key={menu.id}>
+                    <TableCell className="font-medium">{menu.name}</TableCell>
+                    <TableCell>{menu.items.length}</TableCell>
+                    <TableCell>{menu.name === 'TopNav' ? 'Menu navigasi utama di bagian atas halaman' : 'Menu navigasi di bagian bawah halaman'}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -141,18 +120,18 @@ const PagesPage = () => {
                           <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem asChild>
-                            <Link href={page.path} target="_blank">
+                            <Link href={`/dashboard/menu/${menu.id}`}>
                               <Eye className="h-4 w-4 mr-2" />
-                              Preview
+                              Lihat Item
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem disabled>
                             <Edit className="h-4 w-4 mr-2" />
-                            Edit Konten
+                            Edit Menu
                           </DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600" disabled>
                             <Trash2 className="h-4 w-4 mr-2" />
-                            Hapus
+                            Hapus Menu
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -168,4 +147,4 @@ const PagesPage = () => {
   );
 };
 
-export default PagesPage;
+export default MenuPage;
