@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, PlusCircle, Edit, Trash2, Link as LinkIcon, Eye, Copy } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -77,7 +77,7 @@ export default function Page() {
                     </Link>
                   </TableCell>
                   <TableCell>
-                     <Badge variant={getStatusVariant(page.status)}>{page.status}</Badge>
+                     <Badge variant={getStatusVariant(page.status) as "default" | "secondary" | "outline" | "destructive" | null | undefined}>{page.status}</Badge>
                   </TableCell>
                   <TableCell>{page.lastModified}</TableCell>
                   <TableCell className="text-right">
