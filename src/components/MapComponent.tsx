@@ -608,7 +608,7 @@ const BIDANG_TANAH_DATA: [number, number][][] = [
 
 export const MapComponent: React.FC = () => {
   const mapRef = useRef<LeafletMap | null>(null);
-  const [activeLayer, setActiveLayer] = useState<keyof typeof BASE_LAYERS>('street');
+  const [activeLayer, setActiveLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
   const [activeLayers, setActiveLayers] = useState<string[]>(['Peta Administrasi', 'Bidang Tanah']);
   const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
   const [infoPanelExpanded, setInfoPanelExpanded] = useState(false);
