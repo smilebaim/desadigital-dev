@@ -96,45 +96,50 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           </SidebarHeader>
           <SidebarContent>
             <div className="space-y-1 px-2 py-4">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white">
-                  <Globe size={18} className="text-white" />
-                  <span>Kontrol Web</span>
-                </div>
-                <div className="space-y-1 pl-4">
-                   <Link
-                      href="/dashboard/pages"
-                      className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
-                    >
-                      <FileIcon size={16} className="text-white" />
-                      <span>Kontrol Halaman</span>
-                    </Link>
-                </div>
-              </div>
-
               <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="display-control" className="border-none">
-                  <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
-                      <div className="flex items-center gap-2">
-                        <LayoutTemplate size={18} className="text-white" />
-                        <span className="text-white">Kontrol Tampilan</span>
+                  <AccordionItem value="web-control" className="border-none">
+                    <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                        <div className="flex items-center gap-2">
+                          <Globe size={18} className="text-white" />
+                          <span className="text-white">Kontrol Web</span>
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="space-y-1 pl-4">
+                         <Link
+                            href="/dashboard/pages"
+                            className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
+                          >
+                            <FileIcon size={16} className="text-white" />
+                            <span>Kontrol Halaman</span>
+                          </Link>
+                          <Accordion type="single" collapsible className="w-full">
+                            <AccordionItem value="display-control" className="border-none">
+                                <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                                    <div className="flex items-center gap-2">
+                                      <LayoutTemplate size={18} className="text-white" />
+                                      <span className="text-white">Kontrol Tampilan</span>
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                  <div className="space-y-1 pl-4">
+                                    {displayControlMenuItems.map((item, itemIndex) => (
+                                      <Link
+                                        key={itemIndex}
+                                        href={item.path}
+                                        className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
+                                      >
+                                        <item.icon size={16} className="text-white" />
+                                        <span>{item.title}</span>
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
                       </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-1 pl-4">
-                      {displayControlMenuItems.map((item, itemIndex) => (
-                        <Link
-                          key={itemIndex}
-                          href={item.path}
-                          className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
-                        >
-                          <item.icon size={16} className="text-white" />
-                          <span>{item.title}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+                    </AccordionContent>
+                  </AccordionItem>
               </Accordion>
               
               <Accordion type="single" collapsible className="w-full">
