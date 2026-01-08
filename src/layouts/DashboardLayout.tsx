@@ -39,7 +39,8 @@ import {
   ScrollText,
   ChevronDown,
   LayoutTemplate,
-  Image as ImageIcon
+  Image as ImageIcon,
+  File as FileIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -179,29 +180,42 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </AccordionContent>
                       </AccordionItem>
                     ))}
-                     <AccordionItem value="display-control" className="border-none">
-                        <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
-                          <span className="text-white">Kontrol Tampilan</span>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <div className="space-y-1 pl-4">
-                            {displayControlMenuItems.map((item, itemIndex) => (
-                              <Link
-                                key={itemIndex}
-                                href={item.path}
-                                className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
-                              >
-                                <item.icon size={16} className="text-white" />
-                                <span>{item.title}</span>
-                              </Link>
-                            ))}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
                   </Accordion>
+                   <Link
+                      href="/dashboard/pages"
+                      className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
+                    >
+                      <FileIcon size={16} className="text-white" />
+                      <span>Kontrol Halaman</span>
+                    </Link>
                 </div>
               </div>
 
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="display-control" className="border-none">
+                  <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                      <div className="flex items-center gap-2">
+                        <LayoutTemplate size={18} className="text-white" />
+                        <span className="text-white">Kontrol Tampilan</span>
+                      </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-1 pl-4">
+                      {displayControlMenuItems.map((item, itemIndex) => (
+                        <Link
+                          key={itemIndex}
+                          href={item.path}
+                          className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white"
+                        >
+                          <item.icon size={16} className="text-white" />
+                          <span>{item.title}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+              
               <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="apps" className="border-none">
                   <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
@@ -349,8 +363,3 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 export default DashboardLayout;
-
-    
-    
-
-    
