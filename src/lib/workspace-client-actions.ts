@@ -13,7 +13,7 @@ export const getWorkspacesStream = (userId: string, callback: (data: any[]) => v
     const q = query(
         collection(db, "workspaces"),
         where("ownerUid", "==", userId),
-        orderBy("createdAt", "desc")
+        orderBy("createdAt", "asc")
     );
     return onSnapshot(q, (querySnapshot) => {
         const workspaces = querySnapshot.docs.map(doc => ({
