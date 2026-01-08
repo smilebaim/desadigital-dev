@@ -66,7 +66,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import ProtectedRoute from "@/components/ProtectedRoute";
+// import ProtectedRoute from "@/components/ProtectedRoute";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 
@@ -93,7 +93,7 @@ const DashboardLayout = ({
   const webControlMenuItems: any[] = [];
 
   return (
-    <ProtectedRoute>
+    // <ProtectedRoute>
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-gray-50/50">
           <Sidebar className="bg-black shadow-sm">
@@ -267,7 +267,7 @@ const DashboardLayout = ({
           </div>
         </div>
       </SidebarProvider>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   );
 };
 
