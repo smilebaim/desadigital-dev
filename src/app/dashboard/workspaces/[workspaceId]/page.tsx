@@ -2,7 +2,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { getWorkspace, getItemsStream, addItem, updateItem, deleteItem } from '@/lib/workspace-actions';
+import { getWorkspace, addItem, updateItem, deleteItem } from '@/lib/workspace-actions';
+import { getItemsStream } from '@/lib/workspace-client-actions';
 import { useAuth } from '@/contexts/AuthContext';
 import Breadcrumb from '@/components/Breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

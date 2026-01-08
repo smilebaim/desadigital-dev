@@ -48,7 +48,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { useAuth } from "@/contexts/AuthContext";
-import { addWorkspace, getWorkspacesStream, deleteWorkspace, updateWorkspace } from "@/lib/workspace-actions";
+import { addWorkspace, deleteWorkspace, updateWorkspace } from "@/lib/workspace-actions";
+import { getWorkspacesStream } from "@/lib/workspace-client-actions";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Workspace {
