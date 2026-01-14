@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { usePathname } from 'next/navigation';
 import TopNav from '@/components/TopNav';
 import BottomNav from '@/components/BottomNav';
@@ -29,14 +29,11 @@ const PublicLayout = ({
 
   const topNavMenu = menus.find(m => m.location === 'topnav');
   const bottomNavMenu = menus.find(m => m.location === 'bottomnav');
-  const sidebarMenus = menus.filter(m => m.location === 'sidebar');
   
-  const allSidebarPaths = sidebarMenus
-      .flatMap(menu => menu.items?.map(item => item.path.split('/')[1]) || []);
-
-  const uniqueSidebarPaths = [...new Set(allSidebarPaths)];
-  
-  const needsSidebar = uniqueSidebarPaths.some(p => pathname.startsWith(`/${p}`));
+  // This is a placeholder for sidebar logic.
+  // In a real app, you would likely have a more robust way to determine
+  // which sidebar to show based on the current route.
+  const needsSidebar = false;
 
   if (!isClient) {
     return (
