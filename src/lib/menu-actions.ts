@@ -9,9 +9,23 @@ import {
     updateDoc,
     deleteDoc,
     query,
-    orderBy
+    orderBy,
+    serverTimestamp
 } from 'firebase/firestore';
 import type { Menu, MenuItem } from './menu-data';
+
+// Add a new menu
+export const addMenu = async (menuData: Omit<Menu, 'id' | 'items' | 'createdAt'>) => {
+    try {
+        await addDoc(collection(db, 'menus'), {
+            ...menuData,
+            createdAt: serverTimestamp()
+        });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
 
 // Get all menus with their items
 export const getMenusWithItems = async (): Promise<Menu[]> => {
