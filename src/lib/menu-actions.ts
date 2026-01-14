@@ -13,6 +13,35 @@ import {
 } from 'firebase/firestore';
 import type { Menu, MenuItem } from './menu-data';
 
+// Get all menus with their items
+export const getMenusWithItems = async (): Promise<Menu[]> => {
+  try {
+    const menusCollectionRef = collection(db, 'menus');
+    const menuSnapshot = await getDocs(menusCollectionRef);
+    
+    const menus = await Promise.all(menuSnapshot.docs.map(async (menuDoc) => {
+      const menuData = { id: menuDoc.id, ...menuDoc.data() } as Menu;
+      
+      const itemsCollectionRef = collection(db, 'menus', menuDoc.id, 'items');
+      const itemsQuery = query(itemsCollectionRef, orderBy('order'));
+      const itemsSnapshot = await getDocs(itemsQuery);
+      
+      menuData.items = itemsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+      } as unknown as MenuItem));
+      
+      return menuData;
+    }));
+
+    return menus;
+  } catch (error) {
+    console.error("Error fetching menus with items: ", error);
+    return [];
+  }
+};
+
+
 // Get all menus (without items)
 export const getMenus = async (): Promise<Menu[]> => {
   try {

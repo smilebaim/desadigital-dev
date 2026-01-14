@@ -13,6 +13,7 @@ export interface Menu {
   id: string; // Will be the document ID from Firestore
   name: string;
   description: string;
+  icon?: string;
   items?: MenuItem[]; // This will now be a subcollection
   createdAt?: Timestamp;
 }
