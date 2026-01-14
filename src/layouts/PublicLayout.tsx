@@ -25,18 +25,16 @@ const PublicLayout = ({
     fetchMenus();
   }, []);
 
-  const topNavMenu = menus.find(m => m.id === 'top-nav');
-  const bottomNavMenu = menus.find(m => m.id === 'bottom-nav');
+  const topNavMenu = menus.find(m => m.location === 'topnav');
+  const bottomNavMenu = menus.find(m => m.location === 'bottomnav');
+  const sidebarMenus = menus.filter(m => m.location === 'sidebar');
   
-  // Find all parent items for sidebar generation
-  const allParentPaths = menus
-      .filter(menu => menu.id !== 'top-nav' && menu.id !== 'bottom-nav')
-      .flatMap(menu => menu.items?.filter(item => !item.parentId) || [])
-      .map(item => item.path.split('/')[1]);
+  const allSidebarPaths = sidebarMenus
+      .flatMap(menu => menu.items?.map(item => item.path.split('/')[1]) || []);
 
-  const uniqueParentPaths = [...new Set(allParentPaths)];
+  const uniqueSidebarPaths = [...new Set(allSidebarPaths)];
   
-  const needsSidebar = uniqueParentPaths.some(p => pathname.startsWith(`/${p}`));
+  const needsSidebar = uniqueSidebarPaths.some(p => pathname.startsWith(`/${p}`));
 
   return (
     <div className="flex flex-col min-h-screen">

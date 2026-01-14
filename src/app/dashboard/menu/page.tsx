@@ -42,6 +42,7 @@ import type { Menu } from "@/lib/menu-data";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const MenuPage = () => {
   const [menus, setMenus] = useState<Menu[]>([]);
@@ -52,6 +53,7 @@ const MenuPage = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newMenuName, setNewMenuName] = useState("");
   const [newMenuDescription, setNewMenuDescription] = useState("");
+  const [newMenuLocation, setNewMenuLocation] = useState<'topnav' | 'bottomnav' | 'sidebar' | ''>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fetchMenus = useCallback(async () => {
@@ -67,13 +69,17 @@ const MenuPage = () => {
 
   const handleAddMenu = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMenuName) {
-      toast({ title: "Nama menu tidak boleh kosong.", variant: "destructive" });
+    if (!newMenuName || !newMenuLocation) {
+      toast({ title: "Nama dan lokasi menu tidak boleh kosong.", variant: "destructive" });
       return;
     }
     
     setIsSubmitting(true);
-    const result = await addMenu({ name: newMenuName, description: newMenuDescription });
+    const result = await addMenu({ 
+      name: newMenuName, 
+      description: newMenuDescription,
+      location: newMenuLocation as 'topnav' | 'bottomnav' | 'sidebar',
+    });
 
     if (result.success) {
       toast({ title: "Menu berhasil dibuat." });
@@ -81,6 +87,7 @@ const MenuPage = () => {
       setIsAddDialogOpen(false);
       setNewMenuName("");
       setNewMenuDescription("");
+      setNewMenuLocation("");
     } else {
       toast({ title: "Gagal membuat menu.", description: result.error, variant: "destructive" });
     }
@@ -135,6 +142,7 @@ const MenuPage = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nama Menu</TableHead>
+                  <TableHead>Lokasi</TableHead>
                   <TableHead>Deskripsi</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
@@ -142,16 +150,17 @@ const MenuPage = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center">Memuat data menu...</TableCell>
+                    <TableCell colSpan={4} className="text-center">Memuat data menu...</TableCell>
                   </TableRow>
                 ) : menus.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={3} className="text-center">Belum ada menu, silakan tambahkan menu baru.</TableCell>
+                    <TableCell colSpan={4} className="text-center">Belum ada menu, silakan tambahkan menu baru.</TableCell>
                   </TableRow>
                 ) : (
                   menus.map((menu) => (
                     <TableRow key={menu.id}>
                       <TableCell className="font-medium">{menu.name}</TableCell>
+                      <TableCell className="capitalize">{menu.location || 'N/A'}</TableCell>
                       <TableCell>{menu.description}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -210,6 +219,19 @@ const MenuPage = () => {
                   disabled={isSubmitting}
                   required
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="menu-location">Lokasi Menu</Label>
+                <Select value={newMenuLocation} onValueChange={(value) => setNewMenuLocation(value as any)} disabled={isSubmitting}>
+                    <SelectTrigger id="menu-location">
+                        <SelectValue placeholder="Pilih lokasi penempatan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="topnav">Navigasi Atas (TopNav)</SelectItem>
+                        <SelectItem value="bottomnav">Navigasi Bawah (BottomNav)</SelectItem>
+                        <SelectItem value="sidebar">Sidebar</SelectItem>
+                    </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="menu-description">Deskripsi (Opsional)</Label>
