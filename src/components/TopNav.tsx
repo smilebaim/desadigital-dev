@@ -1,5 +1,6 @@
+
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -48,6 +49,11 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, lo
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
   
   const getSubItems = (parentId: string) => {
     return menu?.items?.filter(item => item.parentId === parentId) || [];
@@ -136,79 +142,81 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, lo
                 <Search className="h-5 w-5 sm:h-6 sm:w-6" />
               </Link>
             </Button>
-            <Sheet open={isMainMenuOpen} onOpenChange={setIsMainMenuOpen}>
-              <SheetTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-black hover:text-black hover:bg-black/10 hover:backdrop-blur-sm hover:backdrop-saturate-150 transition-all h-10 w-10 sm:h-12 sm:w-12"
-                >
-                  <MenuIcon className="h-6 w-6 sm:h-7 sm:w-7" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[70vw] sm:w-[336px] bg-white/40 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-black/10 rounded-r-[2rem] top-14 sm:top-20 h-[calc(100vh-7rem)] sm:h-[calc(100vh-10rem)] transition-all duration-300">
-                <SheetTitle className="sr-only">Main Menu</SheetTitle>
-                <SheetDescription className="sr-only">Menu utama untuk mengakses berbagai layanan dan informasi desa</SheetDescription>
-                <ScrollArea className="h-full">
-                  <div className="space-y-3 sm:space-y-4 py-6 sm:py-8">
-                    {loading ? (
-                        <div className="flex justify-center items-center h-full">
-                            <Loader className="animate-spin" />
-                        </div>
-                    ) : menu?.items ? (
-                        <Accordion type="multiple" className="w-full">
-                           {renderMenuItems(menu.items)}
-                        </Accordion>
-                    ) : (
-                        <p className="text-center text-muted-foreground">Menu tidak tersedia.</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2 px-2 sm:px-3 mb-4">
-                    <Button 
-                      asChild
-                      variant="ghost" 
-                      className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
-                    >
-                      <Link href="/berita" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
-                        <Bell className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
-                        <span>Notifikasi</span>
-                        {hasNewNews && (
-                          <span className="ml-2 h-1.5 w-1.5 sm:h-2 sm:w-2 bg-red-500 rounded-full" />
-                        )}
-                      </Link>
-                    </Button>
-                    {isAuthenticated ? (
-                      <Button
+            {isClient && (
+              <Sheet open={isMainMenuOpen} onOpenChange={setIsMainMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-black hover:text-black hover:bg-black/10 hover:backdrop-blur-sm hover:backdrop-saturate-150 transition-all h-10 w-10 sm:h-12 sm:w-12"
+                  >
+                    <MenuIcon className="h-6 w-6 sm:h-7 sm:w-7" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="left" className="w-[70vw] sm:w-[336px] bg-white/40 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-black/10 rounded-r-[2rem] top-14 sm:top-20 h-[calc(100vh-7rem)] sm:h-[calc(100vh-10rem)] transition-all duration-300">
+                  <SheetTitle className="sr-only">Main Menu</SheetTitle>
+                  <SheetDescription className="sr-only">Menu utama untuk mengakses berbagai layanan dan informasi desa</SheetDescription>
+                  <ScrollArea className="h-full">
+                    <div className="space-y-3 sm:space-y-4 py-6 sm:py-8">
+                      {loading ? (
+                          <div className="flex justify-center items-center h-full">
+                              <Loader className="animate-spin" />
+                          </div>
+                      ) : menu?.items ? (
+                          <Accordion type="multiple" className="w-full">
+                             {renderMenuItems(menu.items)}
+                          </Accordion>
+                      ) : (
+                          <p className="text-center text-muted-foreground">Menu tidak tersedia.</p>
+                      )}
+                    </div>
+                    <div className="flex gap-2 px-2 sm:px-3 mb-4">
+                      <Button 
                         asChild
-                        variant="ghost"
+                        variant="ghost" 
                         className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
                       >
-                        <Link href="/dashboard" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
-                          <User className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
-                          <span>Dashboard</span>
+                        <Link href="/berita" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
+                          <Bell className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                          <span>Notifikasi</span>
+                          {hasNewNews && (
+                            <span className="ml-2 h-1.5 w-1.5 sm:h-2 sm:w-2 bg-red-500 rounded-full" />
+                          )}
                         </Link>
                       </Button>
-                    ) : (
-                      <Button
-                        asChild
-                        variant="ghost"
-                        className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
-                      >
-                        <Link href="/login" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
-                          <User className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
-                          <span>Masuk</span>
-                        </Link>
-                      </Button>
-                    )}
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-black/10">
-                    <p className="text-[10px] sm:text-xs text-black/40 italic font-bold">
-                      Penafian : Data dan informasi yang di sajikan dalam Laman ini bersifat indikatif dan tidak di maksudkan untuk penyebarluasan informasi. Lebih lanjut hubungi pemerintah desa dan walidata terkait untuk validasi
-                    </p>
-                  </div>
-                </ScrollArea>
-              </SheetContent>
-            </Sheet>
+                      {isAuthenticated ? (
+                        <Button
+                          asChild
+                          variant="ghost"
+                          className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
+                        >
+                          <Link href="/dashboard" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
+                            <User className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                            <span>Dashboard</span>
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button
+                          asChild
+                          variant="ghost"
+                          className="flex-1 justify-start text-black hover:text-black hover:bg-black/10 transition-all text-xs sm:text-sm"
+                        >
+                          <Link href="/login" className="flex items-center" onClick={() => setIsMainMenuOpen(false)}>
+                            <User className="h-5 w-5 sm:h-6 sm:w-6 mr-2" />
+                            <span>Masuk</span>
+                          </Link>
+                        </Button>
+                      )}
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-black/10">
+                      <p className="text-[10px] sm:text-xs text-black/40 italic font-bold">
+                        Penafian : Data dan informasi yang di sajikan dalam Laman ini bersifat indikatif dan tidak di maksudkan untuk penyebarluasan informasi. Lebih lanjut hubungi pemerintah desa dan walidata terkait untuk validasi
+                      </p>
+                    </div>
+                  </ScrollArea>
+                </SheetContent>
+              </Sheet>
+            )}
           </div>
         </div>
       </nav>
