@@ -44,23 +44,22 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { getMenuDetails } from "@/lib/menu-actions";
-import { useState, useEffect } from "react";
+import { getMenuDetails, addMenuItem, updateMenuItem, deleteMenuItem } from "@/lib/menu-actions";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from 'next/navigation';
 import type { Menu, MenuItem } from '@/lib/menu-data';
-import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import React from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-type MenuWithItems = Menu & { items: MenuItem[] };
 
 const MenuItemsPage = () => {
   const params = useParams();
   const { toast } = useToast();
   const menuId = params.menuId as string;
   
-  const [menuDetails, setMenuDetails] = useState<MenuWithItems | null>(null);
+  const [menuDetails, setMenuDetails] = useState<Menu | null>(null);
   const [loading, setLoading] = useState(true);
 
   // State for modals
@@ -68,36 +67,39 @@ const MenuItemsPage = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formValues, setFormValues] = useState({ title: '', path: '', icon: '' });
+  const [formValues, setFormValues] = useState({ title: '', path: '', icon: '', parentId: '' });
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
 
-  useEffect(() => {
+  const fetchMenuDetails = useCallback(async () => {
     if (menuId) {
-      const fetchMenuDetails = async () => {
-        try {
-          const details = await getMenuDetails(parseInt(menuId, 10));
-          setMenuDetails(details as MenuWithItems);
-        } catch (error) {
-          console.error("Failed to fetch menu details:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchMenuDetails();
+      setLoading(true);
+      try {
+        const details = await getMenuDetails(menuId);
+        setMenuDetails(details);
+      } catch (error) {
+        console.error("Failed to fetch menu details:", error);
+        toast({ title: "Gagal memuat data menu", variant: "destructive" });
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [menuId]);
+  }, [menuId, toast]);
+
+  useEffect(() => {
+    fetchMenuDetails();
+  }, [fetchMenuDetails]);
   
   const openAddForm = () => {
     setFormMode('add');
     setSelectedItem(null);
-    setFormValues({ title: '', path: '', icon: '' });
+    setFormValues({ title: '', path: '', icon: '', parentId: '' });
     setIsFormOpen(true);
   };
 
   const openEditForm = (item: MenuItem) => {
     setFormMode('edit');
     setSelectedItem(item);
-    setFormValues({ title: item.title, path: item.path, icon: item.icon || '' });
+    setFormValues({ title: item.title, path: item.path, icon: item.icon || '', parentId: item.parentId || '' });
     setIsFormOpen(true);
   };
   
@@ -108,27 +110,52 @@ const MenuItemsPage = () => {
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!menuId) return;
+
     setIsSubmitting(true);
-    // TODO: Implement add/edit logic here
-    console.log("Submitting:", formValues);
-    toast({
-        title: formMode === 'add' ? "Item Ditambahkan (Simulasi)" : "Item Diperbarui (Simulasi)",
-        description: `Judul: ${formValues.title}`,
-    });
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    let result;
+
+    if (formMode === 'add') {
+        const newItem: Omit<MenuItem, 'id'> = {
+            title: formValues.title,
+            path: formValues.path,
+            icon: formValues.icon,
+            parentId: formValues.parentId || null,
+            order: menuDetails?.items?.length || 0,
+        };
+        result = await addMenuItem(menuId, newItem);
+    } else if (selectedItem) {
+        const updatedData: Partial<Omit<MenuItem, 'id'>> = {
+            title: formValues.title,
+            path: formValues.path,
+            icon: formValues.icon,
+            parentId: formValues.parentId || null,
+        };
+        result = await updateMenuItem(menuId, selectedItem.id, updatedData);
+    }
+
+    if (result?.success) {
+        toast({ title: `Item menu berhasil ${formMode === 'add' ? 'ditambahkan' : 'diperbarui'}.` });
+        await fetchMenuDetails();
+        setIsFormOpen(false);
+    } else {
+        toast({ title: `Gagal ${formMode === 'add' ? 'menambahkan' : 'memperbarui'} item.`, description: result?.error, variant: 'destructive' });
+    }
     setIsSubmitting(false);
-    setIsFormOpen(false);
   };
 
   const handleDelete = async () => {
-    if (!selectedItem) return;
-    // TODO: Implement delete logic here
-    console.log("Deleting:", selectedItem);
-    toast({
-        title: "Item Dihapus (Simulasi)",
-        description: `Item "${selectedItem.title}" telah dihapus.`,
-    });
+    if (!selectedItem || !menuId) return;
+    
+    const result = await deleteMenuItem(menuId, selectedItem.id);
+    
+    if (result.success) {
+        toast({ title: "Item menu berhasil dihapus." });
+        await fetchMenuDetails();
+    } else {
+        toast({ title: "Gagal menghapus item.", description: result.error, variant: "destructive" });
+    }
+
     setIsDeleteOpen(false);
     setSelectedItem(null);
   };
@@ -141,10 +168,12 @@ const MenuItemsPage = () => {
     return <div>Menu tidak ditemukan.</div>;
   }
 
-  const parentItems = menuDetails.items.filter(item => !item.parentId);
-  const getSubItems = (parentId: number) => {
-    return menuDetails.items.filter(item => item.parentId === parentId);
+  const parentItems = menuDetails.items?.filter(item => !item.parentId) || [];
+  const getSubItems = (parentId: string) => {
+    return menuDetails.items?.filter(item => item.parentId === parentId) || [];
   }
+  
+  const possibleParents = menuDetails.items?.filter(item => !item.parentId) || [];
 
   return (
     <>
@@ -171,7 +200,7 @@ const MenuItemsPage = () => {
           <CardHeader>
             <CardTitle>Daftar Item</CardTitle>
             <CardDescription>
-              Total item: {menuDetails.items.length}
+              Total item: {menuDetails.items?.length || 0}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -185,6 +214,11 @@ const MenuItemsPage = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
+                {parentItems.length === 0 && (
+                    <TableRow>
+                        <TableCell colSpan={4} className="text-center text-muted-foreground">Belum ada item menu.</TableCell>
+                    </TableRow>
+                )}
                 {parentItems.map((item) => (
                   <React.Fragment key={item.id}>
                     <TableRow className="bg-muted/50">
@@ -257,15 +291,31 @@ const MenuItemsPage = () => {
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Judul Item</Label>
-                <Input id="title" value={formValues.title} onChange={(e) => setFormValues({...formValues, title: e.target.value})} placeholder="Contoh: Sejarah Desa" disabled={isSubmitting} />
+                <Input id="title" value={formValues.title} onChange={(e) => setFormValues({...formValues, title: e.target.value})} placeholder="Contoh: Sejarah Desa" disabled={isSubmitting} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="path">Path</Label>
-                <Input id="path" value={formValues.path} onChange={(e) => setFormValues({...formValues, path: e.target.value})} placeholder="/profil/sejarah-desa" disabled={isSubmitting} />
+                <Input id="path" value={formValues.path} onChange={(e) => setFormValues({...formValues, path: e.target.value})} placeholder="/profil/sejarah-desa" disabled={isSubmitting} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="icon">Icon (Opsional)</Label>
                 <Input id="icon" value={formValues.icon} onChange={(e) => setFormValues({...formValues, icon: e.target.value})} placeholder="Nama icon dari Lucide" disabled={isSubmitting} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="parentId">Item Induk (Opsional)</Label>
+                <Select value={formValues.parentId} onValueChange={(value) => setFormValues({...formValues, parentId: value})} disabled={isSubmitting}>
+                    <SelectTrigger id="parentId">
+                        <SelectValue placeholder="Jadikan item utama" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="">Jadikan item utama</SelectItem>
+                        {possibleParents
+                            .filter(p => p.id !== selectedItem?.id) // Prevent self-parenting
+                            .map(parent => (
+                                <SelectItem key={parent.id} value={parent.id}>{parent.title}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
               </div>
             </div>
             <DialogFooter>
@@ -289,7 +339,7 @@ const MenuItemsPage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setIsDeleteOpen(false)}>Batal</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,30 +1,88 @@
 'use server';
-
-import { MENUS } from './menu-data';
+import { db } from '@/firebase/config';
+import { 
+    collection, 
+    getDocs, 
+    doc, 
+    getDoc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    query,
+    orderBy
+} from 'firebase/firestore';
 import type { Menu, MenuItem } from './menu-data';
 
-// Simulate fetching all menus
+// Get all menus (without items)
 export const getMenus = async (): Promise<Menu[]> => {
-  // In a real app, this would fetch from a database
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(JSON.parse(JSON.stringify(MENUS)));
-    }, 500);
-  });
+  try {
+    const menusCollection = collection(db, 'menus');
+    const menuSnapshot = await getDocs(menusCollection);
+    const menus = menuSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Menu));
+    return menus;
+  } catch (error) {
+    console.error("Error fetching menus: ", error);
+    return [];
+  }
 };
 
-// Simulate fetching details for a single menu, including its items
-export const getMenuDetails = async (menuId: number): Promise<(Menu & { items: MenuItem[] }) | null> => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      const menu = MENUS.find(m => m.id === menuId);
-      if (menu) {
-        // In a real app, you might fetch items separately and join them.
-        // Here, the items are already part of the menu object.
-        resolve(JSON.parse(JSON.stringify(menu)));
-      } else {
-        resolve(null);
-      }
-    }, 500);
-  });
+// Get a single menu with its items
+export const getMenuDetails = async (menuId: string): Promise<Menu | null> => {
+    try {
+        const menuDocRef = doc(db, 'menus', menuId);
+        const menuSnap = await getDoc(menuDocRef);
+
+        if (!menuSnap.exists()) {
+            return null;
+        }
+
+        const menuData = { id: menuSnap.id, ...menuSnap.data() } as Menu;
+
+        const itemsCollectionRef = collection(db, 'menus', menuId, 'items');
+        const itemsQuery = query(itemsCollectionRef, orderBy('order'));
+        const itemsSnapshot = await getDocs(itemsQuery);
+        
+        menuData.items = itemsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        } as unknown as MenuItem));
+
+        return menuData;
+    } catch (error) {
+        console.error("Error fetching menu details: ", error);
+        return null;
+    }
+};
+
+// Add a new menu item
+export const addMenuItem = async (menuId: string, itemData: Omit<MenuItem, 'id'>) => {
+    try {
+        const itemsCollectionRef = collection(db, 'menus', menuId, 'items');
+        await addDoc(itemsCollectionRef, itemData);
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+// Update a menu item
+export const updateMenuItem = async (menuId: string, itemId: string, itemData: Partial<Omit<MenuItem, 'id'>>) => {
+    try {
+        const itemDocRef = doc(db, 'menus', menuId, 'items', itemId);
+        await updateDoc(itemDocRef, itemData);
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+// Delete a menu item
+export const deleteMenuItem = async (menuId: string, itemId: string) => {
+    try {
+        const itemDocRef = doc(db, 'menus', menuId, 'items', itemId);
+        await deleteDoc(itemDocRef);
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
 };

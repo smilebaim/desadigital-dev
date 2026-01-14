@@ -1,4 +1,3 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,8 +38,9 @@ const MenuPage = () => {
 
   useEffect(() => {
     const fetchMenus = async () => {
+      setLoading(true);
       const data = await getMenus();
-      setMenus(data as Menu[]);
+      setMenus(data);
       setLoading(false);
     };
     fetchMenus();
@@ -93,7 +93,6 @@ const MenuPage = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Nama Menu</TableHead>
-                <TableHead>Jumlah Item</TableHead>
                 <TableHead>Deskripsi</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
@@ -101,14 +100,17 @@ const MenuPage = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center">Memuat data menu...</TableCell>
+                  <TableCell colSpan={3} className="text-center">Memuat data menu...</TableCell>
+                </TableRow>
+              ) : menus.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center">Belum ada menu, hubungi developer untuk setup awal.</TableCell>
                 </TableRow>
               ) : (
                 menus.map((menu) => (
                   <TableRow key={menu.id}>
                     <TableCell className="font-medium">{menu.name}</TableCell>
-                    <TableCell>{menu.items.length}</TableCell>
-                    <TableCell>{menu.name === 'TopNav' ? 'Menu navigasi utama di bagian atas halaman' : 'Menu navigasi di bagian bawah halaman'}</TableCell>
+                    <TableCell>{menu.description}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -122,7 +124,7 @@ const MenuPage = () => {
                           <DropdownMenuItem asChild>
                             <Link href={`/dashboard/menu/${menu.id}`}>
                               <Eye className="h-4 w-4 mr-2" />
-                              Lihat Item
+                              Kelola Item
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem disabled>

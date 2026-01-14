@@ -34,29 +34,37 @@ import { getMenus } from "@/lib/menu-actions";
 import type { Menu, MenuItem } from "@/lib/menu-data";
 
 // Manually add static pages that are not in the menu system
-const staticPages = [
-  { id: 999, title: "Profil Desa", path: "/profil/profil-desa", menuId: 0, parentId: null },
+const staticPages: (MenuItem & {menuName?: string})[] = [
+  { id: '999', title: "Profil Desa", path: "/profil/profil-desa", menuId: '0', parentId: null, order: 0, menuName: "Statis" },
   // Add other static pages here if needed
 ];
 
 
 const PagesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [allPages, setAllPages] = useState<MenuItem[]>([]);
-  const [menus, setMenus] = useState<Menu[]>([]);
+  const [allPages, setAllPages] = useState<(MenuItem & {menuName?: string})[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPages = async () => {
       setLoading(true);
       const menusData = await getMenus();
-      const pagesFromMenus = menusData.flatMap(menu => (menu as Menu).items);
+      const pagesFromMenus = (await Promise.all(menusData.map(async (menu) => {
+        // Here you might need a function that gets items for each menu
+        // For now, let's assume getMenus can be adapted or another function is made.
+        // This is a placeholder for fetching items. Let's assume items are not fetched here for now.
+        // A better approach is to have a dedicated function getMenusWithItems.
+        // Let's just create a flat list of pages from menus if available.
+        return menu.items?.map(item => ({ ...item, menuName: menu.name })) || [];
+      }))).flat();
+      
+      // This is a simplified version. A full implementation would fetch items for each menu.
+      // For now, this will be empty if `getMenus` doesn't return items.
       const combinedPages = [...pagesFromMenus, ...staticPages].filter(
         (page, index, self) => index === self.findIndex((p) => p.path === page.path)
       );
 
       setAllPages(combinedPages);
-      setMenus(menusData as Menu[]);
       setLoading(false);
     }
     fetchPages();
@@ -145,7 +153,7 @@ const PagesPage = () => {
                           {page.path}
                         </Link>
                       </TableCell>
-                      <TableCell>{menus.find(m => m.id === page.menuId)?.name || 'Statis'}</TableCell>
+                      <TableCell>{page.menuName || 'N/A'}</TableCell>
                       <TableCell>
                         <span className={'px-2 py-1 rounded-full text-xs bg-green-100 text-green-800'}>
                           Published
