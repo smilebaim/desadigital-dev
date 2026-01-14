@@ -33,6 +33,13 @@ import Link from "next/link";
 import { getMenus } from "@/lib/menu-actions";
 import type { Menu, MenuItem } from "@/lib/menu-data";
 
+// Manually add static pages that are not in the menu system
+const staticPages = [
+  { id: 999, title: "Profil Desa", path: "/profil/profil-desa", menuId: 0, parentId: null },
+  // Add other static pages here if needed
+];
+
+
 const PagesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [allPages, setAllPages] = useState<MenuItem[]>([]);
@@ -44,7 +51,11 @@ const PagesPage = () => {
       setLoading(true);
       const menusData = await getMenus();
       const pagesFromMenus = menusData.flatMap(menu => (menu as Menu).items);
-      setAllPages(pagesFromMenus);
+      const combinedPages = [...pagesFromMenus, ...staticPages].filter(
+        (page, index, self) => index === self.findIndex((p) => p.path === page.path)
+      );
+
+      setAllPages(combinedPages);
       setMenus(menusData as Menu[]);
       setLoading(false);
     }
@@ -55,6 +66,14 @@ const PagesPage = () => {
     page.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     page.path.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  const getEditPath = (path: string) => {
+    if (path === '/profil/profil-desa') {
+      return '/dashboard/pages/profil-desa';
+    }
+    // Add more special cases here if needed
+    return null;
+  }
 
   return (
     <div className="space-y-6">
@@ -116,49 +135,61 @@ const PagesPage = () => {
                     <TableCell colSpan={5} className="text-center">Memuat data halaman...</TableCell>
                   </TableRow>
               ) : (
-                filteredPages.map((page) => (
-                  <TableRow key={page.id}>
-                    <TableCell className="font-medium">{page.title}</TableCell>
-                    <TableCell>
-                      <Link href={page.path} className="text-blue-600 hover:underline" target="_blank">
-                        {page.path}
-                      </Link>
-                    </TableCell>
-                    <TableCell>{menus.find(m => m.id === page.menuId)?.name || '-'}</TableCell>
-                    <TableCell>
-                      <span className={'px-2 py-1 rounded-full text-xs bg-green-100 text-green-800'}>
-                        Published
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem asChild>
-                            <Link href={page.path} target="_blank">
-                              <Eye className="h-4 w-4 mr-2" />
-                              Preview
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem disabled>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Konten
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-600" disabled>
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Hapus
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))
+                filteredPages.map((page) => {
+                  const editPath = getEditPath(page.path);
+                  return (
+                    <TableRow key={page.id}>
+                      <TableCell className="font-medium">{page.title}</TableCell>
+                      <TableCell>
+                        <Link href={page.path} className="text-blue-600 hover:underline" target="_blank">
+                          {page.path}
+                        </Link>
+                      </TableCell>
+                      <TableCell>{menus.find(m => m.id === page.menuId)?.name || 'Statis'}</TableCell>
+                      <TableCell>
+                        <span className={'px-2 py-1 rounded-full text-xs bg-green-100 text-green-800'}>
+                          Published
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                              <Link href={page.path} target="_blank">
+                                <Eye className="h-4 w-4 mr-2" />
+                                Preview
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild disabled={!editPath}>
+                              {editPath ? (
+                                <Link href={editPath}>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit Konten
+                                </Link>
+                              ) : (
+                                <span>
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit Konten
+                                </span>
+                              )}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600" disabled>
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
