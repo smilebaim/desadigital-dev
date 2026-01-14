@@ -1,5 +1,3 @@
-import type { Timestamp } from 'firebase/firestore';
-
 export interface MenuItem {
   id: string; // Will be the document ID from Firestore
   title: string;
@@ -16,5 +14,5 @@ export interface Menu {
   location?: 'topnav' | 'bottomnav' | 'sidebar';
   icon?: string;
   items?: MenuItem[]; // This will now be a subcollection
-  createdAt?: Timestamp;
+  createdAt?: string | null;
 }

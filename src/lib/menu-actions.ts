@@ -34,21 +34,30 @@ export const getMenusWithItems = async (): Promise<Menu[]> => {
     const menuSnapshot = await getDocs(menusCollectionRef);
     
     const menus = await Promise.all(menuSnapshot.docs.map(async (menuDoc) => {
-      const menuData = { id: menuDoc.id, ...menuDoc.data() } as Menu;
-      
-      const itemsCollectionRef = collection(db, 'menus', menuDoc.id, 'items');
+      const menuData = menuDoc.data();
+      const menuId = menuDoc.id;
+
+      const itemsCollectionRef = collection(db, 'menus', menuId, 'items');
       const itemsQuery = query(itemsCollectionRef, orderBy('order'));
       const itemsSnapshot = await getDocs(itemsQuery);
       
-      menuData.items = itemsSnapshot.docs.map(doc => ({
+      const items = itemsSnapshot.docs.map(doc => ({
           id: doc.id,
-          ...doc.data()
-      } as unknown as MenuItem));
+          ...(doc.data() as Omit<MenuItem, 'id'>)
+      }));
       
-      return menuData;
+      return {
+        id: menuId,
+        name: menuData.name,
+        description: menuData.description,
+        location: menuData.location,
+        icon: menuData.icon,
+        createdAt: menuData.createdAt?.toDate().toISOString() || null,
+        items,
+      };
     }));
 
-    return menus;
+    return menus as Menu[];
   } catch (error) {
     console.error("Error fetching menus with items: ", error);
     return [];
@@ -61,8 +70,17 @@ export const getMenus = async (): Promise<Menu[]> => {
   try {
     const menusCollection = collection(db, 'menus');
     const menuSnapshot = await getDocs(menusCollection);
-    const menus = menuSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Menu));
-    return menus;
+    const menus = menuSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        name: data.name,
+        description: data.description,
+        location: data.location,
+        createdAt: data.createdAt?.toDate().toISOString() || null,
+      }
+    });
+    return menus as Menu[];
   } catch (error) {
     console.error("Error fetching menus: ", error);
     return [];
@@ -79,18 +97,26 @@ export const getMenuDetails = async (menuId: string): Promise<Menu | null> => {
             return null;
         }
 
-        const menuData = { id: menuSnap.id, ...menuSnap.data() } as Menu;
+        const menuData = menuSnap.data();
 
         const itemsCollectionRef = collection(db, 'menus', menuId, 'items');
         const itemsQuery = query(itemsCollectionRef, orderBy('order'));
         const itemsSnapshot = await getDocs(itemsQuery);
         
-        menuData.items = itemsSnapshot.docs.map(doc => ({
+        const items = itemsSnapshot.docs.map(doc => ({
             id: doc.id,
-            ...doc.data()
-        } as unknown as MenuItem));
+            ...(doc.data() as Omit<MenuItem, 'id'>)
+        }));
 
-        return menuData;
+        return {
+          id: menuSnap.id,
+          name: menuData.name,
+          description: menuData.description,
+          location: menuData.location,
+          icon: menuData.icon,
+          createdAt: menuData.createdAt?.toDate().toISOString() || null,
+          items,
+        } as Menu;
     } catch (error) {
         console.error("Error fetching menu details: ", error);
         return null;
