@@ -14,8 +14,10 @@ const PublicLayout = ({
   const pathname = usePathname();
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const fetchMenus = async () => {
       setLoading(true);
       const menusData = await getMenusWithItems();
@@ -35,6 +37,14 @@ const PublicLayout = ({
   const uniqueSidebarPaths = [...new Set(allSidebarPaths)];
   
   const needsSidebar = uniqueSidebarPaths.some(p => pathname.startsWith(`/${p}`));
+
+  if (!isClient) {
+    return (
+        <div className="flex flex-col min-h-screen">
+          <main className="flex-grow">{children}</main>
+        </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">

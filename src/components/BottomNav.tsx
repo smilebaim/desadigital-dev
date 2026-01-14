@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,6 +25,11 @@ const getIcon = (name?: string): React.FC<any> => {
 const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loading }) => {
   const [openSheet, setOpenSheet] = useState<string | null>(null);
   const pathname = usePathname();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const Sidebar = ({ menuId }: { menuId: string }) => {
     const targetMenu = allMenus?.find(m => m.id === menuId);
@@ -78,9 +83,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
     );
   };
 
+  if (!isClient) return null;
+
   return (
     <>
-      {allMenus?.filter(m => m.id !== 'top-nav' && m.id !== 'bottom-nav').map(m => <Sidebar key={m.id} menuId={m.id} />)}
+      {allMenus?.filter(m => m.location === 'sidebar').map(m => <Sidebar key={m.id} menuId={m.id} />)}
 
       <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40">
         <p className="text-xs sm:text-sm font-medium text-orange-500">©2024 spasial.net</p>

@@ -3,7 +3,7 @@ export interface MenuItem {
   title: string;
   path: string;
   icon?: string;
-  parentId?: string | null;
+  parentId: string | null; // Corrected to be nullable
   order: number;
 }
 
@@ -14,5 +14,5 @@ export interface Menu {
   location?: 'topnav' | 'bottomnav' | 'sidebar';
   icon?: string;
   items?: MenuItem[]; // This will now be a subcollection
-  createdAt?: string | null;
+  createdAt?: string; // Corrected to be a string
 }

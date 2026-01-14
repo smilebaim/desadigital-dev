@@ -220,9 +220,9 @@ const MenuPage = () => {
                   required
                 />
               </div>
-              <div className="space-y-2">
+               <div className="space-y-2">
                 <Label htmlFor="menu-location">Lokasi Menu</Label>
-                <Select value={newMenuLocation} onValueChange={(value) => setNewMenuLocation(value as any)} disabled={isSubmitting}>
+                <Select value={newMenuLocation} onValueChange={(value) => setNewMenuLocation(value as any)} disabled={isSubmitting} required>
                     <SelectTrigger id="menu-location">
                         <SelectValue placeholder="Pilih lokasi penempatan" />
                     </SelectTrigger>

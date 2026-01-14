@@ -10,18 +10,32 @@ import {
     deleteDoc,
     query,
     orderBy,
-    serverTimestamp
+    serverTimestamp,
+    writeBatch
 } from 'firebase/firestore';
 import type { Menu, MenuItem } from './menu-data';
 
 // Add a new menu
 export const addMenu = async (menuData: Omit<Menu, 'id' | 'items' | 'createdAt'>) => {
     try {
-        await addDoc(collection(db, 'menus'), {
+        const docRef = await addDoc(collection(db, 'menus'), {
             ...menuData,
             createdAt: serverTimestamp()
         });
-        return { success: true };
+        
+        // If it's a bottomnav, automatically add 'Tata Ruang'
+        if (menuData.location === 'bottomnav') {
+            const tataRuangItem: Omit<MenuItem, 'id'> = {
+                title: 'Tata Ruang',
+                path: '/tata-ruang',
+                icon: 'Map',
+                order: 0,
+                parentId: null
+            };
+            await addMenuItem(docRef.id, tataRuangItem);
+        }
+
+        return { success: true, id: docRef.id };
     } catch (error: any) {
         return { success: false, error: error.message };
     }
@@ -52,7 +66,7 @@ export const getMenusWithItems = async (): Promise<Menu[]> => {
         description: menuData.description,
         location: menuData.location,
         icon: menuData.icon,
-        createdAt: menuData.createdAt?.toDate().toISOString() || null,
+        createdAt: menuData.createdAt?.toDate().toISOString() || new Date().toISOString(),
         items,
       };
     }));
@@ -77,7 +91,7 @@ export const getMenus = async (): Promise<Menu[]> => {
         name: data.name,
         description: data.description,
         location: data.location,
-        createdAt: data.createdAt?.toDate().toISOString() || null,
+        createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
       }
     });
     return menus as Menu[];
@@ -114,7 +128,7 @@ export const getMenuDetails = async (menuId: string): Promise<Menu | null> => {
           description: menuData.description,
           location: menuData.location,
           icon: menuData.icon,
-          createdAt: menuData.createdAt?.toDate().toISOString() || null,
+          createdAt: menuData.createdAt?.toDate().toISOString() || new Date().toISOString(),
           items,
         } as Menu;
     } catch (error) {
