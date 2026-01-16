@@ -7,7 +7,7 @@ const settingsDocRef = doc(db, 'site_settings', 'main');
 interface SiteSettings {
     logoUrl: string;
     heroUrl: string;
-    updatedAt?: any;
+    updatedAt?: string | null;
 }
 
 // Get site settings from Firestore
@@ -15,7 +15,12 @@ export const getSiteSettings = async (): Promise<SiteSettings | null> => {
     try {
         const docSnap = await getDoc(settingsDocRef);
         if (docSnap.exists()) {
-            return docSnap.data() as SiteSettings;
+            const data = docSnap.data();
+            return {
+                logoUrl: data.logoUrl,
+                heroUrl: data.heroUrl,
+                updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null,
+            };
         }
         // Return default settings if document doesn't exist
         return {

@@ -13,7 +13,7 @@ export interface ProfilDesaData {
     penduduk: string;
     kepalaDesa: string;
     periode: string;
-    updatedAt?: any;
+    updatedAt?: string | null;
 }
 
 // Get profil desa settings from Firestore
@@ -21,7 +21,18 @@ export const getProfilDesa = async (): Promise<ProfilDesaData | null> => {
     try {
         const docSnap = await getDoc(profilDesaDocRef);
         if (docSnap.exists()) {
-            return docSnap.data() as ProfilDesaData;
+            const data = docSnap.data();
+            return {
+                nama: data.nama,
+                kecamatan: data.kecamatan,
+                kabupaten: data.kabupaten,
+                provinsi: data.provinsi,
+                luas: data.luas,
+                penduduk: data.penduduk,
+                kepalaDesa: data.kepalaDesa,
+                periode: data.periode,
+                updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null
+            };
         }
         // Return default settings if document doesn't exist
         return {
@@ -43,8 +54,9 @@ export const getProfilDesa = async (): Promise<ProfilDesaData | null> => {
 // Update profil desa settings in Firestore
 export const updateProfilDesa = async (data: ProfilDesaData): Promise<boolean> => {
     try {
+        const { updatedAt, ...restOfData } = data;
         await setDoc(profilDesaDocRef, {
-            ...data,
+            ...restOfData,
             updatedAt: serverTimestamp()
         }, { merge: true });
         return true;

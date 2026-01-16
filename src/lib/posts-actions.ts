@@ -21,14 +21,15 @@ export interface PostData {
     status: 'Published' | 'Draft';
     author: string;
     userId: string;
-    createdAt?: any;
+    createdAt?: string | null;
+    updatedAt?: string | null;
     views?: number;
 }
 
 // --- Post Actions ---
 
 // Add a new post
-export const addPost = async (postData: PostData) => {
+export const addPost = async (postData: Omit<PostData, 'createdAt' | 'updatedAt' | 'views'>) => {
     try {
         await addDoc(collection(db, "posts"), {
             ...postData,
@@ -48,7 +49,20 @@ export const getPost = async (postId: string) => {
         const docRef = doc(db, 'posts', postId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data() } as PostData & { id: string };
+            const data = docSnap.data();
+            const post: PostData & { id: string } = {
+                id: docSnap.id,
+                title: data.title,
+                content: data.content,
+                category: data.category,
+                status: data.status,
+                author: data.author,
+                userId: data.userId,
+                views: data.views || 0,
+                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
+                updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null,
+            };
+            return post;
         }
         return null;
     } catch (error) {
@@ -61,8 +75,9 @@ export const getPost = async (postId: string) => {
 export const updatePost = async (postId: string, dataToUpdate: Partial<PostData>) => {
     try {
         const docRef = doc(db, "posts", postId);
+        const { createdAt, updatedAt, ...rest } = dataToUpdate;
         await updateDoc(docRef, {
-            ...dataToUpdate,
+            ...rest,
             updatedAt: serverTimestamp()
         });
         return true;
