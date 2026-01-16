@@ -30,44 +30,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { getMenus } from "@/lib/menu-actions";
-import type { Menu, MenuItem } from "@/lib/menu-data";
 
-// Manually add static pages that are not in the menu system
-const staticPages: (MenuItem & {menuName?: string})[] = [
-  { id: '999', title: "Profil Desa", path: "/profil/profil-desa", menuId: '0', parentId: null, order: 0, menuName: "Statis" },
-  // Add other static pages here if needed
+// Define a type for static pages for better type checking
+interface StaticPage {
+  id: string;
+  title: string;
+  path: string;
+  menuName?: string;
+}
+
+// Manually add static pages that are not in the dynamic menu system
+const staticPages: StaticPage[] = [
+  { id: '999', title: "Profil Desa", path: "/profil/profil-desa", menuName: "Statis" },
+  // Add other static pages with editable content here
 ];
 
 
 const PagesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [allPages, setAllPages] = useState<(MenuItem & {menuName?: string})[]>([]);
+  const [allPages, setAllPages] = useState<StaticPage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPages = async () => {
-      setLoading(true);
-      const menusData = await getMenus();
-      const pagesFromMenus = (await Promise.all(menusData.map(async (menu) => {
-        // Here you might need a function that gets items for each menu
-        // For now, let's assume getMenus can be adapted or another function is made.
-        // This is a placeholder for fetching items. Let's assume items are not fetched here for now.
-        // A better approach is to have a dedicated function getMenusWithItems.
-        // Let's just create a flat list of pages from menus if available.
-        return menu.items?.map(item => ({ ...item, menuName: menu.name })) || [];
-      }))).flat();
-      
-      // This is a simplified version. A full implementation would fetch items for each menu.
-      // For now, this will be empty if `getMenus` doesn't return items.
-      const combinedPages = [...pagesFromMenus, ...staticPages].filter(
-        (page, index, self) => index === self.findIndex((p) => p.path === page.path)
-      );
-
-      setAllPages(combinedPages);
-      setLoading(false);
-    }
-    fetchPages();
+    // In the future, you could fetch dynamically created pages here and combine them.
+    // For now, we only have static content pages.
+    setAllPages(staticPages);
+    setLoading(false);
   }, []);
 
   const filteredPages = allPages.filter(page => 
@@ -76,10 +64,11 @@ const PagesPage = () => {
   );
   
   const getEditPath = (path: string) => {
+    // This function maps a public path to its corresponding editor page in the dashboard
     if (path === '/profil/profil-desa') {
       return '/dashboard/pages/profil-desa';
     }
-    // Add more special cases here if needed
+    // Add more special cases here if other static pages become editable
     return null;
   }
 
@@ -89,7 +78,7 @@ const PagesPage = () => {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Kelola Halaman</h2>
           <p className="text-muted-foreground">
-            Buat dan edit konten untuk setiap halaman publik
+            Edit konten untuk halaman statis yang ada di situs.
           </p>
         </div>
         <div className="flex gap-2">
@@ -110,7 +99,7 @@ const PagesPage = () => {
             <div>
               <CardTitle>Daftar Halaman</CardTitle>
               <CardDescription>
-                Total halaman: {filteredPages.length}
+                Total halaman yang dapat diedit: {filteredPages.length}
               </CardDescription>
             </div>
             <div className="flex items-center gap-4">
@@ -132,7 +121,7 @@ const PagesPage = () => {
               <TableRow>
                 <TableHead>Judul Halaman</TableHead>
                 <TableHead>Path</TableHead>
-                <TableHead>Menu</TableHead>
+                <TableHead>Tipe</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
@@ -142,7 +131,7 @@ const PagesPage = () => {
                  <TableRow>
                     <TableCell colSpan={5} className="text-center">Memuat data halaman...</TableCell>
                   </TableRow>
-              ) : (
+              ) : filteredPages.length > 0 ? (
                 filteredPages.map((page) => {
                   const editPath = getEditPath(page.path);
                   return (
@@ -198,6 +187,10 @@ const PagesPage = () => {
                     </TableRow>
                   );
                 })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">Tidak ada halaman yang dapat diedit.</TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
