@@ -1,0 +1,28 @@
+{
+  "recentPosts": [
+    {
+      "id": 1,
+      "title": "Pembangunan Infrastruktur Jalan Desa",
+      "category": "Pembangunan",
+      "excerpt": "Proses pembangunan jalan utama desa telah mencapai 80% dan diharapkan selesai pada akhir bulan depan...",
+      "imageUrl": "https://picsum.photos/seed/1/600/400",
+      "imageHint": "road construction"
+    },
+    {
+      "id": 2,
+      "title": "Pelatihan UMKM untuk Ibu-Ibu PKK",
+      "category": "Ekonomi",
+      "excerpt": "Dalam rangka meningkatkan keterampilan, diadakan pelatihan pembuatan produk olahan dari hasil bumi setempat...",
+      "imageUrl": "https://picsum.photos/seed/2/600/400",
+      "imageHint": "community training"
+    },
+    {
+      "id": 3,
+      "title": "Program Posyandu Balita Bulan Ini",
+      "category": "Kesehatan",
+      "excerpt": "Jangan lewatkan jadwal posyandu untuk penimbangan dan imunisasi balita yang akan dilaksanakan minggu ini...",
+      "imageUrl": "https://picsum.photos/seed/3/600/400",
+      "imageHint": "child health"
+    }
+  ]
+}

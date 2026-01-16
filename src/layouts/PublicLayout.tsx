@@ -5,6 +5,8 @@ import BottomNav from '@/components/BottomNav';
 import { useEffect, useState } from 'react';
 import type { Menu } from '@/lib/menu-data';
 import { getMenusWithItems } from '@/lib/menu-actions';
+import { getSiteSettings } from '@/lib/site-settings-actions';
+import type { SiteSettings } from '@/lib/site-settings-actions';
 
 const PublicLayout = ({
   children,
@@ -15,6 +17,7 @@ const PublicLayout = ({
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -24,7 +27,12 @@ const PublicLayout = ({
       setMenus(menusData);
       setLoading(false);
     };
+    const fetchSettings = async () => {
+        const settingsData = await getSiteSettings();
+        setSiteSettings(settingsData);
+    };
     fetchMenus();
+    fetchSettings();
   }, []);
 
   const topNavMenu = menus.find(m => m.location === 'topnav');
@@ -45,7 +53,7 @@ const PublicLayout = ({
 
   return (
     <div className="flex flex-col min-h-screen">
-      <TopNav menu={topNavMenu} loading={loading} />
+      <TopNav menu={topNavMenu} loading={loading} logoUrl={siteSettings?.logoUrl} />
       <main className={`flex-grow ${needsSidebar ? 'md:pl-72 pl-12' : ''}`}>
         {children}
       </main>

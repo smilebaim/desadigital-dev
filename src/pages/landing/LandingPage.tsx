@@ -5,35 +5,13 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import { recentPosts } from '@/lib/placeholder-images.json';
+import type { SiteSettings } from "@/lib/site-settings-actions";
 
-const recentPosts = [
-    {
-        id: 1,
-        title: "Pembangunan Infrastruktur Jalan Desa",
-        category: "Pembangunan",
-        excerpt: "Proses pembangunan jalan utama desa telah mencapai 80% dan diharapkan selesai pada akhir bulan depan...",
-        imageUrl: "https://picsum.photos/seed/1/600/400",
-    },
-    {
-        id: 2,
-        title: "Pelatihan UMKM untuk Ibu-Ibu PKK",
-        category: "Ekonomi",
-        excerpt: "Dalam rangka meningkatkan keterampilan, diadakan pelatihan pembuatan produk olahan dari hasil bumi setempat...",
-        imageUrl: "https://picsum.photos/seed/2/600/400",
-    },
-    {
-        id: 3,
-        title: "Program Posyandu Balita Bulan Ini",
-        category: "Kesehatan",
-        excerpt: "Jangan lewatkan jadwal posyandu untuk penimbangan dan imunisasi balita yang akan dilaksanakan minggu ini...",
-        imageUrl: "https://picsum.photos/seed/3/600/400",
-    },
-];
-
-const LandingPage = () => {
+const LandingPage = ({ settings }: { settings: SiteSettings | null }) => {
   return (
     <div className="flex-1">
-      <Hero />
+      <Hero heroUrl={settings?.heroUrl} />
       <section className="py-16 md:py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -46,7 +24,13 @@ const LandingPage = () => {
             {recentPosts.map((post) => (
               <Card key={post.id} className="overflow-hidden flex flex-col">
                 <div className="relative h-56 w-full">
-                    <Image src={post.imageUrl} alt={post.title} layout="fill" objectFit="cover" />
+                    <Image 
+                      src={post.imageUrl} 
+                      alt={post.title} 
+                      fill
+                      className="object-cover"
+                      data-ai-hint={post.imageHint}
+                    />
                 </div>
                 <CardHeader>
                   <p className="text-sm text-primary font-semibold">{post.category}</p>

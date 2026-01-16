@@ -4,7 +4,7 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 const settingsDocRef = doc(db, 'site_settings', 'main');
 
-interface SiteSettings {
+export interface SiteSettings {
     logoUrl: string;
     heroUrl: string;
     updatedAt?: string | null;
