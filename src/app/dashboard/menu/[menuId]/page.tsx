@@ -300,7 +300,25 @@ const MenuItemsPage = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="icon">Icon (Opsional)</Label>
-                <Input id="icon" value={formValues.icon} onChange={(e) => setFormValues({...formValues, icon: e.target.value})} placeholder="Nama icon dari Lucide" disabled={isSubmitting} />
+                <Select value={formValues.icon} onValueChange={(value) => setFormValues({...formValues, icon: value})} disabled={isSubmitting}>
+                  <SelectTrigger id="icon">
+                    <SelectValue placeholder="Pilih ikon" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Home">Home</SelectItem>
+                    <SelectItem value="Info">Info</SelectItem>
+                    <SelectItem value="Newspaper">Newspaper</SelectItem>
+                    <SelectItem value="Map">Map</SelectItem>
+                    <SelectItem value="BookOpen">BookOpen</SelectItem>
+                    <SelectItem value="Users">Users</SelectItem>
+                    <SelectItem value="Building2">Building2</SelectItem>
+                    <SelectItem value="Scale">Scale</SelectItem>
+                    <SelectItem value="HeartHandshake">HeartHandshake</SelectItem>
+                    <SelectItem value="FileText">FileText</SelectItem>
+                    <SelectItem value="Calendar">Calendar</SelectItem>
+                    <SelectItem value="Globe">Globe</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="parentId">Item Induk (Opsional)</Label>
