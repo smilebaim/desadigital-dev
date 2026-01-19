@@ -6,7 +6,7 @@ import '@/styles/map.css';
 import type { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, MapPin } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 // Fix Leaflet default marker issue
@@ -127,12 +127,13 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ expanded, onToggle, activeLayer
       <SheetContent 
         side="left" 
         className="w-[70vw] sm:w-[336px] bg-white/40 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-white/20 rounded-r-[2rem] top-14 sm:top-20 h-[calc(100vh-7rem)] sm:h-[calc(100vh-10rem)] transition-all duration-300"
-        aria-label="Layer Panel"
       >
-        <SheetTitle>Layer Controls</SheetTitle>
-        <div className="sr-only" id="layer-panel-description">
-          Control visibility of different map layers and categories
-        </div>
+        <SheetHeader>
+            <SheetTitle>Layer Controls</SheetTitle>
+            <SheetDescription className="sr-only">
+            Control visibility of different map layers and categories
+            </SheetDescription>
+        </SheetHeader>
         <ScrollArea className="h-full px-4 py-8">
           <div className="space-y-3 sm:space-y-4">
             {Object.entries(LAYER_CATEGORIES).map(([key, category]) => (
@@ -241,12 +242,13 @@ const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, markerInfo }) =>
       <SheetContent 
         side="right" 
         className="w-[70vw] sm:w-[336px] bg-white/40 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-l border-white/20 rounded-l-[2rem] top-14 sm:top-20 h-[calc(100vh-7rem)] sm:h-[calc(100vh-10rem)] transition-all duration-300"
-        aria-label="Location Information"
       >
-        <SheetTitle>{markerInfo.title}</SheetTitle>
-        <div className="sr-only" id="location-info-description">
-          Detailed information about {markerInfo.title}
-        </div>
+        <SheetHeader>
+            <SheetTitle>{markerInfo.title}</SheetTitle>
+            <SheetDescription className="sr-only">
+            Detailed information about {markerInfo.title}
+            </SheetDescription>
+        </SheetHeader>
         <ScrollArea className="h-full px-4 py-8">
           <div className="space-y-6 sm:space-y-8">
             <div className="space-y-4">
