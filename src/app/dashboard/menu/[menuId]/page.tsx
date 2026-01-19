@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -303,12 +304,12 @@ const MenuItemsPage = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="parentId">Item Induk (Opsional)</Label>
-                <Select value={formValues.parentId} onValueChange={(value) => setFormValues({...formValues, parentId: value})} disabled={isSubmitting}>
+                <Select value={formValues.parentId || 'null'} onValueChange={(value) => setFormValues({...formValues, parentId: value === 'null' ? '' : value})} disabled={isSubmitting}>
                     <SelectTrigger id="parentId">
                         <SelectValue placeholder="Jadikan item utama" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="">Jadikan item utama</SelectItem>
+                        <SelectItem value="null">Jadikan item utama</SelectItem>
                         {possibleParents
                             .filter(p => p.id !== selectedItem?.id) // Prevent self-parenting
                             .map(parent => (
