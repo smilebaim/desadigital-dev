@@ -330,6 +330,17 @@ const MenuItemsPage = () => {
                     <SelectItem value="FileText">FileText</SelectItem>
                     <SelectItem value="Calendar">Calendar</SelectItem>
                     <SelectItem value="Globe">Globe</SelectItem>
+                    <SelectItem value="Briefcase">Briefcase</SelectItem>
+                    <SelectItem value="LayoutGrid">LayoutGrid</SelectItem>
+                    <SelectItem value="ListTodo">ListTodo</SelectItem>
+                    <SelectItem value="Activity">Activity</SelectItem>
+                    <SelectItem value="Target">Target</SelectItem>
+                    <SelectItem value="Compass">Compass</SelectItem>
+                    <SelectItem value="Store">Store</SelectItem>
+                    <SelectItem value="FileSpreadsheet">FileSpreadsheet</SelectItem>
+                    <SelectItem value="ScrollText">ScrollText</SelectItem>
+                    <SelectItem value="Palette">Palette</SelectItem>
+                    <SelectItem value="MessageSquareWarning">MessageSquareWarning</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
