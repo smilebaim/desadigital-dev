@@ -12,14 +12,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { 
-  Plus, 
-  MoreVertical, 
-  Edit, 
-  Trash2, 
-  ChevronRight,
-  Save
-} from "lucide-react";
+import * as Icons from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -176,6 +169,13 @@ const MenuItemsPage = () => {
   }
   
   const possibleParents = menuDetails.items?.filter(item => !item.parentId) || [];
+  
+  const iconList: (keyof typeof Icons)[] = [
+    "Home", "Info", "Newspaper", "Map", "BookOpen", "Users", "Building2", "Scale",
+    "HeartHandshake", "FileText", "Calendar", "Globe", "Briefcase", "LayoutGrid",
+    "ListTodo", "Activity", "Target", "Compass", "Store", "FileSpreadsheet",
+    "ScrollText", "Palette", "MessageSquareWarning"
+  ];
 
   return (
     <>
@@ -193,7 +193,7 @@ const MenuItemsPage = () => {
             </p>
           </div>
           <Button size="sm" onClick={openAddForm}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Icons.Plus className="h-4 w-4 mr-2" />
             Tambah Item Menu
           </Button>
         </div>
@@ -231,15 +231,15 @@ const MenuItemsPage = () => {
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
+                              <Icons.MoreVertical className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => openEditForm(item)}>
-                              <Edit className="h-4 w-4 mr-2" /> Edit
+                              <Icons.Edit className="h-4 w-4 mr-2" /> Edit
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-600" onClick={() => openDeleteDialog(item)}>
-                              <Trash2 className="h-4 w-4 mr-2" /> Hapus
+                              <Icons.Trash2 className="h-4 w-4 mr-2" /> Hapus
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -248,7 +248,7 @@ const MenuItemsPage = () => {
                     {getSubItems(item.id).map(subItem => (
                       <TableRow key={subItem.id}>
                           <TableCell className="pl-10 font-medium flex items-center">
-                            <ChevronRight className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <Icons.ChevronRight className="h-4 w-4 mr-2 text-muted-foreground" />
                             {subItem.title}
                           </TableCell>
                           <TableCell>{subItem.path}</TableCell>
@@ -257,15 +257,15 @@ const MenuItemsPage = () => {
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon">
-                                  <MoreVertical className="h-4 w-4" />
+                                  <Icons.MoreVertical className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
                                 <DropdownMenuItem onClick={() => openEditForm(subItem)}>
-                                  <Edit className="h-4 w-4 mr-2" /> Edit
+                                  <Icons.Edit className="h-4 w-4 mr-2" /> Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="text-red-600" onClick={() => openDeleteDialog(subItem)}>
-                                  <Trash2 className="h-4 w-4 mr-2" /> Hapus
+                                  <Icons.Trash2 className="h-4 w-4 mr-2" /> Hapus
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -318,29 +318,17 @@ const MenuItemsPage = () => {
                     <SelectValue placeholder="Pilih ikon" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Home">Home</SelectItem>
-                    <SelectItem value="Info">Info</SelectItem>
-                    <SelectItem value="Newspaper">Newspaper</SelectItem>
-                    <SelectItem value="Map">Map</SelectItem>
-                    <SelectItem value="BookOpen">BookOpen</SelectItem>
-                    <SelectItem value="Users">Users</SelectItem>
-                    <SelectItem value="Building2">Building2</SelectItem>
-                    <SelectItem value="Scale">Scale</SelectItem>
-                    <SelectItem value="HeartHandshake">HeartHandshake</SelectItem>
-                    <SelectItem value="FileText">FileText</SelectItem>
-                    <SelectItem value="Calendar">Calendar</SelectItem>
-                    <SelectItem value="Globe">Globe</SelectItem>
-                    <SelectItem value="Briefcase">Briefcase</SelectItem>
-                    <SelectItem value="LayoutGrid">LayoutGrid</SelectItem>
-                    <SelectItem value="ListTodo">ListTodo</SelectItem>
-                    <SelectItem value="Activity">Activity</SelectItem>
-                    <SelectItem value="Target">Target</SelectItem>
-                    <SelectItem value="Compass">Compass</SelectItem>
-                    <SelectItem value="Store">Store</SelectItem>
-                    <SelectItem value="FileSpreadsheet">FileSpreadsheet</SelectItem>
-                    <SelectItem value="ScrollText">ScrollText</SelectItem>
-                    <SelectItem value="Palette">Palette</SelectItem>
-                    <SelectItem value="MessageSquareWarning">MessageSquareWarning</SelectItem>
+                    {iconList.map(iconName => {
+                        const IconComponent = Icons[iconName];
+                        return (
+                            <SelectItem key={iconName} value={iconName}>
+                                <div className="flex items-center gap-2">
+                                    <IconComponent className="h-4 w-4" />
+                                    <span>{iconName}</span>
+                                </div>
+                            </SelectItem>
+                        )
+                    })}
                   </SelectContent>
                 </Select>
               </div>
@@ -364,7 +352,7 @@ const MenuItemsPage = () => {
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>Batal</Button>
               <Button type="submit" disabled={isSubmitting}>
-                <Save className="h-4 w-4 mr-2" />
+                <Icons.Save className="h-4 w-4 mr-2" />
                 {isSubmitting ? 'Menyimpan...' : 'Simpan'}
               </Button>
             </DialogFooter>
