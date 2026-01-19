@@ -41,6 +41,45 @@ export const addMenu = async (menuData: Omit<Menu, 'id' | 'items' | 'createdAt'>
     }
 };
 
+// Update a menu's details (not its items)
+export const updateMenu = async (menuId: string, data: Partial<Omit<Menu, 'id' | 'items' | 'createdAt'>>) => {
+    try {
+        const menuDocRef = doc(db, 'menus', menuId);
+        await updateDoc(menuDocRef, data);
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+// Delete a menu and all its items
+export const deleteMenu = async (menuId: string) => {
+    try {
+        const batch = writeBatch(db);
+
+        // 1. Get all items in the subcollection
+        const itemsCollectionRef = collection(db, 'menus', menuId, 'items');
+        const itemsSnapshot = await getDocs(itemsCollectionRef);
+
+        // 2. Add delete operations for each item to the batch
+        itemsSnapshot.forEach(itemDoc => {
+            batch.delete(itemDoc.ref);
+        });
+
+        // 3. Add the delete operation for the menu document itself
+        const menuDocRef = doc(db, 'menus', menuId);
+        batch.delete(menuDocRef);
+
+        // 4. Commit the batch
+        await batch.commit();
+
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+
 // Get all menus with their items
 export const getMenusWithItems = async (): Promise<Menu[]> => {
   try {

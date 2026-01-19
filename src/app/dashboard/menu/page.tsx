@@ -37,7 +37,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getMenus, addMenu } from "@/lib/menu-actions";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { getMenus, addMenu, updateMenu, deleteMenu } from "@/lib/menu-actions";
 import type { Menu } from "@/lib/menu-data";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
@@ -48,13 +58,25 @@ const MenuPage = () => {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // State for Add Menu Dialog
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newMenuName, setNewMenuName] = useState("");
   const [newMenuDescription, setNewMenuDescription] = useState("");
   const [newMenuLocation, setNewMenuLocation] = useState<'topnav' | 'bottomnav' | 'sidebar' | ''>('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // State for Edit Menu Dialog
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [menuToEdit, setMenuToEdit] = useState<Menu | null>(null);
+  const [editMenuName, setEditMenuName] = useState("");
+  const [editMenuDescription, setEditMenuDescription] = useState("");
+  const [editMenuLocation, setEditMenuLocation] = useState<'topnav' | 'bottomnav' | 'sidebar' | ''>('');
+
+  // State for Delete Menu Dialog
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [menuToDelete, setMenuToDelete] = useState<{ id: string, name: string } | null>(null);
+
 
   const fetchMenus = useCallback(async () => {
     setLoading(true);
@@ -93,6 +115,60 @@ const MenuPage = () => {
     }
     setIsSubmitting(false);
   };
+  
+  const openEditDialog = (menu: Menu) => {
+    setMenuToEdit(menu);
+    setEditMenuName(menu.name);
+    setEditMenuDescription(menu.description);
+    setEditMenuLocation(menu.location || '');
+    setIsEditDialogOpen(true);
+  };
+  
+  const handleEditMenu = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!menuToEdit || !editMenuName || !editMenuLocation) {
+        toast({ title: "Nama dan lokasi menu tidak boleh kosong.", variant: "destructive" });
+        return;
+    }
+
+    setIsSubmitting(true);
+    const result = await updateMenu(menuToEdit.id, {
+        name: editMenuName,
+        description: editMenuDescription,
+        location: editMenuLocation as 'topnav' | 'bottomnav' | 'sidebar',
+    });
+
+    if (result.success) {
+        toast({ title: "Menu berhasil diperbarui." });
+        await fetchMenus();
+        setIsEditDialogOpen(false);
+    } else {
+        toast({ title: "Gagal memperbarui menu.", description: result.error, variant: "destructive" });
+    }
+    setIsSubmitting(false);
+  };
+
+  const openDeleteDialog = (menu: Menu) => {
+    setMenuToDelete({ id: menu.id, name: menu.name });
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteMenu = async () => {
+    if (!menuToDelete) return;
+    
+    const result = await deleteMenu(menuToDelete.id);
+
+    if (result.success) {
+        toast({ title: "Menu berhasil dihapus." });
+        await fetchMenus();
+    } else {
+        toast({ title: "Gagal menghapus menu.", description: result.error, variant: "destructive" });
+    }
+    
+    setIsDeleteDialogOpen(false);
+    setMenuToDelete(null);
+  };
+
 
   return (
     <>
@@ -178,11 +254,11 @@ const MenuPage = () => {
                                 Kelola Item
                               </Link>
                             </DropdownMenuItem>
-                            <DropdownMenuItem disabled>
+                            <DropdownMenuItem onClick={() => openEditDialog(menu)}>
                               <Edit className="h-4 w-4 mr-2" />
                               Edit Menu
                             </DropdownMenuItem>
-                            <DropdownMenuItem className="text-red-600" disabled>
+                            <DropdownMenuItem className="text-red-600" onClick={() => openDeleteDialog(menu)}>
                               <Trash2 className="h-4 w-4 mr-2" />
                               Hapus Menu
                             </DropdownMenuItem>
@@ -256,6 +332,77 @@ const MenuPage = () => {
           </form>
         </DialogContent>
       </Dialog>
+      
+      {/* Edit Menu Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Menu</DialogTitle>
+            <DialogDescription>
+              Ubah detail untuk menu &quot;{menuToEdit?.name}&quot;.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleEditMenu}>
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-menu-name">Nama Menu</Label>
+                <Input
+                  id="edit-menu-name"
+                  value={editMenuName}
+                  onChange={(e) => setEditMenuName(e.target.value)}
+                  disabled={isSubmitting}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-menu-location">Lokasi Menu</Label>
+                <Select value={editMenuLocation} onValueChange={(value) => setEditMenuLocation(value as any)} disabled={isSubmitting} required>
+                  <SelectTrigger id="edit-menu-location">
+                    <SelectValue placeholder="Pilih lokasi penempatan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="topnav">Navigasi Atas (TopNav)</SelectItem>
+                    <SelectItem value="bottomnav">Navigasi Bawah (BottomNav)</SelectItem>
+                    <SelectItem value="sidebar">Sidebar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-menu-description">Deskripsi (Opsional)</Label>
+                <Input
+                  id="edit-menu-description"
+                  value={editMenuDescription}
+                  onChange={(e) => setEditMenuDescription(e.target.value)}
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Batal</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                <Save className="h-4 w-4 mr-2" />
+                {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini akan menghapus menu &quot;{menuToDelete?.name}&quot; dan semua item di dalamnya secara permanen. Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteMenu}>Hapus</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
