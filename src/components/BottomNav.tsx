@@ -1,6 +1,7 @@
+
 "use client";
 import { useState, useEffect } from "react";
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription, SheetHeader } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -30,6 +31,12 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
   useEffect(() => {
     setIsClient(true);
   }, []);
+  
+  const getSubItems = (parentId: string) => {
+    return menu?.items?.filter(item => item.parentId === parentId).sort((a, b) => a.order - b.order) || [];
+  }
+
+  const parentItems = menu?.items?.filter(item => !item.parentId).sort((a, b) => a.order - b.order) || [];
 
   const Sidebar = ({ menuId }: { menuId: string }) => {
     const targetMenu = allMenus?.find(m => m.id === menuId);
@@ -98,13 +105,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
              <div className="flex items-center justify-center w-full h-full">
                 <Icons.Loader className="animate-spin" />
              </div>
-          ) : menu?.items?.map((item) => {
+          ) : parentItems.map((item) => {
             const Icon = getIcon(item.icon);
-            const targetMenu = allMenus?.find(m => m.id === item.path);
+            const subItems = getSubItems(item.id);
 
-            // If path is a menu link, create a sheet trigger
-            if (targetMenu) {
-              const MenuIcon = getIcon(targetMenu.icon);
+            if (subItems.length > 0) {
               return (
                 <Sheet key={item.id} open={openSheet === item.id} onOpenChange={(isOpen) => setOpenSheet(isOpen ? item.id : null)}>
                   <SheetTrigger asChild>
@@ -117,15 +122,17 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
                     </Button>
                   </SheetTrigger>
                   <SheetContent side="left" className="w-[70vw] sm:w-[336px] bg-white/40 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-black/10 rounded-r-[2rem] top-14 sm:top-20 h-[calc(100vh-7rem)] sm:h-[calc(100vh-10rem)] transition-all duration-300">
-                    <SheetTitle className="sr-only">{targetMenu.name}</SheetTitle>
-                    <SheetDescription className="sr-only">{targetMenu.description}</SheetDescription>
+                    <SheetHeader>
+                        <SheetTitle className="sr-only">{item.title}</SheetTitle>
+                        <SheetDescription className="sr-only">Sub-menu for {item.title}</SheetDescription>
+                    </SheetHeader>
                     <ScrollArea className="h-full">
                       <div className="space-y-3 sm:space-y-4 py-6 sm:py-8">
                         <h3 className="font-semibold text-base sm:text-lg mb-2 text-black px-2 sm:px-3 border-b border-black/10 pb-2 transition-all hover:bg-black/10 flex items-center gap-2">
-                           <MenuIcon className="h-5 w-5" />
-                           {targetMenu.name}
+                           <Icon className="h-5 w-5" />
+                           {item.title}
                         </h3>
-                        {targetMenu.items?.map((subItem) => {
+                        {subItems.map((subItem) => {
                           const SubItemIcon = getIcon(subItem.icon);
                           return (
                             <Button
@@ -176,3 +183,5 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
 };
 
 export default BottomNav;
+
+    
