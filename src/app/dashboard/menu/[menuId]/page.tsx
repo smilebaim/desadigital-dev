@@ -53,6 +53,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import React from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { staticPages } from "@/lib/static-pages";
 
 
 const MenuItemsPage = () => {
@@ -297,6 +298,18 @@ const MenuItemsPage = () => {
               <div className="space-y-2">
                 <Label htmlFor="path">Path</Label>
                 <Input id="path" value={formValues.path} onChange={(e) => setFormValues({...formValues, path: e.target.value})} placeholder="/profil/sejarah-desa" disabled={isSubmitting} required />
+                 <Select onValueChange={(value) => { if(value) setFormValues(prev => ({...prev, path: value})) }}>
+                    <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Atau pilih dari halaman yang ada..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="/">Halaman Utama (/)</SelectItem>
+                        {staticPages.map(page => (
+                            <SelectItem key={page.id} value={page.path}>{page.title} ({page.path})</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Pilih dari daftar atau masukkan path secara manual. Contoh: /berita atau https://google.com</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="icon">Icon (Opsional)</Label>
