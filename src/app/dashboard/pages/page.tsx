@@ -1,4 +1,3 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -51,11 +50,12 @@ const PagesPage = () => {
   
   const getEditPath = (path: string) => {
     // This function maps a public path to its corresponding editor page in the dashboard
-    if (path === '/profil/profil-desa') {
-      return '/dashboard/pages/profil-desa';
-    }
-    // Add more special cases here if other static pages become editable
-    return null;
+    const pathMap: { [key: string]: string } = {
+        '/profil/profil-desa': '/dashboard/pages/profil-desa',
+        '/profil/sejarah-desa': '/dashboard/pages/sejarah-desa',
+        '/profil/visi-misi': '/dashboard/pages/visi-misi',
+    };
+    return pathMap[path] || null;
   }
 
   return (

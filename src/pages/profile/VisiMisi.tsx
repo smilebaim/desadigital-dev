@@ -1,9 +1,32 @@
-
 'use client';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Breadcrumb from "@/components/Breadcrumb";
+import { getVisiMisi, type VisiMisiData } from '@/lib/visi-misi-actions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const VisiMisi = () => {
+  const [visiMisiData, setVisiMisiData] = useState<VisiMisiData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVisiMisi = async () => {
+      setLoading(true);
+      const data = await getVisiMisi();
+      setVisiMisiData(data);
+      setLoading(false);
+    };
+    fetchVisiMisi();
+  }, []);
+
+  const renderSkeleton = () => (
+    <div className="space-y-4">
+      <Skeleton className="h-6 w-1/2" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-5/6" />
+    </div>
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Breadcrumb items={[{ title: "Profil", path: "/profil/profil-desa" }, { title: "Visi & Misi" }]} />
@@ -15,9 +38,17 @@ const VisiMisi = () => {
             <CardDescription>Arah dan tujuan jangka panjang desa.</CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-lg italic text-muted-foreground">
-              "Terwujudnya Desa Remau Bako Tuo yang Maju, Mandiri, Sejahtera, dan Berbudaya Berlandaskan Iman dan Taqwa."
-            </p>
+            {loading ? (
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+            ) : (
+              <p className="text-lg italic text-muted-foreground">
+                "{visiMisiData?.visi}"
+              </p>
+            )}
           </CardContent>
         </Card>
         <Card>
@@ -26,11 +57,19 @@ const VisiMisi = () => {
             <CardDescription>Langkah-langkah strategis untuk mencapai visi.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <p>1. Meningkatkan kualitas sumber daya manusia yang cerdas dan sehat.</p>
-            <p>2. Mengembangkan perekonomian desa berbasis potensi lokal.</p>
-            <p>3. Meningkatkan kualitas infrastruktur desa yang merata.</p>
-            <p>4. Menciptakan tata kelola pemerintahan yang baik, bersih, dan transparan.</p>
-            <p>5. Melestarikan dan mengembangkan nilai-nilai budaya dan kearifan lokal.</p>
+            {loading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            ) : (
+              visiMisiData?.misi.map((item, index) => (
+                <p key={index}>{index + 1}. {item}</p>
+              ))
+            )}
           </CardContent>
         </Card>
       </div>

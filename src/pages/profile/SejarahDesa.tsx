@@ -1,29 +1,69 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Breadcrumb from "@/components/Breadcrumb";
+import { getSejarahDesa, type SejarahDesaData } from '@/lib/sejarah-desa-actions';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const SejarahDesa = () => {
+  const [sejarahData, setSejarahData] = useState<SejarahDesaData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchSejarah = async () => {
+      setLoading(true);
+      const data = await getSejarahDesa();
+      setSejarahData(data);
+      setLoading(false);
+    };
+    fetchSejarah();
+  }, []);
+
+  const renderSkeleton = () => (
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-3/4" />
+        <Skeleton className="h-4 w-1/4" />
+        <div className="space-y-4 mt-4">
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-5/6" />
+            <br/>
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-full" />
+            <Skeleton className="h-6 w-2/3" />
+        </div>
+    </div>
+  );
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Breadcrumb items={[{ title: "Profil", path: "/profil/profil-desa" }, { title: "Sejarah Desa" }]} />
-      <h1 className="text-3xl font-bold mb-6 mt-4">Sejarah Desa</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>Asal Usul Desa Remau Bako Tuo</CardTitle>
-          <CardDescription>Cerita di balik terbentuknya desa kita.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-          <p>
-            Menurut cerita dari para tetua desa, nama Remau Bako Tuo memiliki makna yang mendalam. "Remau" dalam bahasa setempat berarti Harimau, yang melambangkan kekuatan dan keberanian. "Bako" berarti Pangkalan atau tempat berkumpul, dan "Tuo" berarti Tua. Jadi, secara harfiah, nama desa ini dapat diartikan sebagai "Pangkalan Harimau Tua".
-          </p>
-          <p>
-            Desa ini didirikan sekitar tahun 1920 oleh sekelompok perantau yang mencari lahan baru untuk bertani. Mereka membuka hutan belantara yang konon menurut cerita dihuni oleh seekor harimau tua yang bijaksana. Alih-alih menjadi ancaman, harimau tersebut justru dianggap sebagai penjaga wilayah.
-          </p>
-          <p>
-            Seiring berjalannya waktu, desa ini berkembang menjadi pusat kegiatan ekonomi dan sosial di wilayah sekitarnya. Tonggak-tonggak sejarah penting termasuk pembangunan masjid pertama pada tahun 1950, masuknya listrik pada tahun 1985, dan pembangunan jalan aspal pertama yang menghubungkan desa dengan ibu kota kecamatan pada awal tahun 2000-an.
-          </p>
-        </CardContent>
-      </Card>
+      
+      {loading ? (
+        <div className="mt-4">
+            <Skeleton className="h-10 w-1/2 mb-6" />
+            <Card>
+                <CardContent className="p-6">{renderSkeleton()}</CardContent>
+            </Card>
+        </div>
+      ) : sejarahData ? (
+        <>
+          <h1 className="text-3xl font-bold mb-6 mt-4">{sejarahData.judul}</h1>
+          <Card>
+            <CardHeader>
+              <CardTitle>{sejarahData.judul}</CardTitle>
+              <CardDescription>Didirikan sekitar tahun {sejarahData.tahun}.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
+              {sejarahData.deskripsi.split('\n\n').map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        <p className="text-muted-foreground mt-6">Gagal memuat data sejarah desa.</p>
+      )}
     </div>
   );
 };
