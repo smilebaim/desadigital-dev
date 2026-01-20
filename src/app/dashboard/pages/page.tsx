@@ -54,6 +54,7 @@ const PagesPage = () => {
         '/profil/profil-desa': '/dashboard/pages/profil-desa',
         '/profil/sejarah-desa': '/dashboard/pages/sejarah-desa',
         '/profil/visi-misi': '/dashboard/pages/visi-misi',
+        '/profil/struktur-pemerintah': '/dashboard/pages/struktur-pemerintah',
     };
     return pathMap[path] || null;
   }
