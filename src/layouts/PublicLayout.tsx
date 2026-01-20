@@ -38,10 +38,22 @@ const PublicLayout = ({
   const topNavMenu = menus.find(m => m.location === 'topnav');
   const bottomNavMenu = menus.find(m => m.location === 'bottomnav');
   
-  // This is a placeholder for sidebar logic.
-  // In a real app, you would likely have a more robust way to determine
-  // which sidebar to show based on the current route.
-  const needsSidebar = false;
+  // Check if any sidebar menu is active for the current path
+  const sidebarMenuIsActive = menus.some(m => {
+    if (m.location !== 'sidebar' || !m.items || m.items.length === 0) {
+      return false;
+    }
+    // A sidebar is considered active if the current path starts with the root of any of its items.
+    return m.items.some(item => {
+        const itemRootPath = item.path.split('/')[1];
+        if (itemRootPath) {
+            return pathname.startsWith(`/${itemRootPath}`);
+        }
+        return false;
+    });
+  });
+  
+  const needsSidebar = sidebarMenuIsActive;
 
   if (!isClient) {
     return (
@@ -54,7 +66,7 @@ const PublicLayout = ({
   return (
     <div className="flex flex-col min-h-screen">
       <TopNav menu={topNavMenu} loading={loading} logoUrl={siteSettings?.logoUrl} />
-      <main className={`flex-grow ${needsSidebar ? 'md:pl-72 pl-12' : ''}`}>
+      <main className={`flex-grow transition-all duration-300 ${needsSidebar ? 'md:pl-72 pl-12' : ''}`}>
         {children}
       </main>
       <BottomNav menu={bottomNavMenu} allMenus={menus} loading={loading} />
