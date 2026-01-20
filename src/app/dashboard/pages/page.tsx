@@ -154,12 +154,12 @@ const PagesPage = () => {
                               {editPath ? (
                                 <Link href={editPath}>
                                   <Edit className="h-4 w-4 mr-2" />
-                                  Edit Konten
+                                  Ubah Konten
                                 </Link>
                               ) : (
                                 <span>
                                   <Edit className="h-4 w-4 mr-2" />
-                                  Edit Konten
+                                  Ubah Konten
                                 </span>
                               )}
                             </DropdownMenuItem>
