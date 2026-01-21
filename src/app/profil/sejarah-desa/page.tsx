@@ -1,12 +1,12 @@
-
-'use client';
 import PublicLayout from "@/layouts/PublicLayout";
 import SejarahDesa from "@/pages/profile/SejarahDesa";
+import { getSejarahDesa } from "@/lib/sejarah-desa-actions";
 
-export default function Page() {
+export default async function Page() {
+  const sejarahData = await getSejarahDesa();
   return (
     <PublicLayout>
-      <SejarahDesa />
+      <SejarahDesa data={sejarahData} />
     </PublicLayout>
   );
 }

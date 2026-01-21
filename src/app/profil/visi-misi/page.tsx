@@ -1,12 +1,13 @@
-
-'use client';
 import PublicLayout from "@/layouts/PublicLayout";
 import VisiMisi from "@/pages/profile/VisiMisi";
+import { getVisiMisi } from "@/lib/visi-misi-actions";
 
-export default function Page() {
+export default async function Page() {
+  const visiMisiData = await getVisiMisi();
+
   return (
     <PublicLayout>
-      <VisiMisi />
+      <VisiMisi data={visiMisiData} />
     </PublicLayout>
   );
 }

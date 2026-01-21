@@ -1,69 +1,53 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import Breadcrumb from "@/components/Breadcrumb";
-import { getSejarahDesa, type SejarahDesaData } from '@/lib/sejarah-desa-actions';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { History } from "lucide-react";
+import { type SejarahDesaData } from "@/lib/sejarah-desa-actions";
+import { useEffect, useState } from "react";
 
-const SejarahDesa = () => {
-  const [sejarahData, setSejarahData] = useState<SejarahDesaData | null>(null);
-  const [loading, setLoading] = useState(true);
+const SejarahDesa = ({ data }: { data: SejarahDesaData | null }) => {
+  const [sejarahData, setSejarahData] = useState(data);
 
   useEffect(() => {
-    const fetchSejarah = async () => {
-      setLoading(true);
-      const data = await getSejarahDesa();
-      setSejarahData(data);
-      setLoading(false);
-    };
-    fetchSejarah();
-  }, []);
+    setSejarahData(data);
+  }, [data]);
 
-  const renderSkeleton = () => (
-      <div className="space-y-4">
-        <Skeleton className="h-8 w-3/4" />
-        <Skeleton className="h-4 w-1/4" />
-        <div className="space-y-4 mt-4">
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-5/6" />
-            <br/>
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-full" />
-            <Skeleton className="h-6 w-2/3" />
-        </div>
-    </div>
-  );
+  if (!sejarahData) {
+    return <div>Memuat data sejarah desa...</div>;
+  }
+
+  const paragraphs = sejarahData.deskripsi.split('\n').filter(p => p.trim() !== '');
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Breadcrumb items={[{ title: "Profil", path: "/profil/profil-desa" }, { title: "Sejarah Desa" }]} />
-      
-      {loading ? (
-        <div className="mt-4">
-            <Skeleton className="h-10 w-1/2 mb-6" />
-            <Card>
-                <CardContent className="p-6">{renderSkeleton()}</CardContent>
-            </Card>
+    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Sejarah Desa</h2>
+          <p className="text-muted-foreground">
+            Sejarah dan perkembangan Desa Remau Bako Tuo dari masa ke masa
+          </p>
         </div>
-      ) : sejarahData ? (
-        <>
-          <h1 className="text-3xl font-bold mb-6 mt-4">{sejarahData.judul}</h1>
-          <Card>
-            <CardHeader>
-              <CardTitle>{sejarahData.judul}</CardTitle>
-              <CardDescription>Didirikan sekitar tahun {sejarahData.tahun}.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 text-muted-foreground leading-relaxed">
-              {sejarahData.deskripsi.split('\n\n').map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
-            </CardContent>
-          </Card>
-        </>
-      ) : (
-        <p className="text-muted-foreground mt-6">Gagal memuat data sejarah desa.</p>
-      )}
+
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <History className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{sejarahData.judul}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Didirikan sekitar tahun {sejarahData.tahun}
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {paragraphs.map((paragraph, index) => (
+              <p key={index} className="text-muted-foreground leading-relaxed">
+                {paragraph}
+              </p>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

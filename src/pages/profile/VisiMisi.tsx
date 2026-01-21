@@ -1,77 +1,64 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import Breadcrumb from "@/components/Breadcrumb";
-import { getVisiMisi, type VisiMisiData } from '@/lib/visi-misi-actions';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Target, ListChecks } from "lucide-react";
+import { type VisiMisiData } from "@/lib/visi-misi-actions";
+import { useEffect, useState } from "react";
 
-const VisiMisi = () => {
-  const [visiMisiData, setVisiMisiData] = useState<VisiMisiData | null>(null);
-  const [loading, setLoading] = useState(true);
+
+const VisiMisi = ({ data }: { data: VisiMisiData | null }) => {
+  const [visiMisiData, setVisiMisiData] = useState(data);
 
   useEffect(() => {
-    const fetchVisiMisi = async () => {
-      setLoading(true);
-      const data = await getVisiMisi();
-      setVisiMisiData(data);
-      setLoading(false);
-    };
-    fetchVisiMisi();
-  }, []);
+    setVisiMisiData(data);
+  }, [data]);
 
-  const renderSkeleton = () => (
-    <div className="space-y-4">
-      <Skeleton className="h-6 w-1/2" />
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-5/6" />
-    </div>
-  );
-
+  if (!visiMisiData) {
+    return <div>Memuat data...</div>;
+  }
+  
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Breadcrumb items={[{ title: "Profil", path: "/profil/profil-desa" }, { title: "Visi & Misi" }]} />
-      <h1 className="text-3xl font-bold mb-6 mt-4">Visi dan Misi Desa</h1>
-      <div className="grid md:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Visi</CardTitle>
-            <CardDescription>Arah dan tujuan jangka panjang desa.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-3/4" />
-              </div>
-            ) : (
-              <p className="text-lg italic text-muted-foreground">
-                "{visiMisiData?.visi}"
-              </p>
-            )}
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Misi</CardTitle>
-            <CardDescription>Langkah-langkah strategis untuk mencapai visi.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {loading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-              </div>
-            ) : (
-              visiMisiData?.misi.map((item, index) => (
-                <p key={index}>{index + 1}. {item}</p>
-              ))
-            )}
-          </CardContent>
-        </Card>
+    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Visi dan Misi Desa</h2>
+          <p className="text-muted-foreground">
+            Visi dan Misi Desa Remau Bako Tuo
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-4">
+                        <Target className="h-8 w-8 text-primary" />
+                        <CardTitle>Visi</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-lg font-medium text-muted-foreground">
+                        &quot;{visiMisiData.visi}&quot;
+                    </p>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader>
+                     <div className="flex items-center gap-4">
+                        <ListChecks className="h-8 w-8 text-primary" />
+                        <CardTitle>Misi</CardTitle>
+                    </div>
+                </CardHeader>
+                <CardContent>
+                    <ul className="space-y-2">
+                        {visiMisiData.misi.map((item, index) => (
+                             <li key={index} className="flex items-start gap-3">
+                                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">{index + 1}</span>
+                                <span className="flex-1 text-muted-foreground">{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </CardContent>
+            </Card>
+        </div>
       </div>
     </div>
   );

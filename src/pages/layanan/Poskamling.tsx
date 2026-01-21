@@ -1,28 +1,27 @@
-import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText, Users, LineChart, Briefcase } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
 
-const Posyandu = () => {
-  const posyanduData = {
+const Poskamling = () => {
+  const poskamlingData = {
     umum: {
       title: "Informasi Umum",
       icon: FileText,
       content: {
-        deskripsi: "Posyandu adalah pusat pelayanan kesehatan dasar yang dikelola oleh masyarakat untuk meningkatkan derajat kesehatan ibu dan anak, serta keluarga berencana.",
+        deskripsi: "Poskamling (Pos Keamanan Lingkungan) adalah sistem keamanan lingkungan yang dikelola oleh masyarakat secara swadaya untuk menjaga keamanan dan ketertiban di lingkungan masing-masing. Poskamling merupakan wujud partisipasi masyarakat dalam upaya pencegahan kejahatan dan penanganan gangguan keamanan.",
         data: [
           {
-            label: "Jumlah Posyandu",
-            value: "10 Unit"
+            label: "Nama Organisasi",
+            value: "Poskamling Remaubakotuo"
           },
           {
-            label: "Jumlah Kader",
-            value: "50 Orang"
+            label: "Tahun Berdiri",
+            value: "2010"
           },
           {
-            label: "Jumlah Sasaran",
-            value: "500 Jiwa"
+            label: "Jumlah Anggota",
+            value: "30 Orang"
           },
           {
             label: "Status",
@@ -31,45 +30,45 @@ const Posyandu = () => {
         ]
       }
     },
-    layanan: {
-      title: "Layanan",
+    program: {
+      title: "Program",
       icon: Users,
       content: {
         kategori: [
           {
-            nama: "Kesehatan Ibu",
-            layanan: [
-              "Pemeriksaan Kehamilan",
-              "Pemeriksaan Nifas",
-              "Konsultasi Gizi",
-              "Pendampingan Persalinan"
+            nama: "Keamanan",
+            program: [
+              "Ronda Malam",
+              "Pengamanan Lingkungan",
+              "Penanganan Gangguan",
+              "Koordinasi dengan Aparat"
             ]
           },
           {
-            nama: "Kesehatan Anak",
-            layanan: [
-              "Pemeriksaan Bayi",
-              "Pemeriksaan Balita",
-              "Imunisasi",
-              "Penimbangan"
+            nama: "Ketertiban",
+            program: [
+              "Pengaturan Lalu Lintas",
+              "Penertiban PKL",
+              "Penanganan Keributan",
+              "Pengawasan Kegiatan"
             ]
           },
           {
-            nama: "Keluarga Berencana",
-            layanan: [
-              "Konsultasi KB",
-              "Pemberian Alat KB",
-              "Pendampingan KB",
-              "Pemantauan KB"
+            nama: "Pencegahan",
+            program: [
+              "Penyuluhan Keamanan",
+              "Pencegahan Narkoba",
+              "Pencegahan Tawuran",
+              "Pencegahan Pencurian"
             ]
           },
           {
-            nama: "Promotif Preventif",
-            layanan: [
-              "Penyuluhan Kesehatan",
-              "Pencegahan Stunting",
-              "Peningkatan Gizi",
-              "Kesehatan Lingkungan"
+            nama: "Kemitraan",
+            program: [
+              "Kerja Sama dengan RT/RW",
+              "Kerja Sama dengan Polisi",
+              "Kerja Sama dengan Satpam",
+              "Kerja Sama dengan Masyarakat"
             ]
           }
         ]
@@ -82,31 +81,31 @@ const Posyandu = () => {
         tahun: [
           {
             tahun: "2020",
-            kunjungan: 1200,
-            layanan: 1500,
-            anggaran: "Rp 50.000.000",
-            manfaat: "Peningkatan Kesehatan Ibu dan Anak"
+            patroli: 365,
+            penanganan: 12,
+            anggaran: "Rp 30.000.000",
+            manfaat: "Penurunan Angka Kejahatan"
           },
           {
             tahun: "2021",
-            kunjungan: 1500,
-            layanan: 1800,
-            anggaran: "Rp 75.000.000",
-            manfaat: "Penurunan Angka Kematian Ibu"
+            patroli: 365,
+            penanganan: 10,
+            anggaran: "Rp 35.000.000",
+            manfaat: "Peningkatan Keamanan"
           },
           {
             tahun: "2022",
-            kunjungan: 1800,
-            layanan: 2000,
-            anggaran: "Rp 100.000.000",
-            manfaat: "Peningkatan Kualitas Layanan"
+            patroli: 365,
+            penanganan: 8,
+            anggaran: "Rp 40.000.000",
+            manfaat: "Penurunan Gangguan"
           },
           {
             tahun: "2023",
-            kunjungan: 2000,
-            layanan: 2500,
-            anggaran: "Rp 125.000.000",
-            manfaat: "Peningkatan Akses Kesehatan"
+            patroli: 365,
+            penanganan: 5,
+            anggaran: "Rp 45.000.000",
+            manfaat: "Peningkatan Ketertiban"
           }
         ]
       }
@@ -117,24 +116,24 @@ const Posyandu = () => {
       content: {
         struktur: [
           {
-            nama: "Ketua Posyandu",
-            tugas: "Memimpin dan mengkoordinasikan seluruh kegiatan Posyandu"
+            nama: "Ketua Poskamling",
+            tugas: "Memimpin dan mengkoordinasikan seluruh kegiatan Poskamling"
           },
           {
-            nama: "Kader Kesehatan",
-            tugas: "Melaksanakan pelayanan kesehatan dasar"
+            nama: "Wakil Ketua",
+            tugas: "Membantu ketua dalam melaksanakan tugas dan fungsi organisasi"
           },
           {
-            nama: "Bidan Desa",
-            tugas: "Melaksanakan pelayanan kesehatan ibu dan anak"
+            nama: "Sekretaris",
+            tugas: "Mengelola administrasi dan dokumentasi organisasi"
           },
           {
-            nama: "Petugas Gizi",
-            tugas: "Melaksanakan pelayanan gizi"
+            nama: "Bendahara",
+            tugas: "Mengelola keuangan dan aset organisasi"
           },
           {
-            nama: "Petugas KB",
-            tugas: "Melaksanakan pelayanan KB"
+            nama: "Anggota",
+            tugas: "Melaksanakan tugas ronda dan pengamanan"
           }
         ]
       }
@@ -142,37 +141,37 @@ const Posyandu = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-16 mb-20">
+    <div className="container mx-auto px-4 py-8">
       <Breadcrumb
         items={[
           { title: "Layanan", path: "/layanan" },
-          { title: "Posyandu" }
+          { title: "Poskamling" }
         ]}
       />
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Posyandu</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Poskamling</h2>
           <p className="text-muted-foreground">
-            Pos Pelayanan Terpadu
+            Pos Keamanan Lingkungan
           </p>
         </div>
 
         <Tabs defaultValue="umum" className="space-y-4">
           <TabsList>
             <TabsTrigger value="umum">Informasi Umum</TabsTrigger>
-            <TabsTrigger value="layanan">Layanan</TabsTrigger>
+            <TabsTrigger value="program">Program</TabsTrigger>
             <TabsTrigger value="kinerja">Kinerja</TabsTrigger>
             <TabsTrigger value="pengelolaan">Pengelolaan</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="umum">
+          <TabsContent value="umum" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <FileText className="h-8 w-8 text-primary" />
                 <div>
-                  <CardTitle>{posyanduData.umum.title}</CardTitle>
+                  <CardTitle>{poskamlingData.umum.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Informasi dasar Posyandu
+                    Informasi dasar Poskamling
                   </p>
                 </div>
               </CardHeader>
@@ -180,11 +179,11 @@ const Posyandu = () => {
                 <div>
                   <h4 className="font-semibold mb-2">Deskripsi</h4>
                   <p className="text-sm text-muted-foreground">
-                    {posyanduData.umum.content.deskripsi}
+                    {poskamlingData.umum.content.deskripsi}
                   </p>
                 </div>
                 <div className="space-y-2">
-                  {posyanduData.umum.content.data.map((item, index) => (
+                  {poskamlingData.umum.content.data.map((item, index) => (
                     <div key={index} className="flex justify-between items-center">
                       <span className="text-sm font-medium">{item.label}</span>
                       <span className="text-sm text-muted-foreground">{item.value}</span>
@@ -195,27 +194,27 @@ const Posyandu = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="layanan">
+          <TabsContent value="program" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <Users className="h-8 w-8 text-primary" />
                 <div>
-                  <CardTitle>{posyanduData.layanan.title}</CardTitle>
+                  <CardTitle>{poskamlingData.program.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Layanan kesehatan yang tersedia
+                    Program dan kegiatan Poskamling
                   </p>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                {posyanduData.layanan.content.kategori.map((kategori, index) => (
+                {poskamlingData.program.content.kategori.map((kategori, index) => (
                   <div key={index} className="space-y-4">
                     <div>
                       <h4 className="font-semibold">{kategori.nama}</h4>
                       <ul className="space-y-2 mt-2">
-                        {kategori.layanan.map((layanan, idx) => (
+                        {kategori.program.map((program, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <Users className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                            <span className="text-muted-foreground">{layanan}</span>
+                            <span className="text-muted-foreground">{program}</span>
                           </li>
                         ))}
                       </ul>
@@ -226,33 +225,41 @@ const Posyandu = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="kinerja">
+          <TabsContent value="kinerja" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <LineChart className="h-8 w-8 text-primary" />
                 <div>
-                  <CardTitle>{posyanduData.kinerja.title}</CardTitle>
+                  <CardTitle>{poskamlingData.kinerja.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Kinerja Posyandu per tahun
+                    Kinerja Poskamling per tahun
                   </p>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {posyanduData.kinerja.content.tahun.map((tahun, index) => (
+                {poskamlingData.kinerja.content.tahun.map((tahun, index) => (
                   <Card key={index}>
                     <CardContent className="pt-6">
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <h5 className="font-medium">{tahun.tahun}</h5>
                         </div>
-                        <div className="mt-2 space-y-2">
+                        <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Kunjungan: {tahun.kunjungan}</span>
-                            <span className="text-muted-foreground">Layanan: {tahun.layanan}</span>
+                            <span className="text-muted-foreground">Jumlah Patroli:</span>
+                            <span>{tahun.patroli}</span>
                           </div>
                           <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Anggaran: {tahun.anggaran}</span>
-                            <span className="text-muted-foreground">Manfaat: {tahun.manfaat}</span>
+                            <span className="text-muted-foreground">Penanganan Kasus:</span>
+                            <span>{tahun.penanganan}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Anggaran:</span>
+                            <span>{tahun.anggaran}</span>
+                          </div>
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Manfaat:</span>
+                            <span>{tahun.manfaat}</span>
                           </div>
                         </div>
                       </div>
@@ -263,19 +270,19 @@ const Posyandu = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="pengelolaan">
+          <TabsContent value="pengelolaan" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center gap-4">
                 <Briefcase className="h-8 w-8 text-primary" />
                 <div>
-                  <CardTitle>{posyanduData.pengelolaan.title}</CardTitle>
+                  <CardTitle>{poskamlingData.pengelolaan.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Struktur pengelolaan Posyandu
+                    Struktur pengelolaan Poskamling
                   </p>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {posyanduData.pengelolaan.content.struktur.map((item, index) => (
+                {poskamlingData.pengelolaan.content.struktur.map((item, index) => (
                   <Card key={index}>
                     <CardContent className="pt-6">
                       <div className="space-y-2">
@@ -294,4 +301,4 @@ const Posyandu = () => {
   );
 };
 
-export default Posyandu; 
+export default Poskamling; 

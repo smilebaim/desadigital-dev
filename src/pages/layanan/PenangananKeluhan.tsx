@@ -1,95 +1,96 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, FileCheck, FileX, FileClock } from "lucide-react";
+import { FileText, AlertCircle, MessageSquare, CheckCircle } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
 
-const Persuratan = () => {
-  const persuratanData = {
+const PenangananKeluhan = () => {
+  const keluhanData = {
     umum: {
       title: "Informasi Umum",
       icon: FileText,
       content: {
-        deskripsi: "Layanan persuratan desa meliputi pengajuan, pengolahan, dan pengiriman surat-surat resmi yang diperlukan oleh masyarakat desa."
+        deskripsi: "Layanan penanganan keluhan desa merupakan sarana bagi masyarakat untuk menyampaikan keluhan, kritik, dan saran terkait pelayanan publik di desa."
       }
     },
     jenis: {
-      title: "Jenis Surat",
-      icon: FileCheck,
+      title: "Jenis Keluhan",
+      icon: AlertCircle,
       content: {
         kategori: [
           {
-            nama: "Surat Keterangan",
+            nama: "Pelayanan Publik",
             jenis: [
-              "Surat Keterangan Domisili",
-              "Surat Keterangan Usaha",
-              "Surat Keterangan Tidak Mampu",
-              "Surat Keterangan Belum Menikah"
+              "Pelayanan Administrasi",
+              "Pelayanan Kesehatan",
+              "Pelayanan Pendidikan",
+              "Pelayanan Infrastruktur"
             ]
           },
           {
-            nama: "Surat Pengantar",
+            nama: "Kesejahteraan",
             jenis: [
-              "Surat Pengantar KTP",
-              "Surat Pengantar KK",
-              "Surat Pengantar Nikah",
-              "Surat Pengantar SKCK"
+              "Bantuan Sosial",
+              "Program Pemberdayaan",
+              "Kesehatan Masyarakat",
+              "Pendidikan"
             ]
           },
           {
-            nama: "Surat Rekomendasi",
+            nama: "Keamanan dan Ketertiban",
             jenis: [
-              "Surat Rekomendasi Beasiswa",
-              "Surat Rekomendasi Kerja",
-              "Surat Rekomendasi Usaha"
+              "Keamanan Lingkungan",
+              "Ketertiban Umum",
+              "Penanganan Konflik",
+              "Penegakan Peraturan"
             ]
           }
         ]
       }
     },
     prosedur: {
-      title: "Prosedur Pengajuan",
-      icon: FileClock,
+      title: "Prosedur Pengaduan",
+      icon: MessageSquare,
       content: {
-        langkah: [
+        tahap: [
           {
-            tahap: "Persiapan",
-            deskripsi: "Menyiapkan dokumen yang diperlukan sesuai jenis surat"
+            nama: "Pengajuan",
+            deskripsi: "Mengisi formulir pengaduan di kantor desa atau melalui aplikasi"
           },
           {
-            tahap: "Pengajuan",
-            deskripsi: "Mengisi formulir pengajuan di kantor desa"
+            nama: "Verifikasi",
+            deskripsi: "Pemeriksaan dan verifikasi keluhan oleh petugas"
           },
           {
-            tahap: "Verifikasi",
-            deskripsi: "Pemeriksaan dan verifikasi dokumen oleh petugas"
+            nama: "Penanganan",
+            deskripsi: "Proses penanganan keluhan oleh pihak terkait"
           },
           {
-            tahap: "Penerbitan",
-            deskripsi: "Penerbitan surat setelah proses verifikasi selesai"
+            nama: "Penyelesaian",
+            deskripsi: "Pemberitahuan hasil penanganan kepada pengadu"
           }
         ]
       }
     },
     status: {
-      title: "Status Pengajuan",
-      icon: FileX,
+      title: "Status Pengaduan",
+      icon: CheckCircle,
       content: {
         status: [
           {
             nama: "Menunggu Verifikasi",
-            deskripsi: "Surat sedang dalam proses verifikasi oleh petugas"
+            deskripsi: "Keluhan sedang dalam proses verifikasi"
           },
           {
-            nama: "Dokumen Kurang",
-            deskripsi: "Perlu melengkapi dokumen yang kurang"
+            nama: "Dalam Penanganan",
+            deskripsi: "Keluhan sedang ditangani oleh pihak terkait"
           },
           {
             nama: "Selesai",
-            deskripsi: "Surat telah selesai diproses dan dapat diambil"
+            deskripsi: "Keluhan telah selesai ditangani"
           },
           {
             nama: "Ditolak",
-            deskripsi: "Pengajuan surat ditolak karena tidak memenuhi syarat"
+            deskripsi: "Keluhan ditolak karena tidak memenuhi kriteria"
           }
         ]
       }
@@ -101,21 +102,21 @@ const Persuratan = () => {
       <Breadcrumb
         items={[
           { title: "Layanan", path: "/layanan" },
-          { title: "Persuratan" }
+          { title: "Penanganan Keluhan" }
         ]}
       />
       <div className="space-y-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Layanan Persuratan</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Penanganan Keluhan</h2>
           <p className="text-muted-foreground">
-            Informasi layanan persuratan desa
+            Informasi layanan penanganan keluhan desa
           </p>
         </div>
 
         <Tabs defaultValue="umum" className="space-y-4">
           <TabsList>
             <TabsTrigger value="umum">Informasi Umum</TabsTrigger>
-            <TabsTrigger value="jenis">Jenis Surat</TabsTrigger>
+            <TabsTrigger value="jenis">Jenis Keluhan</TabsTrigger>
             <TabsTrigger value="prosedur">Prosedur</TabsTrigger>
             <TabsTrigger value="status">Status</TabsTrigger>
           </TabsList>
@@ -125,9 +126,9 @@ const Persuratan = () => {
               <CardHeader className="flex flex-row items-center gap-4">
                 <FileText className="h-8 w-8 text-primary" />
                 <div>
-                  <CardTitle>{persuratanData.umum.title}</CardTitle>
+                  <CardTitle>{keluhanData.umum.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Informasi dasar layanan persuratan desa
+                    Informasi dasar layanan penanganan keluhan
                   </p>
                 </div>
               </CardHeader>
@@ -135,7 +136,7 @@ const Persuratan = () => {
                 <div>
                   <h4 className="font-semibold mb-2">Deskripsi</h4>
                   <p className="text-sm text-muted-foreground">
-                    {persuratanData.umum.content.deskripsi}
+                    {keluhanData.umum.content.deskripsi}
                   </p>
                 </div>
               </CardContent>
@@ -145,23 +146,23 @@ const Persuratan = () => {
           <TabsContent value="jenis" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center gap-4">
-                <FileCheck className="h-8 w-8 text-primary" />
+                <AlertCircle className="h-8 w-8 text-primary" />
                 <div>
-                  <CardTitle>{persuratanData.jenis.title}</CardTitle>
+                  <CardTitle>{keluhanData.jenis.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Daftar jenis surat yang dapat diajukan
+                    Jenis-jenis keluhan yang dapat diajukan
                   </p>
                 </div>
               </CardHeader>
               <CardContent className="space-y-6">
-                {persuratanData.jenis.content.kategori.map((kategori, index) => (
+                {keluhanData.jenis.content.kategori.map((kategori, index) => (
                   <div key={index} className="space-y-4">
                     <div>
                       <h4 className="font-semibold">{kategori.nama}</h4>
                       <ul className="space-y-2 mt-2">
                         {kategori.jenis.map((jenis, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <FileText className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                            <AlertCircle className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
                             <span className="text-muted-foreground">{jenis}</span>
                           </li>
                         ))}
@@ -176,21 +177,21 @@ const Persuratan = () => {
           <TabsContent value="prosedur" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center gap-4">
-                <FileClock className="h-8 w-8 text-primary" />
+                <MessageSquare className="h-8 w-8 text-primary" />
                 <div>
-                  <CardTitle>{persuratanData.prosedur.title}</CardTitle>
+                  <CardTitle>{keluhanData.prosedur.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Prosedur pengajuan surat
+                    Prosedur pengajuan keluhan
                   </p>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {persuratanData.prosedur.content.langkah.map((langkah, index) => (
+                {keluhanData.prosedur.content.tahap.map((tahap, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h4 className="font-semibold">{langkah.tahap}</h4>
-                        <p className="text-sm text-muted-foreground">{langkah.deskripsi}</p>
+                        <h4 className="font-semibold">{tahap.nama}</h4>
+                        <p className="text-sm text-muted-foreground">{tahap.deskripsi}</p>
                       </div>
                     </div>
                   </div>
@@ -202,16 +203,16 @@ const Persuratan = () => {
           <TabsContent value="status" className="space-y-4">
             <Card>
               <CardHeader className="flex flex-row items-center gap-4">
-                <FileX className="h-8 w-8 text-primary" />
+                <CheckCircle className="h-8 w-8 text-primary" />
                 <div>
-                  <CardTitle>{persuratanData.status.title}</CardTitle>
+                  <CardTitle>{keluhanData.status.title}</CardTitle>
                   <p className="text-sm text-muted-foreground">
-                    Status pengajuan surat
+                    Status pengajuan keluhan
                   </p>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                {persuratanData.status.content.status.map((status, index) => (
+                {keluhanData.status.content.status.map((status, index) => (
                   <div key={index} className="space-y-2">
                     <div className="flex justify-between items-center">
                       <div>
@@ -230,4 +231,4 @@ const Persuratan = () => {
   );
 };
 
-export default Persuratan; 
+export default PenangananKeluhan; 
