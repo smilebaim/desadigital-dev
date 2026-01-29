@@ -100,22 +100,22 @@ const DashboardLayout = ({
   return (
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-gray-50/50">
-          <Sidebar className="bg-black shadow-sm">
+          <Sidebar className="bg-emerald-900 shadow-sm">
             <SidebarHeader className="flex items-center gap-2 p-4">
               <div className="flex items-center gap-2">
                 <Image src="/logo-desa.png" alt="Logo Desa" className="h-8 w-8" width={32} height={32} />
-                <span className="font-semibold text-white">Dashboard</span>
+                <span className="font-semibold text-emerald-100">Dashboard</span>
               </div>
             </SidebarHeader>
             <SidebarContent>
               <nav className="space-y-1 px-2 py-4">
-                 <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                  <Home size={18} className="text-white" />
+                 <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                  <Home size={18} className="text-emerald-100" />
                   <span>Beranda</span>
                 </Link>
                 
-                <Link href="/dashboard/workspaces" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                  <Briefcase size={18} className="text-white" />
+                <Link href="/dashboard/workspaces" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                  <Briefcase size={18} className="text-emerald-100" />
                   <span>Workspaces</span>
                 </Link>
 
@@ -123,24 +123,24 @@ const DashboardLayout = ({
                   <>
                     <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value="halaman" className="border-none">
-                        <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                        <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors">
                           <div className="flex items-center gap-2">
-                            <FileSpreadsheet size={18} className="text-white" />
-                            <span className="text-white">Kelola Halaman</span>
+                            <FileSpreadsheet size={18} className="text-emerald-100" />
+                            <span className="text-emerald-100">Kelola Halaman</span>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
                           <ul className="space-y-1 pl-4">
-                            <li><Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <ListTodo size={16} className="text-white" />
+                            <li><Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <ListTodo size={16} className="text-emerald-100" />
                               <span>Daftar Halaman</span>
                             </Link></li>
-                            <li><Link href="/dashboard/halaman-utama" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <LayoutGrid size={16} className="text-white" />
+                            <li><Link href="/dashboard/halaman-utama" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <LayoutGrid size={16} className="text-emerald-100" />
                               <span>Halaman Utama</span>
                             </Link></li>
-                            <li><Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                                <ListTodo size={16} className="text-white" />
+                            <li><Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                                <ListTodo size={16} className="text-emerald-100" />
                                 <span>Kelola Menu</span>
                             </Link></li>
                           </ul>
@@ -148,64 +148,64 @@ const DashboardLayout = ({
                       </AccordionItem>
                     </Accordion>
                     
-                    <Link href="/dashboard/info" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                      <Newspaper size={18} className="text-white" />
+                    <Link href="/dashboard/info" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                      <Newspaper size={18} className="text-emerald-100" />
                       <span>Info & Berita</span>
                     </Link>
 
-                    <Link href="/dashboard/map-control" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                      <Map size={18} className="text-white" />
+                    <Link href="/dashboard/map-control" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                      <Map size={18} className="text-emerald-100" />
                       <span>Kontrol Peta</span>
                     </Link>
 
                     <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value="apps" className="border-none">
-                        <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors">
+                        <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors">
                           <div className="flex items-center gap-2">
-                            <AppWindow size={18} className="text-white" />
-                            <span className="text-white">Aplikasi Desa</span>
+                            <AppWindow size={18} className="text-emerald-100" />
+                            <span className="text-emerald-100">Aplikasi Desa</span>
                           </div>
                         </AccordionTrigger>
                         <AccordionContent>
                           <ul className="space-y-1 pl-4">
-                            <li><Link href="/dashboard/apps/surat-masuk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-masuk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Masuk</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-keluar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-keluar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Keluar</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-keterangan" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-keterangan" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Keterangan</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-pengantar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-pengantar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Pengantar</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-nikah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-nikah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Nikah</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-domisili" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-domisili" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Domisili</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Usaha</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-kematian" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-kematian" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Kematian</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-kelahiran" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-kelahiran" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Kelahiran</span>
                             </Link></li>
-                            <li><Link href="/dashboard/apps/surat-pindah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-100/10 transition-colors text-white">
-                              <FileText size={16} className="text-white" />
+                            <li><Link href="/dashboard/apps/surat-pindah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <FileText size={16} className="text-emerald-100" />
                               <span>Surat Pindah</span>
                             </Link></li>
                           </ul>
@@ -220,14 +220,14 @@ const DashboardLayout = ({
               {isClient && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <div className="flex items-center gap-3 cursor-pointer hover:bg-emerald-100/10 p-2 rounded-md transition-colors">
+                    <div className="flex items-center gap-3 cursor-pointer hover:bg-emerald-800 p-2 rounded-md transition-colors">
                       <Avatar>
-                        <AvatarFallback className="bg-white text-black">
+                        <AvatarFallback className="bg-emerald-100 text-emerald-900">
                           {user?.email?.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-medium text-white">Admin</span>
-                      <ChevronDown size={16} className="ml-auto text-white" />
+                      <span className="text-sm font-medium text-emerald-100">Admin</span>
+                      <ChevronDown size={16} className="ml-auto text-emerald-100" />
                     </div>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
