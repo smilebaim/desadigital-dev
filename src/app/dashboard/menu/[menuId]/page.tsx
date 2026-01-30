@@ -17,6 +17,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -38,7 +39,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { getMenuDetails, addMenuItem, updateMenuItem, deleteMenuItem } from "@/lib/menu-actions";
+import { getMenuDetails, addMenuItem, updateMenuItem, deleteMenuItem, swapMenuItemOrder } from "@/lib/menu-actions";
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from 'next/navigation';
 import type { Menu, MenuItem } from '@/lib/menu-data';
@@ -109,14 +110,16 @@ const MenuItemsPage = () => {
 
     setIsSubmitting(true);
     let result;
-
+    const parentItems = menuDetails?.items?.filter(item => !item.parentId) || [];
+    const subItems = formValues.parentId ? menuDetails?.items?.filter(i => i.parentId === formValues.parentId) || [] : [];
+    
     if (formMode === 'add') {
         const newItem: Omit<MenuItem, 'id'> = {
             title: formValues.title,
             path: formValues.path,
             icon: formValues.icon,
             parentId: formValues.parentId || null,
-            order: menuDetails?.items?.length || 0,
+            order: formValues.parentId ? subItems.length : parentItems.length,
         };
         result = await addMenuItem(menuId, newItem);
     } else if (selectedItem) {
@@ -155,6 +158,32 @@ const MenuItemsPage = () => {
     setSelectedItem(null);
   };
 
+  const handleMove = async (item: MenuItem, direction: 'up' | 'down') => {
+    const list = item.parentId 
+      ? menuDetails?.items?.filter(i => i.parentId === item.parentId).sort((a,b) => a.order - b.order) || []
+      : menuDetails?.items?.filter(i => !i.parentId).sort((a,b) => a.order - b.order) || [];
+      
+    const currentIndex = list.findIndex(i => i.id === item.id);
+    let otherItem: MenuItem | undefined;
+
+    if (direction === 'up' && currentIndex > 0) {
+      otherItem = list[currentIndex - 1];
+    } else if (direction === 'down' && currentIndex < list.length - 1) {
+      otherItem = list[currentIndex + 1];
+    }
+
+    if (otherItem) {
+      const result = await swapMenuItemOrder(menuId, item.id, item.order, otherItem.id, otherItem.order);
+      if (result.success) {
+          toast({ title: "Urutan berhasil diubah." });
+          await fetchMenuDetails();
+      } else {
+          toast({ title: "Gagal mengubah urutan.", description: result.error, variant: "destructive" });
+      }
+    }
+  };
+
+
   if (loading) {
     return <div>Memuat data menu...</div>;
   }
@@ -163,9 +192,9 @@ const MenuItemsPage = () => {
     return <div>Menu tidak ditemukan.</div>;
   }
 
-  const parentItems = menuDetails.items?.filter(item => !item.parentId) || [];
+  const parentItems = menuDetails.items?.filter(item => !item.parentId).sort((a, b) => a.order - b.order) || [];
   const getSubItems = (parentId: string) => {
-    return menuDetails.items?.filter(item => item.parentId === parentId) || [];
+    return menuDetails.items?.filter(item => item.parentId === parentId).sort((a, b) => a.order - b.order) || [];
   }
   
   const possibleParents = menuDetails.items?.filter(item => !item.parentId) || [];
@@ -174,7 +203,7 @@ const MenuItemsPage = () => {
     "Home", "Info", "Newspaper", "Map", "BookOpen", "Users", "Building2", "Scale",
     "HeartHandshake", "FileText", "Calendar", "Globe", "Briefcase", "LayoutGrid",
     "ListTodo", "Activity", "Target", "Compass", "Store", "FileSpreadsheet",
-    "ScrollText", "Palette", "MessageSquareWarning"
+    "ScrollText", "Palette", "MessageSquareWarning", "ArrowUp", "ArrowDown"
   ];
 
   return (
@@ -209,6 +238,7 @@ const MenuItemsPage = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>Urutan</TableHead>
                   <TableHead>Judul Item</TableHead>
                   <TableHead>Path</TableHead>
                   <TableHead>Icon</TableHead>
@@ -218,12 +248,13 @@ const MenuItemsPage = () => {
               <TableBody>
                 {parentItems.length === 0 && (
                     <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground">Belum ada item menu.</TableCell>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground">Belum ada item menu.</TableCell>
                     </TableRow>
                 )}
-                {parentItems.map((item) => (
+                {parentItems.map((item, index) => (
                   <React.Fragment key={item.id}>
                     <TableRow className="bg-muted/50">
+                      <TableCell>{index + 1}</TableCell>
                       <TableCell className="font-medium">{item.title}</TableCell>
                       <TableCell>{item.path}</TableCell>
                       <TableCell>{item.icon}</TableCell>
@@ -235,6 +266,13 @@ const MenuItemsPage = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleMove(item, 'up')} disabled={index === 0}>
+                              <Icons.ArrowUp className="h-4 w-4 mr-2" /> Pindah ke Atas
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleMove(item, 'down')} disabled={index === parentItems.length - 1}>
+                              <Icons.ArrowDown className="h-4 w-4 mr-2" /> Pindah ke Bawah
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={() => openEditForm(item)}>
                               <Icons.Edit className="h-4 w-4 mr-2" /> Edit
                             </DropdownMenuItem>
@@ -245,33 +283,44 @@ const MenuItemsPage = () => {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                    {getSubItems(item.id).map(subItem => (
-                      <TableRow key={subItem.id}>
-                          <TableCell className="pl-10 font-medium flex items-center">
-                            <Icons.ChevronRight className="h-4 w-4 mr-2 text-muted-foreground" />
-                            {subItem.title}
-                          </TableCell>
-                          <TableCell>{subItem.path}</TableCell>
-                          <TableCell>{subItem.icon}</TableCell>
-                          <TableCell className="text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon">
-                                  <Icons.MoreVertical className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => openEditForm(subItem)}>
-                                  <Icons.Edit className="h-4 w-4 mr-2" /> Edit
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="text-red-600" onClick={() => openDeleteDialog(subItem)}>
-                                  <Icons.Trash2 className="h-4 w-4 mr-2" /> Hapus
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                      </TableRow>
-                    ))}
+                    {getSubItems(item.id).map((subItem, subIndex) => {
+                      const subItemsList = getSubItems(item.id);
+                      return (
+                        <TableRow key={subItem.id}>
+                            <TableCell></TableCell>
+                            <TableCell className="pl-10 font-medium flex items-center">
+                              <Icons.ChevronRight className="h-4 w-4 mr-2 text-muted-foreground" />
+                              {subItem.title}
+                            </TableCell>
+                            <TableCell>{subItem.path}</TableCell>
+                            <TableCell>{subItem.icon}</TableCell>
+                            <TableCell className="text-right">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon">
+                                    <Icons.MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                   <DropdownMenuItem onClick={() => handleMove(subItem, 'up')} disabled={subIndex === 0}>
+                                    <Icons.ArrowUp className="h-4 w-4 mr-2" /> Pindah ke Atas
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleMove(subItem, 'down')} disabled={subIndex === subItemsList.length - 1}>
+                                    <Icons.ArrowDown className="h-4 w-4 mr-2" /> Pindah ke Bawah
+                                  </DropdownMenuItem>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem onClick={() => openEditForm(subItem)}>
+                                    <Icons.Edit className="h-4 w-4 mr-2" /> Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem className="text-red-600" onClick={() => openDeleteDialog(subItem)}>
+                                    <Icons.Trash2 className="h-4 w-4 mr-2" /> Hapus
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </TableCell>
+                        </TableRow>
+                      );
+                    })}
                   </React.Fragment>
                 ))}
               </TableBody>
@@ -366,11 +415,11 @@ const MenuItemsPage = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
             <AlertDialogDescription>
-              Tindakan ini akan menghapus item menu &quot;{selectedItem?.title}&quot; secara permanen. Tindakan ini tidak dapat dibatalkan.
+              Tindakan ini akan menghapus item menu &quot;{selectedItem?.title}&quot; dan semua item di dalamnya secara permanen. Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsDeleteOpen(false)}>Batal</AlertDialogCancel>
+            <Button variant="outline" onClick={() => setIsDeleteOpen(false)}>Batal</Button>
             <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

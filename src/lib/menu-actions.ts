@@ -208,3 +208,20 @@ export const deleteMenuItem = async (menuId: string, itemId: string) => {
         return { success: false, error: error.message };
     }
 };
+
+// Swap the order of two menu items
+export const swapMenuItemOrder = async (menuId: string, itemId1: string, order1: number, itemId2: string, order2: number) => {
+    try {
+        const batch = writeBatch(db);
+        const item1Ref = doc(db, 'menus', menuId, 'items', itemId1);
+        const item2Ref = doc(db, 'menus', menuId, 'items', itemId2);
+
+        batch.update(item1Ref, { order: order2 });
+        batch.update(item2Ref, { order: order1 });
+
+        await batch.commit();
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
