@@ -119,100 +119,96 @@ const DashboardLayout = ({
                   <span>Workspaces</span>
                 </Link>
 
+                <Link href="/dashboard/info" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                    <Newspaper size={18} className="text-emerald-100" />
+                    <span>Info & Berita</span>
+                </Link>
+
+                <Link href="/dashboard/map-control" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                    <Map size={18} className="text-emerald-100" />
+                    <span>Kontrol Peta</span>
+                </Link>
+
                 {isClient && (
-                  <>
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="halaman" className="border-none">
-                        <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors">
-                          <div className="flex items-center gap-2">
-                            <FileSpreadsheet size={18} className="text-emerald-100" />
-                            <span className="text-emerald-100">Kelola Halaman</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <ul className="space-y-1 pl-4">
-                            <li><Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="halaman" className="border-none">
+                      <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors">
+                        <div className="flex items-center gap-2">
+                          <FileSpreadsheet size={18} className="text-emerald-100" />
+                          <span className="text-emerald-100">Kelola Halaman</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-1 pl-4">
+                          <li><Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <ListTodo size={16} className="text-emerald-100" />
+                            <span>Daftar Halaman</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/halaman-utama" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <LayoutGrid size={16} className="text-emerald-100" />
+                            <span>Halaman Utama</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                               <ListTodo size={16} className="text-emerald-100" />
-                              <span>Daftar Halaman</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/halaman-utama" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <LayoutGrid size={16} className="text-emerald-100" />
-                              <span>Halaman Utama</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                                <ListTodo size={16} className="text-emerald-100" />
-                                <span>Kelola Menu</span>
-                            </Link></li>
-                          </ul>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
+                              <span>Kelola Menu</span>
+                          </Link></li>
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
                     
-                    <Link href="/dashboard/info" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                      <Newspaper size={18} className="text-emerald-100" />
-                      <span>Info & Berita</span>
-                    </Link>
-
-                    <Link href="/dashboard/map-control" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                      <Map size={18} className="text-emerald-100" />
-                      <span>Kontrol Peta</span>
-                    </Link>
-
-                    <Accordion type="single" collapsible className="w-full">
-                      <AccordionItem value="apps" className="border-none">
-                        <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors">
-                          <div className="flex items-center gap-2">
-                            <AppWindow size={18} className="text-emerald-100" />
-                            <span className="text-emerald-100">Aplikasi Desa</span>
-                          </div>
-                        </AccordionTrigger>
-                        <AccordionContent>
-                          <ul className="space-y-1 pl-4">
-                            <li><Link href="/dashboard/apps/surat-masuk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Masuk</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-keluar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Keluar</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-keterangan" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Keterangan</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-pengantar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Pengantar</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-nikah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Nikah</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-domisili" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Domisili</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Usaha</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-kematian" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Kematian</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-kelahiran" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Kelahiran</span>
-                            </Link></li>
-                            <li><Link href="/dashboard/apps/surat-pindah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <FileText size={16} className="text-emerald-100" />
-                              <span>Surat Pindah</span>
-                            </Link></li>
-                          </ul>
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                  </>
+                    <AccordionItem value="apps" className="border-none">
+                      <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors">
+                        <div className="flex items-center gap-2">
+                          <AppWindow size={18} className="text-emerald-100" />
+                          <span className="text-emerald-100">Aplikasi Desa</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-1 pl-4">
+                          <li><Link href="/dashboard/apps/surat-masuk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Masuk</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-keluar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Keluar</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-keterangan" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Keterangan</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-pengantar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Pengantar</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-nikah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Nikah</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-domisili" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Domisili</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Usaha</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-kematian" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Kematian</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-kelahiran" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Kelahiran</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/apps/surat-pindah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <FileText size={16} className="text-emerald-100" />
+                            <span>Surat Pindah</span>
+                          </Link></li>
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                 )}
               </nav>
             </SidebarContent>
