@@ -370,7 +370,7 @@ const MenuItemsPage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setIsDeleteOpen(false)}>Batal</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

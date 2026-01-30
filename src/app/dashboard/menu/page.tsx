@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -379,7 +380,7 @@ const MenuPage = () => {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Batal</Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || !editMenuName.trim()}>
                 <Save className="h-4 w-4 mr-2" />
                 {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
               </Button>
@@ -398,7 +399,7 @@ const MenuPage = () => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>Batal</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteMenu}>Hapus</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
