@@ -164,7 +164,7 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, lo
                               <Loader className="animate-spin" />
                           </div>
                       ) : menu?.items ? (
-                          <Accordion type="multiple" className="w-full">
+                          <Accordion type="single" collapsible className="w-full">
                              {renderMenuItems(menu.items)}
                           </Accordion>
                       ) : (
