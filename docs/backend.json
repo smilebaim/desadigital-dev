@@ -91,6 +91,27 @@
         "nama": { "type": "string" },
         "periode": { "type": "string" }
       }
+    },
+    "Penduduk": {
+      "title": "Penduduk",
+      "type": "object",
+      "description": "Data individu penduduk desa.",
+      "properties": {
+        "nik": { "type": "string", "description": "Nomor Induk Kependudukan" },
+        "kk": { "type": "string", "description": "Nomor Kartu Keluarga" },
+        "nama": { "type": "string", "description": "Nama lengkap penduduk" },
+        "jenisKelamin": { "type": "string", "enum": ["Laki-laki", "Perempuan"] },
+        "tempatLahir": { "type": "string" },
+        "tanggalLahir": { "type": "string", "format": "date" },
+        "agama": { "type": "string" },
+        "pendidikan": { "type": "string" },
+        "pekerjaan": { "type": "string" },
+        "statusPerkawinan": { "type": "string", "enum": ["Belum Kawin", "Kawin", "Cerai Hidup", "Cerai Mati"] },
+        "alamat": { "type": "string" },
+        "rt": { "type": "string" },
+        "rw": { "type": "string" }
+      },
+      "required": ["nik", "kk", "nama", "jenisKelamin", "tanggalLahir"]
     }
   },
   "firestore": {
@@ -139,6 +160,11 @@
         "path": "/pemerintahan/{pemerintahanId}",
         "schema": { "$ref": "#/entities/Pemerintahan" },
         "description": "Koleksi untuk menyimpan struktur pemerintahan desa."
+      },
+      {
+        "path": "/penduduk/{pendudukId}",
+        "schema": { "$ref": "#/entities/Penduduk" },
+        "description": "Koleksi untuk menyimpan data setiap penduduk."
       }
     ]
   },

@@ -113,6 +113,11 @@ const DashboardLayout = ({
                   <Home size={18} className="text-emerald-100" />
                   <span>Beranda</span>
                 </Link>
+
+                <Link href="/dashboard/penduduk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                  <Users size={18} className="text-emerald-100" />
+                  <span>Data Penduduk</span>
+                </Link>
                 
                 <Link href="/dashboard/workspaces" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                   <Briefcase size={18} className="text-emerald-100" />
