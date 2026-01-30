@@ -112,6 +112,23 @@
         "rw": { "type": "string" }
       },
       "required": ["nik", "kk", "nama", "jenisKelamin", "tanggalLahir"]
+    },
+    "SuratUsaha": {
+      "title": "Surat Keterangan Usaha",
+      "type": "object",
+      "description": "Dokumen surat keterangan usaha yang diajukan oleh penduduk.",
+      "properties": {
+        "pendudukId": { "type": "string", "description": "ID penduduk yang mengajukan" },
+        "namaPemohon": { "type": "string", "description": "Nama pemohon (denormalized)" },
+        "nikPemohon": { "type": "string", "description": "NIK pemohon (denormalized)" },
+        "namaUsaha": { "type": "string", "description": "Nama usaha yang dijalankan" },
+        "jenisUsaha": { "type": "string", "description": "Jenis atau bidang usaha" },
+        "alamatUsaha": { "type": "string", "description": "Alamat lokasi usaha" },
+        "tanggalSurat": { "type": "string", "format": "date-time", "description": "Tanggal surat dibuat" },
+        "nomorSurat": { "type": "string", "description": "Nomor surat resmi" },
+        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }
+      },
+      "required": ["pendudukId", "namaPemohon", "nikPemohon", "namaUsaha", "status"]
     }
   },
   "firestore": {
@@ -165,6 +182,11 @@
         "path": "/penduduk/{pendudukId}",
         "schema": { "$ref": "#/entities/Penduduk" },
         "description": "Koleksi untuk menyimpan data setiap penduduk."
+      },
+      {
+        "path": "/surat_usaha/{suratUsahaId}",
+        "schema": { "$ref": "#/entities/SuratUsaha" },
+        "description": "Koleksi untuk menyimpan data surat keterangan usaha."
       }
     ]
   },
