@@ -1,0 +1,12 @@
+--- a/node_modules/recharts/package.json
++++ b/node_modules/recharts/package.json
+@@ -69,6 +69,6 @@
+     "fast-deep-equal": "^3.1.3"
+   },
+   "peerDependencies": {
+-    "react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+-    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0"
++    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
++    "react-dom": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+   }
+ }

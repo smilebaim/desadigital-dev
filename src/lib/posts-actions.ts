@@ -1,3 +1,4 @@
+
 'use server';
 import { db } from '@/firebase/config';
 import { 
@@ -10,7 +11,9 @@ import {
     getDoc,
     query,
     where,
-    getDocs
+    getDocs,
+    orderBy,
+    increment
 } from 'firebase/firestore';
 
 // Interface for a single post
@@ -27,6 +30,45 @@ export interface PostData {
 }
 
 // --- Post Actions ---
+
+// Get all published posts
+export const getPublishedPosts = async () => {
+    try {
+        const q = query(
+            collection(db, "posts"),
+            where("status", "==", "Published"),
+            orderBy("createdAt", "desc")
+        );
+        const querySnapshot = await getDocs(q);
+        return querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
+            } as PostData & { id: string };
+        });
+    } catch (error) {
+        console.error("Error getting published posts:", error);
+        return [];
+    }
+}
+
+// Increment post view count
+export const incrementPostView = async (postId: string) => {
+    if (!postId) return;
+    try {
+        const postRef = doc(db, 'posts', postId);
+        // We run this without await to not block the page render
+        updateDoc(postRef, {
+            views: increment(1)
+        });
+    } catch (error) {
+        // It's okay if this fails, not critical for user experience
+        console.error(`Error incrementing post view for ${postId}:`, error);
+    }
+}
+
 
 // Add a new post
 export const addPost = async (postData: Omit<PostData, 'createdAt' | 'updatedAt' | 'views'>) => {
