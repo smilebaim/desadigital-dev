@@ -4,7 +4,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Calendar, Target, Clock, AlertTriangle, FileText, Users, LineChart, Briefcase } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer, Treemap } from 'recharts';
 
 const DaftarProgram = () => {
   const programData = {

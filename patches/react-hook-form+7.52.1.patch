@@ -1,0 +1,12 @@
+--- a/node_modules/react-hook-form/package.json
++++ b/node_modules/react-hook-form/package.json
+@@ -35,6 +35,6 @@
+       "main": "dist/index.js",
+       "types": "dist/index.d.ts"
+     },
+-    "peerDependencies": {
+-      "react": "^16.8.0 || ^17 || ^18"
++    "peerDependencies": {
++      "react": "^16.8.0 || ^17 || ^18 || ^19"
+     }
+   }

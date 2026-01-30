@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { DollarSign, ArrowUpDown, PieChart as PieChartIcon } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const pembiayaanData = {
   title: "Pembiayaan Desa",
@@ -115,4 +114,4 @@ const Pembiayaan: React.FC = () => {
   );
 };
 
-export default Pembiayaan; 
+export default Pembiayaan;
