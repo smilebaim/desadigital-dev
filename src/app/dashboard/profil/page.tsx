@@ -1,10 +1,9 @@
 'use client';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser, useFirestore } from '@/firebase';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { useFirestore } from '@/firebase';
 
 interface UserProfile {
   displayName: string;
@@ -13,7 +12,7 @@ interface UserProfile {
 }
 
 export default function ProfilPage() {
-    const { user, loading } = useAuth();
+    const { user, isUserLoading } = useUser();
     const db = useFirestore();
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
@@ -49,12 +48,12 @@ export default function ProfilPage() {
             }
         };
 
-        if (!loading) {
+        if (!isUserLoading) {
             fetchUserProfile();
         }
-    }, [user, loading, db]);
+    }, [user, isUserLoading, db]);
 
-    if (loading || !user) {
+    if (isUserLoading || !user) {
         return (
             <div className="p-4">
                 <h1 className="text-2xl font-bold mb-4">Profil Admin</h1>

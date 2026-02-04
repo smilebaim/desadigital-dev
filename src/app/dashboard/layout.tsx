@@ -47,7 +47,8 @@ import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useAuth } from "@/contexts/AuthContext";
+import { useUser, useAuth } from '@/firebase';
+import { signOut } from 'firebase/auth';
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
@@ -76,7 +77,8 @@ const DashboardLayout = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { user, logout } = useAuth();
+  const { user } = useUser();
+  const auth = useAuth();
   const router = useRouter();
   const { toast } = useToast();
   const { setTheme } = useTheme();
@@ -86,12 +88,12 @@ const DashboardLayout = ({
     setIsClient(true);
   }, []);
   
-  const handleLogout = () => {
+  const handleLogout = async () => {
     toast({
       title: "Logout",
       description: "Anda akan dialihkan ke halaman utama.",
     });
-    logout();
+    await signOut(auth);
     router.push('/');
   };
 

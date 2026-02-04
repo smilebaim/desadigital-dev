@@ -27,7 +27,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/firebase';
 import type { Menu, MenuItem } from '@/lib/menu-data';
 import * as Icons from 'lucide-react';
 
@@ -49,7 +49,8 @@ const getIcon = (name?: string): React.FC<any> => {
 const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, loading, logoUrl }) => {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { isAuthenticated } = useAuth();
+  const { user } = useUser();
+  const isAuthenticated = !!user;
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {

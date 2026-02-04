@@ -47,7 +47,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from '@/firebase';
 import { addWorkspace, deleteWorkspace, updateWorkspace } from "@/lib/workspace-actions";
 import { getWorkspacesStream } from "@/lib/workspace-client-actions";
 import { useToast } from "@/components/ui/use-toast";
@@ -60,7 +60,7 @@ interface Workspace {
 }
 
 const WorkspacesPage = () => {
-  const { user } = useAuth();
+  const { user } = useUser();
   const { toast } = useToast();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [newWorkspaceName, setNewWorkspaceName] = useState("");
@@ -335,5 +335,3 @@ const WorkspacesPage = () => {
 };
 
 export default WorkspacesPage;
-
-    

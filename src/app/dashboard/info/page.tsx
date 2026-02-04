@@ -41,7 +41,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { deletePost, type PostData } from "@/lib/posts-actions";
 import { getPostsStream } from "@/lib/posts-client-actions";
-import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from '@/firebase';
 import { useToast } from "@/components/ui/use-toast";
 
 interface Post extends PostData {
@@ -51,7 +51,7 @@ interface Post extends PostData {
 }
 
 const BeritaDashboardPage = () => {
-  const { user } = useAuth();
+  const { user } = useUser();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [posts, setPosts] = useState<Post[]>([]);
@@ -65,6 +65,10 @@ const BeritaDashboardPage = () => {
         setLoading(false);
       });
       return () => unsubscribe();
+    } else if (user === null) {
+      // Handle logged out state
+      setLoading(false);
+      setPosts([]);
     }
   }, [user]);
 

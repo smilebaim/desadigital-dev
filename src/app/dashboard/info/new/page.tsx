@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '@/firebase';
 import { addPost, type PostData } from '@/lib/posts-actions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 
 const NewPostPage = () => {
-    const { user } = useAuth();
+    const { user } = useUser();
     const router = useRouter();
     const { toast } = useToast();
     
