@@ -1,196 +1,56 @@
 {
   "entities": {
-    "ProfilDesa": {
-      "title": "Profil Desa",
+    "Village": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Village",
       "type": "object",
-      "description": "Informasi umum mengenai desa.",
+      "description": "Represents the village information.",
       "properties": {
-        "nama": { "type": "string", "description": "Nama desa" },
-        "kecamatan": { "type": "string", "description": "Kecamatan" },
-        "kabupaten": { "type": "string", "description": "Kabupaten" },
-        "provinsi": { "type": "string", "description": "Provinsi" },
-        "luas": { "type": "string", "description": "Luas wilayah desa" },
-        "penduduk": { "type": "string", "description": "Jumlah penduduk" },
-        "kepalaDesa": { "type": "string", "description": "Nama kepala desa" },
-        "periode": { "type": "string", "description": "Periode jabatan kepala desa" }
-      }
-    },
-    "Pembangunan": {
-      "title": "Pembangunan",
-      "type": "object",
-      "description": "Informasi mengenai program pembangunan di desa.",
-      "properties": {
-        "judul": { "type": "string", "description": "Judul program pembangunan" },
-        "deskripsi": { "type": "string", "description": "Deskripsi program" },
-        "kegiatan": { "type": "array", "items": { "type": "string" } }
-      }
-    },
-    "DanaDesa": {
-      "title": "Dana Desa",
-      "type": "object",
-      "description": "Informasi mengenai dana desa.",
-      "properties": {
-        "tahun": { "type": "string" },
-        "total": { "type": "string" },
-        "deskripsi": { "type": "string" }
-      }
-    },
-    "Indeks": {
-      "title": "Indeks",
-      "type": "object",
-      "description": "Informasi mengenai berbagai indeks desa.",
-      "properties": {
-        "nama": { "type": "string" },
-        "nilai": { "type": "string" },
-        "status": { "type": "string" }
-      }
-    },
-    "TataRuang": {
-      "title": "Tata Ruang",
-      "type": "object",
-      "description": "Informasi mengenai tata ruang desa.",
-      "properties": {
-        "nama": { "type": "string" },
-        "deskripsi": { "type": "string" }
-      }
-    },
-    "Layanan": {
-      "title": "Layanan",
-      "type": "object",
-      "description": "Informasi mengenai layanan yang tersedia di desa.",
-      "properties": {
-        "nama": { "type": "string" },
-        "deskripsi": { "type": "string" }
-      }
-    },
-    "Sejarah": {
-      "title": "Sejarah",
-      "type": "object",
-      "description": "Informasi mengenai sejarah desa.",
-      "properties": {
-        "judul": { "type": "string" },
-        "deskripsi": { "type": "string" },
-        "tahun": { "type": "string" }
-      }
-    },
-    "VisiMisi": {
-      "title": "Visi Misi",
-      "type": "object",
-      "description": "Visi dan Misi desa.",
-      "properties": {
-        "visi": { "type": "string" },
-        "misi": { "type": "array", "items": { "type": "string" } }
-      }
-    },
-    "Pemerintahan": {
-      "title": "Pemerintahan",
-      "type": "object",
-      "description": "Struktur pemerintahan desa.",
-      "properties": {
-        "jabatan": { "type": "string" },
-        "nama": { "type": "string" },
-        "periode": { "type": "string" }
-      }
-    },
-    "Penduduk": {
-      "title": "Penduduk",
-      "type": "object",
-      "description": "Data individu penduduk desa.",
-      "properties": {
-        "nik": { "type": "string", "description": "Nomor Induk Kependudukan" },
-        "kk": { "type": "string", "description": "Nomor Kartu Keluarga" },
-        "nama": { "type": "string", "description": "Nama lengkap penduduk" },
-        "jenisKelamin": { "type": "string", "enum": ["Laki-laki", "Perempuan"] },
-        "tempatLahir": { "type": "string" },
-        "tanggalLahir": { "type": "string", "format": "date" },
-        "agama": { "type": "string" },
-        "pendidikan": { "type": "string" },
-        "pekerjaan": { "type": "string" },
-        "statusPerkawinan": { "type": "string", "enum": ["Belum Kawin", "Kawin", "Cerai Hidup", "Cerai Mati"] },
-        "alamat": { "type": "string" },
-        "rt": { "type": "string" },
-        "rw": { "type": "string" }
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Village entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the village."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the village."
+        }
       },
-      "required": ["nik", "kk", "nama", "jenisKelamin", "tanggalLahir"]
-    },
-    "SuratUsaha": {
-      "title": "Surat Keterangan Usaha",
-      "type": "object",
-      "description": "Dokumen surat keterangan usaha yang diajukan oleh penduduk.",
-      "properties": {
-        "pendudukId": { "type": "string", "description": "ID penduduk yang mengajukan" },
-        "namaPemohon": { "type": "string", "description": "Nama pemohon (denormalized)" },
-        "nikPemohon": { "type": "string", "description": "NIK pemohon (denormalized)" },
-        "namaUsaha": { "type": "string", "description": "Nama usaha yang dijalankan" },
-        "jenisUsaha": { "type": "string", "description": "Jenis atau bidang usaha" },
-        "alamatUsaha": { "type": "string", "description": "Alamat lokasi usaha" },
-        "tanggalSurat": { "type": "string", "format": "date-time", "description": "Tanggal surat dibuat" },
-        "nomorSurat": { "type": "string", "description": "Nomor surat resmi" },
-        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }
-      },
-      "required": ["pendudukId", "namaPemohon", "nikPemohon", "namaUsaha", "status"]
+      "required": [
+        "id",
+        "name",
+        "description"
+      ]
     }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
   },
   "firestore": {
     "structure": [
       {
-        "path": "/profil_desa/{profilId}",
-        "schema": { "$ref": "#/entities/ProfilDesa" },
-        "description": "Koleksi untuk menyimpan profil desa."
-      },
-      {
-        "path": "/pembangunan/{pembangunanId}",
-        "schema": { "$ref": "#/entities/Pembangunan" },
-        "description": "Koleksi untuk menyimpan data program pembangunan."
-      },
-      {
-        "path": "/dana_desa/{danaId}",
-        "schema": { "$ref": "#/entities/DanaDesa" },
-        "description": "Koleksi untuk menyimpan informasi dana desa."
-      },
-      {
-        "path": "/indeks/{indeksId}",
-        "schema": { "$ref": "#/entities/Indeks" },
-        "description": "Koleksi untuk menyimpan data indeks desa."
-      },
-      {
-        "path": "/tata_ruang/{tataRuangId}",
-        "schema": { "$ref": "#/entities/TataRuang" },
-        "description": "Koleksi untuk menyimpan data tata ruang."
-      },
-      {
-        "path": "/layanan/{layananId}",
-        "schema": { "$ref": "#/entities/Layanan" },
-        "description": "Koleksi untuk menyimpan informasi layanan desa."
-      },
-      {
-        "path": "/sejarah/{sejarahId}",
-        "schema": { "$ref": "#/entities/Sejarah" },
-        "description": "Koleksi untuk menyimpan sejarah desa."
-      },
-      {
-        "path": "/visi_misi/{visiMisiId}",
-        "schema": { "$ref": "#/entities/VisiMisi" },
-        "description": "Koleksi untuk menyimpan visi dan misi desa."
-      },
-      {
-        "path": "/pemerintahan/{pemerintahanId}",
-        "schema": { "$ref": "#/entities/Pemerintahan" },
-        "description": "Koleksi untuk menyimpan struktur pemerintahan desa."
-      },
-      {
-        "path": "/penduduk/{pendudukId}",
-        "schema": { "$ref": "#/entities/Penduduk" },
-        "description": "Koleksi untuk menyimpan data setiap penduduk."
-      },
-      {
-        "path": "/surat_usaha/{suratUsahaId}",
-        "schema": { "$ref": "#/entities/SuratUsaha" },
-        "description": "Koleksi untuk menyimpan data surat keterangan usaha."
+        "path": "/villages/{villageId}",
+        "definition": {
+          "entityName": "Village",
+          "schema": {
+            "$ref": "#/backend/entities/Village"
+          },
+          "description": "Stores village information. All users have read access. '{villageId}' is the unique identifier for each village.",
+          "params": [
+            {
+              "name": "villageId",
+              "description": "Unique identifier for the village."
+            }
+          ]
+        }
       }
-    ]
-  },
-  "auth": {
-    "providers": ["anonymous", "password"]
+    ],
+    "reasoning": "Given the simple requirements of displaying village information, the data structure focuses on a single collection for villages. The structure prioritizes simplicity and ease of access, aligning with the app's core functionality.\n\nAuthorization Independence: Since there are no user-specific roles or collaborative features outlined, authorization primarily concerns read access. No denormalization is necessary as all users can be assumed to have read access to the village information. If, in the future, specific user roles or edit permissions are introduced, the 'Village' document could include a 'members' map or a separate subcollection for access control lists (ACLs), denormalizing relevant role information within documents requiring restricted access.\n\nQAPs: The single 'villages' collection supports simple 'list' operations for retrieving all villages. If the number of villages grows significantly, pagination techniques can be implemented on the client-side. Structural Segregation isn't required as the data is homogeneous (all village documents share the same read access requirements)."
   }
 }

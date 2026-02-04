@@ -1,11 +1,69 @@
+/**
+ * Core Philosophy: This ruleset establishes a public, read-only data model.
+ * The primary goal is to allow any visitor, authenticated or not, to view
+ * information about villages, while strictly prohibiting any form of data
+ * modification until an explicit administrative or ownership role is defined.
+ *
+ * Data Structure: The data is organized into a single top-level collection
+ * named 'villages'. Each document within this collection represents a unique
+ * village.
+ *
+ * Key Security Decisions:
+ * - Public Read Access: All documents in the /villages collection are publicly
+ *   readable (`get` and `list`) to support the core feature of displaying
+ *   village information to everyone.
+ * - Write Prohibition: All write operations (`create`, `update`, `delete`) are
+ *   explicitly disabled by default. This is a critical security measure taken
+ *   because the 'Village' data entity does not currently contain an 'ownerId'
+ *   or 'authorId' field, making it impossible to safely authorize who can
+ *   modify the data. This rule forces the developer to implement a proper
+ *   ownership model before enabling writes.
+ *
+ * Denormalization for Authorization: No denormalization is currently needed as
+ * the access model is uniform (public read). If future requirements introduce
+ * roles (e.g., a village elder who can edit a village's description), that
+ * role or ownership information should be denormalized directly onto the
+ * village document to enable efficient and secure rule enforcement.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow read/write access to all documents by default.
-    // This is not secure for production apps.
-    // You should secure your data with more specific rules.
-    match /{document=**} {
-      allow read, write: if true;
+
+    // Helper functions for readability and reuse.
+
+    /**
+     * Checks if a user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * @description
+     *   Rules for the 'villages' collection. Allows public read access to all
+     *   village documents but denies all write operations until a proper
+     *   ownership model is defined.
+     * @path
+     *   /villages/{villageId}
+     * @allow
+     *   Anyone, authenticated or not, reading a village document: `(get) /villages/some_village_id`
+     * @deny
+     *   Any user attempting to create a new village document: `(create) /villages/new_village`
+     * @principle
+     *   Implements a public read-only pattern. Writes are disabled as a security
+     *   default because the data model lacks an ownership field (e.g., 'authorId')
+     *   to authorize modifications.
+     */
+    match /villages/{villageId} {
+      // Any user, signed in or not, can read village data.
+      allow get: if true;
+      allow list: if true;
+
+      // CRITICAL: Cannot implement owner-only writes. The 'Village' entity is missing an 'ownerId' or 'authorId' field.
+      // All write operations are denied to prevent unauthorized data modification.
+      allow create: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow update: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+      allow delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
     }
   }
 }
