@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '@/firebase/config';
+import { useFirestore } from '@/firebase';
 
 interface UserProfile {
   displayName: string;
@@ -14,31 +14,45 @@ interface UserProfile {
 
 export default function ProfilPage() {
     const { user, loading } = useAuth();
+    const db = useFirestore();
     const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
     useEffect(() => {
         const fetchUserProfile = async () => {
-            if (user) {
+            if (user && db) {
                 const docRef = doc(db, "users", user.uid);
-                const docSnap = await getDoc(docRef);
+                try {
+                    const docSnap = await getDoc(docRef);
 
-                if (docSnap.exists()) {
-                    setUserProfile(docSnap.data() as UserProfile);
-                } else {
-                    // Fallback for users that might not be in firestore
-                    // e.g. created before firestore profile sync was implemented
-                    setUserProfile({
+                    if (docSnap.exists()) {
+                        setUserProfile(docSnap.data() as UserProfile);
+                    } else {
+                        // Fallback for users that might not be in firestore
+                        // e.g. created before firestore profile sync was implemented
+                        setUserProfile({
+                            displayName: user.displayName || user.email || "Admin",
+                            email: user.email || "Tidak ada email",
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error fetching user profile:", error);
+                     setUserProfile({
                         displayName: user.displayName || user.email || "Admin",
                         email: user.email || "Tidak ada email",
                     });
                 }
+            } else if (user) {
+                 setUserProfile({
+                    displayName: user.displayName || user.email || "Admin",
+                    email: user.email || "Tidak ada email",
+                });
             }
         };
 
         if (!loading) {
             fetchUserProfile();
         }
-    }, [user, loading]);
+    }, [user, loading, db]);
 
     if (loading || !user) {
         return (

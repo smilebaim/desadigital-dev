@@ -1,56 +1,91 @@
 {
   "entities": {
-    "Village": {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "Village",
+    "Penduduk": {
+      "title": "Penduduk",
       "type": "object",
-      "description": "Represents the village information.",
       "properties": {
-        "id": {
+        "nama": {
           "type": "string",
-          "description": "Unique identifier for the Village entity."
+          "description": "Nama lengkap penduduk."
         },
-        "name": {
+        "nik": {
           "type": "string",
-          "description": "The name of the village."
+          "description": "Nomor Induk Kependudukan."
         },
-        "description": {
+        "kk": {
           "type": "string",
-          "description": "A detailed description of the village."
+          "description": "Nomor Kartu Keluarga."
+        },
+        "jenisKelamin": {
+          "type": "string",
+          "enum": [
+            "Laki-laki",
+            "Perempuan"
+          ]
+        },
+        "tempatLahir": {
+          "type": "string"
+        },
+        "tanggalLahir": {
+          "type": "string",
+          "format": "date"
+        },
+        "agama": {
+          "type": "string"
+        },
+        "pendidikan": {
+          "type": "string"
+        },
+        "pekerjaan": {
+          "type": "string"
+        },
+        "statusPerkawinan": {
+          "type": "string",
+          "enum": [
+            "Belum Kawin",
+            "Kawin",
+            "Cerai Hidup",
+            "Cerai Mati"
+          ]
+        },
+        "alamat": {
+          "type": "string"
+        },
+        "rt": {
+          "type": "string"
+        },
+        "rw": {
+          "type": "string"
         }
       },
       "required": [
-        "id",
-        "name",
-        "description"
+        "nama",
+        "nik",
+        "kk",
+        "jenisKelamin",
+        "tempatLahir",
+        "tanggalLahir",
+        "agama",
+        "pendidikan",
+        "pekerjaan",
+        "statusPerkawinan",
+        "alamat",
+        "rt",
+        "rw"
       ]
     }
   },
   "auth": {
     "providers": [
-      "password",
       "anonymous"
     ]
   },
   "firestore": {
-    "structure": [
-      {
-        "path": "/villages/{villageId}",
-        "definition": {
-          "entityName": "Village",
-          "schema": {
-            "$ref": "#/backend/entities/Village"
-          },
-          "description": "Stores village information. All users have read access. '{villageId}' is the unique identifier for each village.",
-          "params": [
-            {
-              "name": "villageId",
-              "description": "Unique identifier for the village."
-            }
-          ]
-        }
-      }
-    ],
-    "reasoning": "Given the simple requirements of displaying village information, the data structure focuses on a single collection for villages. The structure prioritizes simplicity and ease of access, aligning with the app's core functionality.\n\nAuthorization Independence: Since there are no user-specific roles or collaborative features outlined, authorization primarily concerns read access. No denormalization is necessary as all users can be assumed to have read access to the village information. If, in the future, specific user roles or edit permissions are introduced, the 'Village' document could include a 'members' map or a separate subcollection for access control lists (ACLs), denormalizing relevant role information within documents requiring restricted access.\n\nQAPs: The single 'villages' collection supports simple 'list' operations for retrieving all villages. If the number of villages grows significantly, pagination techniques can be implemented on the client-side. Structural Segregation isn't required as the data is homogeneous (all village documents share the same read access requirements)."
+    "/penduduk/{pendudukId}": {
+      "schema": {
+        "$ref": "#/entities/Penduduk"
+      },
+      "description": "Stores information about each resident."
+    }
   }
 }
