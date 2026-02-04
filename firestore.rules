@@ -1,64 +1,10 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function isSignedIn() {
-      return request.auth != null;
-    }
-
-    // --- Public-read, Admin-write collections ---
-    // These collections contain public-facing website content
-    // managed through the dashboard.
-    match /penduduk/{docId} { allow read: if true; allow write: if isSignedIn(); }
-    match /site_settings/{docId} { allow read: if true; allow write: if isSignedIn(); }
-    match /profil_desa/{docId} { allow read: if true; allow write: if isSignedIn(); }
-    match /sejarah/{docId} { allow read: if true; allow write: if isSignedIn(); }
-    match /visi_misi/{docId} { allow read: if true; allow write: if isSignedIn(); }
-    match /pemerintahan/{docId} { allow read: if true; allow write: if isSignedIn(); }
-    match /map_markers/{docId} { allow read: if true; allow write: if isSignedIn(); }
-    match /map_polygons/{docId} { allow read: if true; allow write: if isSignedIn(); }
-    match /map_layer_categories/{docId} { allow read: if true; allow write: if isSignedIn(); }
-
-    // --- Menu requires nested rule ---
-    match /menus/{menuId} {
-      allow read: if true;
-      allow write: if isSignedIn();
-      match /items/{itemId} {
-        allow read: if true;
-        allow write: if isSignedIn();
-      }
-    }
-    
-    // --- Posts: public can read published, admin can do anything ---
-    match /posts/{postId} {
-      allow get: if resource.data.status == 'Published' || isSignedIn();
-      allow list: if true;
-      allow write: if isSignedIn();
-    }
-
-    // --- Admin-only collections ---
-    // These are for internal dashboard functionality
-    match /surat_usaha/{suratId} {
-      allow read, write: if isSignedIn();
-    }
-
-    // --- User-specific collections ---
-    // Workspaces are private to the user who created them
-    match /workspaces/{workspaceId} {
-      function isOwner() {
-        return isSignedIn() && resource.data.ownerUid == request.auth.uid;
-      }
-      allow read, write: if isOwner();
-      
-      match /items/{itemId} {
-        // check ownership on the parent workspace document
-        allow read, write: if isSignedIn() && get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.ownerUid == request.auth.uid;
-      }
-    }
-
-    // Fallback to deny all other access
+    // WARNING: These rules are completely open and are not secure.
+    // They should only be used for initial development and testing.
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if true;
     }
   }
 }
