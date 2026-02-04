@@ -1,69 +1,64 @@
-/**
- * Core Philosophy: This ruleset establishes a public, read-only data model.
- * The primary goal is to allow any visitor, authenticated or not, to view
- * information about villages, while strictly prohibiting any form of data
- * modification until an explicit administrative or ownership role is defined.
- *
- * Data Structure: The data is organized into a single top-level collection
- * named 'villages'. Each document within this collection represents a unique
- * village.
- *
- * Key Security Decisions:
- * - Public Read Access: All documents in the /villages collection are publicly
- *   readable (`get` and `list`) to support the core feature of displaying
- *   village information to everyone.
- * - Write Prohibition: All write operations (`create`, `update`, `delete`) are
- *   explicitly disabled by default. This is a critical security measure taken
- *   because the 'Village' data entity does not currently contain an 'ownerId'
- *   or 'authorId' field, making it impossible to safely authorize who can
- *   modify the data. This rule forces the developer to implement a proper
- *   ownership model before enabling writes.
- *
- * Denormalization for Authorization: No denormalization is currently needed as
- * the access model is uniform (public read). If future requirements introduce
- * roles (e.g., a village elder who can edit a village's description), that
- * role or ownership information should be denormalized directly onto the
- * village document to enable efficient and secure rule enforcement.
- */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions for readability and reuse.
-
-    /**
-     * Checks if a user is authenticated.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * @description
-     *   Rules for the 'villages' collection. Allows public read access to all
-     *   village documents but denies all write operations until a proper
-     *   ownership model is defined.
-     * @path
-     *   /villages/{villageId}
-     * @allow
-     *   Anyone, authenticated or not, reading a village document: `(get) /villages/some_village_id`
-     * @deny
-     *   Any user attempting to create a new village document: `(create) /villages/new_village`
-     * @principle
-     *   Implements a public read-only pattern. Writes are disabled as a security
-     *   default because the data model lacks an ownership field (e.g., 'authorId')
-     *   to authorize modifications.
-     */
-    match /villages/{villageId} {
-      // Any user, signed in or not, can read village data.
-      allow get: if true;
-      allow list: if true;
+    // --- Public-read, Admin-write collections ---
+    // These collections contain public-facing website content
+    // managed through the dashboard.
+    match /penduduk/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /site_settings/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /profil_desa/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /sejarah/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /visi_misi/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /pemerintahan/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /map_markers/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /map_polygons/{docId} { allow read: if true; allow write: if isSignedIn(); }
+    match /map_layer_categories/{docId} { allow read: if true; allow write: if isSignedIn(); }
 
-      // CRITICAL: Cannot implement owner-only writes. The 'Village' entity is missing an 'ownerId' or 'authorId' field.
-      // All write operations are denied to prevent unauthorized data modification.
-      allow create: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
-      allow update: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
-      allow delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
+    // --- Menu requires nested rule ---
+    match /menus/{menuId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+      match /items/{itemId} {
+        allow read: if true;
+        allow write: if isSignedIn();
+      }
+    }
+    
+    // --- Posts: public can read published, admin can do anything ---
+    match /posts/{postId} {
+      allow get: if resource.data.status == 'Published' || isSignedIn();
+      allow list: if true;
+      allow write: if isSignedIn();
+    }
+
+    // --- Admin-only collections ---
+    // These are for internal dashboard functionality
+    match /surat_usaha/{suratId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // --- User-specific collections ---
+    // Workspaces are private to the user who created them
+    match /workspaces/{workspaceId} {
+      function isOwner() {
+        return isSignedIn() && resource.data.ownerUid == request.auth.uid;
+      }
+      allow read, write: if isOwner();
+      
+      match /items/{itemId} {
+        // check ownership on the parent workspace document
+        allow read, write: if isSignedIn() && get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.ownerUid == request.auth.uid;
+      }
+    }
+
+    // Fallback to deny all other access
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
