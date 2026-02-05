@@ -151,6 +151,30 @@
           "type": "string",
           "format": "date-time",
           "description": "Waktu item dibuat."
+        },
+        "attachments": {
+          "type": "array",
+          "description": "Daftar lampiran file untuk item ini.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "path": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "url",
+              "path"
+            ]
+          }
         }
       },
       "required": [
