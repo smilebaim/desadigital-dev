@@ -10,8 +10,14 @@ import {
 
 // Get a stream of workspaces for a user, including those they own and are a member of.
 export const getWorkspacesStream = (userId: string, callback: (data: any[]) => void) => {
+    if (!userId) {
+        callback([]);
+        return () => {};
+    }
+
     let ownedWorkspaces: any[] = [];
     let memberWorkspaces: any[] = [];
+    let combinedUnsub: (() => void) | null = null;
 
     const combineAndCallback = () => {
         const allWorkspacesMap = new Map();
@@ -46,6 +52,8 @@ export const getWorkspacesStream = (userId: string, callback: (data: any[]) => v
             ...doc.data()
         }));
         combineAndCallback();
+    }, (error) => {
+        console.error("Error fetching owned workspaces:", error);
     });
 
     // Query for workspaces where the user is a member
@@ -56,6 +64,8 @@ export const getWorkspacesStream = (userId: string, callback: (data: any[]) => v
             ...doc.data()
         }));
         combineAndCallback();
+    }, (error) => {
+        console.error("Error fetching member workspaces:", error);
     });
     
     // Return a function that unsubscribes from both listeners
@@ -76,5 +86,10 @@ export const getItemsStream = (workspaceId: string, callback: (data: any[]) => v
             ...doc.data()
         }));
         callback(items);
+    }, (error) => {
+        console.error(`Error fetching items for workspace ${workspaceId}:`, error);
+        callback([]);
     });
 };
+
+    

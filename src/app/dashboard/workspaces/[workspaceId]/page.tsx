@@ -388,7 +388,7 @@ const WorkspaceDetailPage = () => {
                                         <p className="text-sm text-muted-foreground">{member.email}</p>
                                     </div>
                                 </div>
-                                {user?.uid === workspace.ownerUid && (
+                                {user?.uid === workspace.ownerUid && member.id !== user.uid && (
                                     <Button variant="ghost" size="icon" onClick={() => handleRemoveMember(member.id)}>
                                         <Trash2 className="h-4 w-4 text-red-500" />
                                     </Button>
@@ -457,3 +457,5 @@ const WorkspaceDetailPage = () => {
 };
 
 export default WorkspaceDetailPage;
+
+    
