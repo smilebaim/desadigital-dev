@@ -73,6 +73,54 @@
         "rt",
         "rw"
       ]
+    },
+    "Workspace": {
+      "title": "Workspace",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Nama dari workspace."
+        },
+        "description": {
+          "type": "string",
+          "description": "Deskripsi singkat dari workspace."
+        },
+        "ownerUid": {
+          "type": "string",
+          "description": "User ID dari pemilik workspace."
+        }
+      },
+      "required": [
+        "name",
+        "ownerUid"
+      ]
+    },
+    "WorkspaceItem": {
+      "title": "Workspace Item",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Judul dari item workspace."
+        },
+        "description": {
+          "type": "string",
+          "description": "Deskripsi atau catatan detail dari item."
+        },
+        "completed": {
+          "type": "boolean",
+          "description": "Status penyelesaian item."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Waktu item dibuat."
+        }
+      },
+      "required": [
+        "title"
+      ]
     }
   },
   "auth": {
@@ -85,7 +133,19 @@
       "schema": {
         "$ref": "#/entities/Penduduk"
       },
-      "description": "Stores information about each resident."
+      "description": "Menyimpan informasi tentang setiap penduduk."
+    },
+    "/workspaces/{workspaceId}": {
+      "schema": {
+        "$ref": "#/entities/Workspace"
+      },
+      "description": "Menyimpan metadata untuk setiap workspace."
+    },
+    "/workspaces/{workspaceId}/items/{itemId}": {
+      "schema": {
+        "$ref": "#/entities/WorkspaceItem"
+      },
+      "description": "Menyimpan item-item yang ada di dalam sebuah workspace."
     }
   }
 }

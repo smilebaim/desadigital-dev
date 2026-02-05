@@ -23,7 +23,7 @@ export const getWorkspacesStream = (userId: string, callback: (data: any[]) => v
         // Sort on the client to avoid needing a composite index
         workspaces.sort((a, b) => {
             if (a.createdAt && b.createdAt) {
-                return a.createdAt.seconds - b.createdAt.seconds;
+                return b.createdAt.seconds - a.createdAt.seconds;
             }
             // Handle cases where createdAt might be null
             if (a.createdAt) return -1;
@@ -38,7 +38,7 @@ export const getWorkspacesStream = (userId: string, callback: (data: any[]) => v
 // Get a stream of items for a workspace
 export const getItemsStream = (workspaceId: string, callback: (data: any[]) => void) => {
     const itemsCollectionRef = collection(db, 'workspaces', workspaceId, 'items');
-    const q = query(itemsCollectionRef); // You can add orderBy here if needed
+    const q = query(itemsCollectionRef, orderBy("createdAt", "desc")); // Sort by creation time, newest first
     
     return onSnapshot(q, (querySnapshot) => {
         const items = querySnapshot.docs.map(doc => ({

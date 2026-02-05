@@ -13,6 +13,14 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/components/ui/use-toast';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface Workspace {
   id: string;
@@ -23,8 +31,10 @@ interface Workspace {
 
 interface WorkspaceItem {
   id: string;
-  text: string;
+  title: string;
+  description: string;
   completed: boolean;
+  createdAt: any;
 }
 
 const WorkspaceDetailPage = () => {
@@ -34,7 +44,8 @@ const WorkspaceDetailPage = () => {
   const { toast } = useToast();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [items, setItems] = useState<WorkspaceItem[]>([]);
-  const [newItemText, setNewItemText] = useState('');
+  const [newItemTitle, setNewItemTitle] = useState('');
+  const [newItemDesc, setNewItemDesc] = useState('');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -78,12 +89,13 @@ const WorkspaceDetailPage = () => {
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newItemText.trim() || !workspaceId) return;
+    if (!newItemTitle.trim() || !workspaceId) return;
 
     setIsSubmitting(true);
-    const success = await addItem(workspaceId, { text: newItemText });
+    const success = await addItem(workspaceId, { title: newItemTitle, description: newItemDesc });
     if (success) {
-      setNewItemText('');
+      setNewItemTitle('');
+      setNewItemDesc('');
       toast({ title: 'Item berhasil ditambahkan.' });
     } else {
       toast({ title: 'Gagal menambahkan item.', variant: 'destructive' });
@@ -159,39 +171,69 @@ const WorkspaceDetailPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleAddItem} className="flex gap-2 mb-6">
-            <Input
-              value={newItemText}
-              onChange={(e) => setNewItemText(e.target.value)}
-              placeholder="Tambahkan item baru..."
-              disabled={isSubmitting}
-            />
-            <Button type="submit" disabled={isSubmitting || !newItemText.trim()}>
+          <form onSubmit={handleAddItem} className="space-y-4 mb-6 border-b pb-6">
+            <div className="space-y-2">
+                <Label htmlFor="item-title">Judul Item Baru</Label>
+                <Input
+                  id="item-title"
+                  value={newItemTitle}
+                  onChange={(e) => setNewItemTitle(e.target.value)}
+                  placeholder="Apa yang perlu dilakukan?"
+                  disabled={isSubmitting}
+                />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="item-desc">Deskripsi (Opsional)</Label>
+                <Textarea
+                  id="item-desc"
+                  value={newItemDesc}
+                  onChange={(e) => setNewItemDesc(e.target.value)}
+                  placeholder="Tambahkan detail lebih lanjut..."
+                  disabled={isSubmitting}
+                  rows={3}
+                />
+            </div>
+            <Button type="submit" disabled={isSubmitting || !newItemTitle.trim()} className="w-full md:w-auto">
               <Plus className="h-4 w-4 mr-2" />
-              {isSubmitting ? 'Menambahkan...' : 'Tambah'}
+              {isSubmitting ? 'Menambahkan...' : 'Tambah Item'}
             </Button>
           </form>
 
-          <div className="space-y-4">
+          <div className="space-y-2">
             {items.length > 0 ? (
-              items.map(item => (
-                <div key={item.id} className="flex items-center gap-4 p-3 bg-muted/50 rounded-md">
-                  <Checkbox
-                    id={`item-${item.id}`}
-                    checked={item.completed}
-                    onCheckedChange={(checked) => handleToggleItem(item.id, !!checked)}
-                  />
-                  <label
-                    htmlFor={`item-${item.id}`}
-                    className={`flex-grow text-sm ${item.completed ? 'line-through text-muted-foreground' : ''}`}
-                  >
-                    {item.text}
-                  </label>
-                  <Button variant="ghost" size="icon" onClick={() => handleDeleteItem(item.id)}>
-                    <Trash2 className="h-4 w-4 text-red-500" />
-                  </Button>
-                </div>
-              ))
+               <Accordion type="single" collapsible className="w-full space-y-2">
+                {items.map(item => (
+                  <AccordionItem value={item.id} key={item.id} className="border rounded-md bg-muted/50 data-[state=open]:bg-white">
+                    <AccordionTrigger className="p-4 hover:no-underline">
+                      <div className="flex items-center gap-4 flex-grow">
+                        <Checkbox
+                          id={`item-${item.id}`}
+                          checked={item.completed}
+                          onCheckedChange={(checked) => handleToggleItem(item.id, !!checked)}
+                          onClick={(e) => e.stopPropagation()} // Prevent accordion from toggling when clicking checkbox
+                        />
+                        <label
+                          htmlFor={`item-${item.id}`}
+                          className={`flex-grow text-left text-sm ${item.completed ? 'line-through text-muted-foreground' : ''}`}
+                        >
+                          {item.title}
+                        </label>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="p-4 pt-0">
+                      <div className="border-t pt-4 space-y-4">
+                          <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                              {item.description || "Tidak ada deskripsi."}
+                          </p>
+                          <Button variant="outline" size="sm" onClick={() => handleDeleteItem(item.id)}>
+                            <Trash2 className="h-4 w-4 mr-2 text-red-500" />
+                            Hapus Item
+                          </Button>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-4">
                 Belum ada item di workspace ini.

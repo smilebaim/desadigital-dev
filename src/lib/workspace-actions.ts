@@ -13,8 +13,10 @@ import {
 
 // Interface for a single workspace item
 export interface WorkspaceItemData {
-    text: string;
+    title: string;
+    description: string;
     completed?: boolean;
+    createdAt?: any;
 }
 
 // Interface for a workspace
@@ -91,12 +93,13 @@ export const deleteWorkspace = async (workspaceId: string) => {
 // --- Workspace Item Actions ---
 
 // Add an item to a workspace
-export const addItem = async (workspaceId: string, itemData: WorkspaceItemData) => {
+export const addItem = async (workspaceId: string, itemData: Omit<WorkspaceItemData, 'completed' | 'createdAt'>) => {
     try {
         const itemsCollectionRef = collection(db, 'workspaces', workspaceId, 'items');
         await addDoc(itemsCollectionRef, {
             ...itemData,
-            completed: false, // Default value
+            completed: false,
+            createdAt: serverTimestamp(),
         });
         return true;
     } catch (error) {
