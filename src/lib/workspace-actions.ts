@@ -8,7 +8,11 @@ import {
     doc, 
     serverTimestamp,
     getDoc,
-    getDocs
+    getDocs,
+    arrayUnion,
+    arrayRemove,
+    query,
+    where
 } from 'firebase/firestore';
 
 // Interface for a single workspace item
@@ -46,13 +50,33 @@ export const addWorkspace = async (workspaceData: Omit<WorkspaceData, 'members' 
     }
 };
 
-// Get a single workspace
+// Get a single workspace with its owner and members' profiles
 export const getWorkspace = async (workspaceId: string) => {
     try {
         const docRef = doc(db, 'workspaces', workspaceId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data() };
+            const workspaceData = docSnap.data();
+
+            // Fetch owner profile
+            const ownerDoc = await getDoc(doc(db, 'users', workspaceData.ownerUid));
+            const owner = ownerDoc.exists() 
+                ? { id: ownerDoc.id, ...ownerDoc.data() } 
+                : { id: workspaceData.ownerUid, displayName: 'Pemilik tidak dikenal', email: '' };
+            
+            // Fetch member profiles
+            const memberIds = workspaceData.members || [];
+            const memberPromises = memberIds.map(async (id: string) => {
+                const userDoc = await getDoc(doc(db, 'users', id));
+                if (userDoc.exists()) {
+                    return { id: userDoc.id, ...userDoc.data() };
+                }
+                return null; // Return null for unfound members
+            });
+            
+            const members = (await Promise.all(memberPromises)).filter(Boolean); // Filter out nulls
+
+            return { id: docSnap.id, ...workspaceData, owner, members };
         }
         return null;
     } catch (error) {
@@ -89,6 +113,43 @@ export const deleteWorkspace = async (workspaceId: string) => {
     } catch (error) {
         console.error("Error deleting workspace: ", error);
         return false;
+    }
+};
+
+// --- Workspace Member Actions ---
+export const addMemberToWorkspace = async (workspaceId: string, email: string) => {
+    try {
+        const usersRef = collection(db, 'users');
+        const q = query(usersRef, where("email", "==", email));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+            return { success: false, error: "Pengguna dengan email tersebut tidak ditemukan." };
+        }
+
+        const userDoc = querySnapshot.docs[0];
+        const userId = userDoc.id;
+
+        const workspaceRef = doc(db, 'workspaces', workspaceId);
+        await updateDoc(workspaceRef, {
+            members: arrayUnion(userId)
+        });
+
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+export const removeMemberFromWorkspace = async (workspaceId: string, memberId: string) => {
+    try {
+        const workspaceRef = doc(db, 'workspaces', workspaceId);
+        await updateDoc(workspaceRef, {
+            members: arrayRemove(memberId)
+        });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
     }
 };
 

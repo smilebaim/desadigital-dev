@@ -1,6 +1,14 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // --- User Profile Rules ---
+    match /users/{userId} {
+      // Any authenticated user can read profiles (to invite members)
+      allow read: if request.auth != null;
+      // Only the user themselves can create or update their own profile
+      allow write: if request.auth.uid == userId;
+    }
 
     // --- Workspace Rules (Owner & Members) ---
     match /workspaces/{workspaceId} {

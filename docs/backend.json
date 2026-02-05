@@ -74,6 +74,30 @@
         "rw"
       ]
     },
+    "UserProfile": {
+      "title": "User Profile",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Nama tampilan pengguna."
+        },
+        "email": {
+          "type": "string",
+          "description": "Alamat email pengguna.",
+          "format": "email"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "URL foto profil pengguna.",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "displayName",
+        "email"
+      ]
+    },
     "Workspace": {
       "title": "Workspace",
       "type": "object",
@@ -145,6 +169,12 @@
         "$ref": "#/entities/Penduduk"
       },
       "description": "Menyimpan informasi tentang setiap penduduk."
+    },
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Menyimpan profil publik pengguna aplikasi."
     },
     "/workspaces/{workspaceId}": {
       "schema": {

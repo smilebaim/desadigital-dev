@@ -1,8 +1,8 @@
 
 'use client';
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { getWorkspace, addItem, updateItem, deleteItem } from '@/lib/workspace-actions';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'next/navigation';
+import { getWorkspace, addItem, updateItem, deleteItem, addMemberToWorkspace, removeMemberFromWorkspace } from '@/lib/workspace-actions';
 import { getItemsStream } from '@/lib/workspace-client-actions';
 import { useUser } from '@/firebase';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -30,12 +30,22 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+
+
+interface UserProfile {
+  id: string;
+  displayName: string;
+  email: string;
+}
 
 interface Workspace {
   id: string;
   name: string;
   description: string;
   ownerUid: string;
+  owner: UserProfile;
+  members: UserProfile[];
 }
 
 interface WorkspaceItem {
@@ -49,49 +59,49 @@ interface WorkspaceItem {
 
 const WorkspaceDetailPage = () => {
   const params = useParams();
-  const router = useRouter();
   const { user } = useUser();
   const { toast } = useToast();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [items, setItems] = useState<WorkspaceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Form states
   const [newItemTitle, setNewItemTitle] = useState('');
   const [newItemDesc, setNewItemDesc] = useState('');
   const [newItemLabel, setNewItemLabel] = useState('');
-  const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
+  
   // Edit state
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [itemToEdit, setItemToEdit] = useState<WorkspaceItem | null>(null);
 
+  // Member management states
+  const [newMemberEmail, setNewMemberEmail] = useState('');
+  const [isInviting, setIsInviting] = useState(false);
+
   const workspaceId = Array.isArray(params.workspaceId) ? params.workspaceId[0] : params.workspaceId;
 
-  useEffect(() => {
-    const fetchWorkspace = async () => {
-      if (!workspaceId || !user) return;
+  const fetchWorkspace = useCallback(async () => {
+    if (!workspaceId || !user) return;
+    setLoading(true);
+    const data = await getWorkspace(workspaceId);
 
-      setLoading(true);
-      const data = await getWorkspace(workspaceId);
-
-      if (!data) {
-        setError("Workspace tidak ditemukan.");
-        setLoading(false);
-        return;
-      }
-      
-      if (data.ownerUid !== user.uid) {
-        setError("Anda tidak memiliki akses ke workspace ini.");
-        setLoading(false);
-        return;
-      }
-      
-      setWorkspace(data as Workspace);
+    if (!data) {
+      setError("Workspace tidak ditemukan atau Anda tidak memiliki akses.");
       setLoading(false);
-    };
-
-    fetchWorkspace();
+      return;
+    }
+    
+    setWorkspace(data as Workspace);
+    setLoading(false);
+    setError(null);
   }, [workspaceId, user]);
+
+
+  useEffect(() => {
+    fetchWorkspace();
+  }, [fetchWorkspace]);
 
   useEffect(() => {
     if (workspaceId) {
@@ -160,6 +170,33 @@ const WorkspaceDetailPage = () => {
     setIsSubmitting(false);
   };
 
+  const handleInviteMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMemberEmail.trim() || !workspaceId) return;
+
+    setIsInviting(true);
+    const result = await addMemberToWorkspace(workspaceId, newMemberEmail);
+
+    if (result.success) {
+        toast({ title: 'Anggota berhasil diundang.' });
+        setNewMemberEmail('');
+        await fetchWorkspace(); // Refresh data
+    } else {
+        toast({ title: 'Gagal mengundang anggota.', description: result.error, variant: 'destructive' });
+    }
+    setIsInviting(false);
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+      if (!workspaceId) return;
+      const result = await removeMemberFromWorkspace(workspaceId, memberId);
+      if (result.success) {
+          toast({ title: 'Anggota berhasil dihapus.' });
+          await fetchWorkspace(); // Refresh data
+      } else {
+          toast({ title: 'Gagal menghapus anggota.', variant: 'destructive' });
+      }
+  };
 
   if (loading) {
     return (
@@ -206,105 +243,163 @@ const WorkspaceDetailPage = () => {
             </Link>
           </Button>
         </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Daftar Item</CardTitle>
-            <CardDescription>
-              Kelola tugas, catatan, atau item lain yang terkait dengan workspace ini.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleAddItem} className="space-y-4 mb-6 border-b pb-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                 <div className="space-y-2 md:col-span-2">
-                      <Label htmlFor="item-title">Judul Item Baru</Label>
-                      <Input
-                        id="item-title"
-                        value={newItemTitle}
-                        onChange={(e) => setNewItemTitle(e.target.value)}
-                        placeholder="Apa yang perlu dilakukan?"
-                        disabled={isSubmitting}
-                      />
-                  </div>
-                   <div className="space-y-2">
-                      <Label htmlFor="item-label">Label (Opsional)</Label>
-                      <Input
-                        id="item-label"
-                        value={newItemLabel}
-                        onChange={(e) => setNewItemLabel(e.target.value)}
-                        placeholder="Contoh: Penting"
-                        disabled={isSubmitting}
-                      />
-                  </div>
-              </div>
-              <div className="space-y-2">
-                  <Label htmlFor="item-desc">Deskripsi (Opsional)</Label>
-                  <Textarea
-                    id="item-desc"
-                    value={newItemDesc}
-                    onChange={(e) => setNewItemDesc(e.target.value)}
-                    placeholder="Tambahkan detail lebih lanjut..."
-                    disabled={isSubmitting}
-                    rows={3}
-                  />
-              </div>
-              <Button type="submit" disabled={isSubmitting || !newItemTitle.trim()} className="w-full md:w-auto">
-                <Plus className="h-4 w-4 mr-2" />
-                {isSubmitting ? 'Menambahkan...' : 'Tambah Item'}
-              </Button>
-            </form>
 
-            <div className="space-y-2">
-              {items.length > 0 ? (
-                 <Accordion type="single" collapsible className="w-full space-y-2">
-                  {items.map(item => (
-                    <AccordionItem value={item.id} key={item.id} className="border rounded-md bg-muted/50 data-[state=open]:bg-white">
-                      <AccordionTrigger className="p-4 hover:no-underline">
-                        <div className="flex items-center gap-4 flex-grow">
-                          <Checkbox
-                            id={`item-${item.id}`}
-                            checked={item.completed}
-                            onCheckedChange={(checked) => handleToggleItem(item.id, !!checked)}
-                            onClick={(e) => e.stopPropagation()} // Prevent accordion from toggling when clicking checkbox
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Daftar Item</CardTitle>
+                <CardDescription>
+                  Kelola tugas, catatan, atau item lain yang terkait dengan workspace ini.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleAddItem} className="space-y-4 mb-6 border-b pb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2 md:col-span-2">
+                          <Label htmlFor="item-title">Judul Item Baru</Label>
+                          <Input
+                            id="item-title"
+                            value={newItemTitle}
+                            onChange={(e) => setNewItemTitle(e.target.value)}
+                            placeholder="Apa yang perlu dilakukan?"
+                            disabled={isSubmitting}
                           />
-                          <label
-                            htmlFor={`item-${item.id}`}
-                            className={`flex-grow text-left text-sm ${item.completed ? 'line-through text-muted-foreground' : ''}`}
-                          >
-                            {item.title}
-                          </label>
-                          {item.label && <Badge variant="secondary">{item.label}</Badge>}
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent className="p-4 pt-0">
-                        <div className="border-t pt-4 space-y-4">
-                            <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                                {item.description || "Tidak ada deskripsi."}
-                            </p>
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="sm" onClick={() => openEditDialog(item)}>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit
-                                </Button>
-                                <Button variant="outline" size="sm" onClick={() => handleDeleteItem(item.id)}>
-                                  <Trash2 className="h-4 w-4 mr-2 text-red-500" />
-                                  Hapus
-                                </Button>
+                      </div>
+                      <div className="space-y-2">
+                          <Label htmlFor="item-label">Label (Opsional)</Label>
+                          <Input
+                            id="item-label"
+                            value={newItemLabel}
+                            onChange={(e) => setNewItemLabel(e.target.value)}
+                            placeholder="Contoh: Penting"
+                            disabled={isSubmitting}
+                          />
+                      </div>
+                  </div>
+                  <div className="space-y-2">
+                      <Label htmlFor="item-desc">Deskripsi (Opsional)</Label>
+                      <Textarea
+                        id="item-desc"
+                        value={newItemDesc}
+                        onChange={(e) => setNewItemDesc(e.target.value)}
+                        placeholder="Tambahkan detail lebih lanjut..."
+                        disabled={isSubmitting}
+                        rows={3}
+                      />
+                  </div>
+                  <Button type="submit" disabled={isSubmitting || !newItemTitle.trim()} className="w-full md:w-auto">
+                    <Plus className="h-4 w-4 mr-2" />
+                    {isSubmitting ? 'Menambahkan...' : 'Tambah Item'}
+                  </Button>
+                </form>
+
+                <div className="space-y-2">
+                  {items.length > 0 ? (
+                    <Accordion type="single" collapsible className="w-full space-y-2">
+                      {items.map(item => (
+                        <AccordionItem value={item.id} key={item.id} className="border rounded-md bg-muted/50 data-[state=open]:bg-white">
+                          <AccordionTrigger className="p-4 hover:no-underline">
+                            <div className="flex items-center gap-4 flex-grow">
+                              <Checkbox
+                                id={`item-${item.id}`}
+                                checked={item.completed}
+                                onCheckedChange={(checked) => handleToggleItem(item.id, !!checked)}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <label
+                                htmlFor={`item-${item.id}`}
+                                className={`flex-grow text-left text-sm ${item.completed ? 'line-through text-muted-foreground' : ''}`}
+                              >
+                                {item.title}
+                              </label>
+                              {item.label && <Badge variant="secondary">{item.label}</Badge>}
                             </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="p-4 pt-0">
+                            <div className="border-t pt-4 space-y-4">
+                                <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                                    {item.description || "Tidak ada deskripsi."}
+                                </p>
+                                <div className="flex gap-2">
+                                    <Button variant="outline" size="sm" onClick={() => openEditDialog(item)}>
+                                        <Edit className="h-4 w-4 mr-2" />
+                                        Edit
+                                    </Button>
+                                    <Button variant="outline" size="sm" onClick={() => handleDeleteItem(item.id)}>
+                                      <Trash2 className="h-4 w-4 mr-2 text-red-500" />
+                                      Hapus
+                                    </Button>
+                                </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      ))}
+                    </Accordion>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Belum ada item di workspace ini.
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div>
+             <Card>
+                <CardHeader>
+                    <CardTitle>Anggota Workspace</CardTitle>
+                    <CardDescription>Undang dan kelola anggota untuk berkolaborasi.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    {user?.uid === workspace.ownerUid && (
+                      <form onSubmit={handleInviteMember} className="flex gap-2 mb-6">
+                          <Input 
+                              type="email" 
+                              placeholder="Email anggota baru"
+                              value={newMemberEmail}
+                              onChange={(e) => setNewMemberEmail(e.target.value)}
+                              disabled={isInviting}
+                          />
+                          <Button type="submit" disabled={isInviting || !newMemberEmail.trim()}>
+                              {isInviting ? 'Mengundang...' : 'Undang'}
+                          </Button>
+                      </form>
+                    )}
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <Avatar><AvatarFallback>{workspace.owner?.displayName?.charAt(0) || 'O'}</AvatarFallback></Avatar>
+                                <div>
+                                    <p className="font-medium">{workspace.owner?.displayName}</p>
+                                    <p className="text-sm text-muted-foreground">{workspace.owner?.email}</p>
+                                </div>
+                            </div>
+                            <Badge variant="secondary">Pemilik</Badge>
                         </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  Belum ada item di workspace ini.
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                        
+                        {workspace.members && workspace.members.map(member => (
+                            <div key={member.id} className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <Avatar><AvatarFallback>{member.displayName?.charAt(0) || '?'}</AvatarFallback></Avatar>
+                                    <div>
+                                        <p className="font-medium">{member.displayName}</p>
+                                        <p className="text-sm text-muted-foreground">{member.email}</p>
+                                    </div>
+                                </div>
+                                {user?.uid === workspace.ownerUid && (
+                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveMember(member.id)}>
+                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                    </Button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
