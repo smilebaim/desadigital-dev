@@ -8,31 +8,61 @@ import {
     orderBy
 } from 'firebase/firestore';
 
-// Get a stream of workspaces for a user
+// Get a stream of workspaces for a user, including those they own and are a member of.
 export const getWorkspacesStream = (userId: string, callback: (data: any[]) => void) => {
-    const q = query(
-        collection(db, "workspaces"),
-        where("ownerUid", "==", userId)
-    );
-    return onSnapshot(q, (querySnapshot) => {
-        const workspaces = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+    let ownedWorkspaces: any[] = [];
+    let memberWorkspaces: any[] = [];
 
-        // Sort on the client to avoid needing a composite index
-        workspaces.sort((a, b) => {
+    const combineAndCallback = () => {
+        const allWorkspacesMap = new Map();
+        
+        // Add owned and member workspaces to a map to avoid duplicates
+        [...ownedWorkspaces, ...memberWorkspaces].forEach(ws => {
+            if (!allWorkspacesMap.has(ws.id)) {
+                allWorkspacesMap.set(ws.id, ws);
+            }
+        });
+
+        const combined = Array.from(allWorkspacesMap.values());
+        
+        // Sort the combined list by creation date
+        combined.sort((a, b) => {
             if (a.createdAt && b.createdAt) {
                 return b.createdAt.seconds - a.createdAt.seconds;
             }
-            // Handle cases where createdAt might be null
             if (a.createdAt) return -1;
             if (b.createdAt) return 1;
             return 0;
         });
 
-        callback(workspaces);
+        callback(combined);
+    };
+
+    // Query for workspaces owned by the user
+    const q1 = query(collection(db, "workspaces"), where("ownerUid", "==", userId));
+    const unsub1 = onSnapshot(q1, (querySnapshot) => {
+        ownedWorkspaces = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        combineAndCallback();
     });
+
+    // Query for workspaces where the user is a member
+    const q2 = query(collection(db, "workspaces"), where("members", "array-contains", userId));
+    const unsub2 = onSnapshot(q2, (querySnapshot) => {
+        memberWorkspaces = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        combineAndCallback();
+    });
+    
+    // Return a function that unsubscribes from both listeners
+    return () => {
+        unsub1();
+        unsub2();
+    };
 };
 
 // Get a stream of items for a workspace
