@@ -108,6 +108,10 @@
           "type": "string",
           "description": "Deskripsi atau catatan detail dari item."
         },
+        "label": {
+          "type": "string",
+          "description": "Label atau kategori untuk item."
+        },
         "completed": {
           "type": "boolean",
           "description": "Status penyelesaian item."

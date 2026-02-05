@@ -15,6 +15,7 @@ import {
 export interface WorkspaceItemData {
     title: string;
     description: string;
+    label?: string;
     completed?: boolean;
     createdAt?: any;
 }

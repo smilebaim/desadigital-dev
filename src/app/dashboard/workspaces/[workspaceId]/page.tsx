@@ -21,6 +21,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from '@/components/ui/badge';
 
 interface Workspace {
   id: string;
@@ -33,6 +34,7 @@ interface WorkspaceItem {
   id: string;
   title: string;
   description: string;
+  label?: string;
   completed: boolean;
   createdAt: any;
 }
@@ -46,6 +48,7 @@ const WorkspaceDetailPage = () => {
   const [items, setItems] = useState<WorkspaceItem[]>([]);
   const [newItemTitle, setNewItemTitle] = useState('');
   const [newItemDesc, setNewItemDesc] = useState('');
+  const [newItemLabel, setNewItemLabel] = useState('');
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,10 +95,11 @@ const WorkspaceDetailPage = () => {
     if (!newItemTitle.trim() || !workspaceId) return;
 
     setIsSubmitting(true);
-    const success = await addItem(workspaceId, { title: newItemTitle, description: newItemDesc });
+    const success = await addItem(workspaceId, { title: newItemTitle, description: newItemDesc, label: newItemLabel });
     if (success) {
       setNewItemTitle('');
       setNewItemDesc('');
+      setNewItemLabel('');
       toast({ title: 'Item berhasil ditambahkan.' });
     } else {
       toast({ title: 'Gagal menambahkan item.', variant: 'destructive' });
@@ -172,15 +176,27 @@ const WorkspaceDetailPage = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleAddItem} className="space-y-4 mb-6 border-b pb-6">
-            <div className="space-y-2">
-                <Label htmlFor="item-title">Judul Item Baru</Label>
-                <Input
-                  id="item-title"
-                  value={newItemTitle}
-                  onChange={(e) => setNewItemTitle(e.target.value)}
-                  placeholder="Apa yang perlu dilakukan?"
-                  disabled={isSubmitting}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor="item-title">Judul Item Baru</Label>
+                    <Input
+                      id="item-title"
+                      value={newItemTitle}
+                      onChange={(e) => setNewItemTitle(e.target.value)}
+                      placeholder="Apa yang perlu dilakukan?"
+                      disabled={isSubmitting}
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="item-label">Label (Opsional)</Label>
+                    <Input
+                      id="item-label"
+                      value={newItemLabel}
+                      onChange={(e) => setNewItemLabel(e.target.value)}
+                      placeholder="Contoh: Penting"
+                      disabled={isSubmitting}
+                    />
+                </div>
             </div>
             <div className="space-y-2">
                 <Label htmlFor="item-desc">Deskripsi (Opsional)</Label>
@@ -218,6 +234,7 @@ const WorkspaceDetailPage = () => {
                         >
                           {item.title}
                         </label>
+                        {item.label && <Badge variant="secondary">{item.label}</Badge>}
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className="p-4 pt-0">
