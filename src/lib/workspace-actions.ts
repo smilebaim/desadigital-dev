@@ -109,11 +109,11 @@ export const addItem = async (workspaceId: string, itemData: Omit<WorkspaceItemD
     }
 };
 
-// Update an item's completion status
-export const updateItem = async (workspaceId: string, itemId: string, completed: boolean) => {
+// Update an item
+export const updateItem = async (workspaceId: string, itemId: string, data: Partial<WorkspaceItemData>) => {
     try {
         const itemDocRef = doc(db, 'workspaces', workspaceId, 'items', itemId);
-        await updateDoc(itemDocRef, { completed });
+        await updateDoc(itemDocRef, data);
         return true;
     } catch (error) {
         console.error("Error updating item: ", error);
