@@ -2,13 +2,14 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { getWorkspace, addItem, updateItem, deleteItem, addMemberToWorkspace, removeMemberFromWorkspace } from '@/lib/workspace-actions';
+import { getWorkspace, addItem, updateItem, deleteItem, addMemberToWorkspace, removeMemberFromWorkspace, addAttachmentMetadata } from '@/lib/workspace-actions';
 import { getItemsStream } from '@/lib/workspace-client-actions';
-import { useUser } from '@/firebase';
+import { useUser, useStorage } from '@/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import Breadcrumb from '@/components/Breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Plus, Trash2, Edit } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, File as FileIcon, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -31,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
 
 
 interface UserProfile {
@@ -48,6 +50,12 @@ interface Workspace {
   members: UserProfile[];
 }
 
+interface Attachment {
+  name: string;
+  url: string;
+  path: string;
+}
+
 interface WorkspaceItem {
   id: string;
   title: string;
@@ -55,11 +63,13 @@ interface WorkspaceItem {
   label?: string;
   completed: boolean;
   createdAt: any;
+  attachments?: Attachment[];
 }
 
 const WorkspaceDetailPage = () => {
   const params = useParams();
   const { user } = useUser();
+  const storage = useStorage();
   const { toast } = useToast();
   const [workspace, setWorkspace] = useState<Workspace | null>(null);
   const [items, setItems] = useState<WorkspaceItem[]>([]);
@@ -79,6 +89,10 @@ const WorkspaceDetailPage = () => {
   // Member management states
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [isInviting, setIsInviting] = useState(false);
+  
+  // Attachment states
+  const [uploadingFile, setUploadingFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
 
   const workspaceId = Array.isArray(params.workspaceId) ? params.workspaceId[0] : params.workspaceId;
 
@@ -111,6 +125,15 @@ const WorkspaceDetailPage = () => {
       return () => unsubscribe();
     }
   }, [workspaceId]);
+  
+  useEffect(() => {
+    if (isEditDialogOpen && itemToEdit) {
+      const currentItem = items.find(item => item.id === itemToEdit.id);
+      if(currentItem) {
+        setItemToEdit(currentItem);
+      }
+    }
+  }, [items, isEditDialogOpen, itemToEdit]);
 
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,7 +168,9 @@ const WorkspaceDetailPage = () => {
   };
   
   const openEditDialog = (item: WorkspaceItem) => {
-    setItemToEdit(item);
+    setItemToEdit(JSON.parse(JSON.stringify(item))); // Deep copy to avoid direct state mutation
+    setUploadingFile(null);
+    setUploadProgress(null);
     setIsEditDialogOpen(true);
   };
 
@@ -162,8 +187,7 @@ const WorkspaceDetailPage = () => {
 
     if (success) {
         toast({ title: 'Item berhasil diperbarui.' });
-        setIsEditDialogOpen(false);
-        setItemToEdit(null);
+        // Don't close dialog, user might want to upload files
     } else {
         toast({ title: 'Gagal memperbarui item.', variant: 'destructive' });
     }
@@ -197,6 +221,56 @@ const WorkspaceDetailPage = () => {
           toast({ title: 'Gagal menghapus anggota.', variant: 'destructive' });
       }
   };
+
+  const handleFileUpload = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (!uploadingFile || !itemToEdit || !storage) {
+        toast({ title: 'File atau item tidak dipilih.', variant: 'destructive' });
+        return;
+    }
+
+    setUploadProgress(0);
+
+    const storagePath = `workspaces/${workspaceId}/items/${itemToEdit.id}/${Date.now()}-${uploadingFile.name}`;
+    const storageRef = ref(storage, storagePath);
+    const uploadTask = uploadBytesResumable(storageRef, uploadingFile);
+
+    uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+        },
+        (error) => {
+            console.error("Upload failed:", error);
+            toast({ title: 'Gagal mengunggah file.', description: error.message, variant: 'destructive' });
+            setUploadProgress(null);
+            setUploadingFile(null);
+        },
+        async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            const attachmentData: Attachment = {
+                name: uploadingFile.name,
+                url: downloadURL,
+                path: storagePath,
+            };
+            
+            const result = await addAttachmentMetadata(workspaceId, itemToEdit.id, attachmentData);
+            
+            if (result.success) {
+                toast({ title: 'Lampiran berhasil ditambahkan.' });
+            } else {
+                toast({ title: 'Gagal menyimpan metadata lampiran.', variant: 'destructive' });
+            }
+
+            setUploadProgress(null);
+            const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+            if(fileInput) fileInput.value = '';
+            setUploadingFile(null);
+        }
+    );
+};
+
 
   if (loading) {
     return (
@@ -321,6 +395,21 @@ const WorkspaceDetailPage = () => {
                                 <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                                     {item.description || "Tidak ada deskripsi."}
                                 </p>
+                                {item.attachments && item.attachments.length > 0 && (
+                                    <div className="space-y-2">
+                                        <h4 className="text-xs font-semibold text-muted-foreground">Lampiran:</h4>
+                                        <ul className="space-y-1">
+                                            {item.attachments.map((att, index) => (
+                                                <li key={index}>
+                                                    <a href={att.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-primary hover:underline">
+                                                        <FileIcon className="h-4 w-4"/>
+                                                        {att.name}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                                 <div className="flex gap-2">
                                     <Button variant="outline" size="sm" onClick={() => openEditDialog(item)}>
                                         <Edit className="h-4 w-4 mr-2" />
@@ -403,16 +492,17 @@ const WorkspaceDetailPage = () => {
       </div>
 
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-[625px]">
             <DialogHeader>
                 <DialogTitle>Edit Item</DialogTitle>
                 <DialogDescription>
-                    Perbarui detail item di bawah ini.
+                    Perbarui detail item dan kelola lampiran.
                 </DialogDescription>
             </DialogHeader>
             {itemToEdit && (
-                <form onSubmit={handleUpdateItem}>
-                    <div className="space-y-4 py-4">
+                 <div className="max-h-[70vh] overflow-y-auto pr-4 -mr-6 space-y-6">
+                    {/* Form to update text fields */}
+                    <form id="edit-item-form" onSubmit={handleUpdateItem} className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="edit-item-title">Judul</Label>
                             <Input
@@ -441,15 +531,52 @@ const WorkspaceDetailPage = () => {
                                 rows={4}
                             />
                         </div>
+                    </form>
+
+                     {/* Attachments Section */}
+                    <div className="space-y-2">
+                        <Label>Lampiran</Label>
+                        {(itemToEdit.attachments?.length || 0) > 0 ? (
+                            <ul className="mt-2 space-y-2">
+                                {itemToEdit.attachments?.map((att, index) => (
+                                    <li key={index} className="flex items-center justify-between text-sm p-2 rounded-md bg-muted">
+                                        <a href={att.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:underline truncate">
+                                            <FileIcon className="h-4 w-4 flex-shrink-0" />
+                                            <span className="truncate">{att.name}</span>
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-sm text-muted-foreground mt-2">Belum ada lampiran.</p>
+                        )}
                     </div>
-                    <DialogFooter>
-                        <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Batal</Button>
-                        <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
-                        </Button>
-                    </DialogFooter>
-                </form>
+
+                    {/* Upload Section */}
+                    <div className="space-y-2">
+                        <Label htmlFor="file-upload">Unggah Lampiran Baru</Label>
+                        <div className="flex gap-2">
+                            <Input id="file-upload" type="file" onChange={(e) => setUploadingFile(e.target.files ? e.target.files[0] : null)} disabled={uploadProgress !== null} />
+                            <Button onClick={handleFileUpload} disabled={!uploadingFile || uploadProgress !== null}>
+                                <Upload className="h-4 w-4 mr-2" />
+                                Unggah
+                            </Button>
+                        </div>
+                        {uploadProgress !== null && (
+                            <div className="mt-2">
+                                <Progress value={uploadProgress} />
+                                <p className="text-xs text-muted-foreground mt-1">{uploadProgress.toFixed(0)}% selesai</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
             )}
+            <DialogFooter className="pt-6">
+                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Tutup</Button>
+                <Button type="submit" form="edit-item-form" disabled={isSubmitting}>
+                    {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </Button>
+            </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
@@ -457,5 +584,3 @@ const WorkspaceDetailPage = () => {
 };
 
 export default WorkspaceDetailPage;
-
-    

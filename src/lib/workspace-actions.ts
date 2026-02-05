@@ -1,3 +1,4 @@
+
 'use server';
 import { db } from '@/firebase/config';
 import { 
@@ -22,6 +23,7 @@ export interface WorkspaceItemData {
     label?: string;
     completed?: boolean;
     createdAt?: any;
+    attachments?: AttachmentData[];
 }
 
 // Interface for a workspace
@@ -31,6 +33,13 @@ export interface WorkspaceData {
   ownerUid: string;
   members: string[];
   createdAt?: any;
+}
+
+// Interface for an attachment
+export interface AttachmentData {
+  name: string;
+  url: string;
+  path: string;
 }
 
 // --- Workspace Actions ---
@@ -157,13 +166,14 @@ export const removeMemberFromWorkspace = async (workspaceId: string, memberId: s
 // --- Workspace Item Actions ---
 
 // Add an item to a workspace
-export const addItem = async (workspaceId: string, itemData: Omit<WorkspaceItemData, 'completed' | 'createdAt'>) => {
+export const addItem = async (workspaceId: string, itemData: Omit<WorkspaceItemData, 'completed' | 'createdAt' | 'attachments'>) => {
     try {
         const itemsCollectionRef = collection(db, 'workspaces', workspaceId, 'items');
         await addDoc(itemsCollectionRef, {
             ...itemData,
             completed: false,
             createdAt: serverTimestamp(),
+            attachments: []
         });
         return true;
     } catch (error) {
@@ -195,3 +205,18 @@ export const deleteItem = async (workspaceId: string, itemId: string) => {
         return false;
     }
 };
+
+
+// --- Workspace Item Attachment Actions ---
+export const addAttachmentMetadata = async (workspaceId: string, itemId: string, attachmentData: AttachmentData) => {
+    try {
+        const itemDocRef = doc(db, 'workspaces', workspaceId, 'items', itemId);
+        await updateDoc(itemDocRef, {
+            attachments: arrayUnion(attachmentData)
+        });
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error adding attachment metadata:", error);
+        return { success: false, error: error.message };
+    }
+}
