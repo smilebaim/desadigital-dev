@@ -1,6 +1,6 @@
 
 'use server';
-import { db } from '@/firebase/config';
+import { db, storage } from '@/firebase/config';
 import { 
     collection, 
     addDoc, 
@@ -15,6 +15,7 @@ import {
     query,
     where
 } from 'firebase/firestore';
+import { ref, deleteObject } from 'firebase/storage';
 
 // Interface for a single workspace item
 export interface WorkspaceItemData {
@@ -220,3 +221,24 @@ export const addAttachmentMetadata = async (workspaceId: string, itemId: string,
         return { success: false, error: error.message };
     }
 }
+
+export const removeAttachment = async (workspaceId: string, itemId: string, attachment: AttachmentData) => {
+    try {
+        // 1. Delete file from Firebase Storage
+        const storageRef = ref(storage, attachment.path);
+        await deleteObject(storageRef);
+
+        // 2. Remove metadata from Firestore
+        const itemDocRef = doc(db, 'workspaces', workspaceId, 'items', itemId);
+        await updateDoc(itemDocRef, {
+            attachments: arrayRemove(attachment)
+        });
+
+        return { success: true };
+    } catch (error: any) {
+        console.error("Error removing attachment:", error);
+        // If deleting from storage fails, we might not want to remove from firestore.
+        // For simplicity, we'll just report the error.
+        return { success: false, error: error.message };
+    }
+};

@@ -2,14 +2,14 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { getWorkspace, addItem, updateItem, deleteItem, addMemberToWorkspace, removeMemberFromWorkspace, addAttachmentMetadata } from '@/lib/workspace-actions';
+import { getWorkspace, addItem, updateItem, deleteItem, addMemberToWorkspace, removeMemberFromWorkspace, addAttachmentMetadata, removeAttachment } from '@/lib/workspace-actions';
 import { getItemsStream } from '@/lib/workspace-client-actions';
 import { useUser, useStorage } from '@/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import Breadcrumb from '@/components/Breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Plus, Trash2, Edit, File as FileIcon, Upload } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, File as FileIcon, Upload, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -93,6 +93,7 @@ const WorkspaceDetailPage = () => {
   // Attachment states
   const [uploadingFile, setUploadingFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [isDeletingAttachment, setIsDeletingAttachment] = useState<string | null>(null);
 
   const workspaceId = Array.isArray(params.workspaceId) ? params.workspaceId[0] : params.workspaceId;
 
@@ -269,6 +270,20 @@ const WorkspaceDetailPage = () => {
             setUploadingFile(null);
         }
     );
+};
+
+const handleRemoveAttachment = async (attachment: Attachment) => {
+    if (!workspaceId || !itemToEdit) return;
+
+    setIsDeletingAttachment(attachment.path);
+    const result = await removeAttachment(workspaceId, itemToEdit.id, attachment);
+
+    if (result.success) {
+        toast({ title: "Lampiran berhasil dihapus." });
+    } else {
+        toast({ title: "Gagal menghapus lampiran.", description: result.error, variant: 'destructive' });
+    }
+    setIsDeletingAttachment(null);
 };
 
 
@@ -544,6 +559,19 @@ const WorkspaceDetailPage = () => {
                                             <FileIcon className="h-4 w-4 flex-shrink-0" />
                                             <span className="truncate">{att.name}</span>
                                         </a>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-6 w-6"
+                                            onClick={() => handleRemoveAttachment(att)}
+                                            disabled={isDeletingAttachment === att.path}
+                                        >
+                                            {isDeletingAttachment === att.path ? (
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                            ) : (
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            )}
+                                        </Button>
                                     </li>
                                 ))}
                             </ul>

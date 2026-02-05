@@ -1,5 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 export const firebaseConfig = {
   "projectId": "desa-lengkap-15157263-d704f",
@@ -26,3 +27,4 @@ if (!getApps().length) {
 }
 
 export const db = getFirestore(app);
+export const storage = getStorage(app);
