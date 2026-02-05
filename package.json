@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "postinstall": "patch-package"
+    "lint": "next lint"
   },
   "dependencies": {
     "@genkit-ai/googleai": "1.14.1",
@@ -47,7 +46,6 @@
     "next": "^15.0.0-rc.0",
     "next-themes": "0.4.0",
     "papaparse": "^5.4.1",
-    "patch-package": "^8.0.0",
     "react": "^19.0.0-rc-f994737d14-20240522",
     "react-day-picker": "^9.0.5",
     "react-dom": "^19.0.0-rc-f994737d14-20240522",

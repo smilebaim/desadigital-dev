@@ -55,7 +55,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { parse } from 'papaparse';
 
 import { addPenduduk, updatePenduduk, deletePenduduk, addPendudukBatch, type PendudukData } from "@/lib/penduduk-actions";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
@@ -164,7 +163,7 @@ const PendudukPage = () => {
     setIsDeleteOpen(false);
   };
   
-  const handleImport = () => {
+  const handleImport = async () => {
     if (!importFile) {
         toast({ title: "Tidak ada file yang dipilih.", variant: "destructive" });
         return;
@@ -172,7 +171,9 @@ const PendudukPage = () => {
 
     setIsImporting(true);
 
-    parse(importFile, {
+    const Papa = await import('papaparse');
+
+    Papa.parse(importFile, {
         header: true,
         skipEmptyLines: true,
         complete: async (results) => {
@@ -195,7 +196,7 @@ const PendudukPage = () => {
             setIsImporting(false);
             setImportFile(null);
         },
-        error: (error) => {
+        error: (error: any) => {
             toast({ title: "Gagal memproses file CSV.", description: error.message, variant: "destructive" });
             setIsImporting(false);
         }
