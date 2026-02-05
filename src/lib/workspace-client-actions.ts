@@ -12,14 +12,25 @@ import {
 export const getWorkspacesStream = (userId: string, callback: (data: any[]) => void) => {
     const q = query(
         collection(db, "workspaces"),
-        where("ownerUid", "==", userId),
-        orderBy("createdAt", "asc")
+        where("ownerUid", "==", userId)
     );
     return onSnapshot(q, (querySnapshot) => {
         const workspaces = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
         }));
+
+        // Sort on the client to avoid needing a composite index
+        workspaces.sort((a, b) => {
+            if (a.createdAt && b.createdAt) {
+                return a.createdAt.seconds - b.createdAt.seconds;
+            }
+            // Handle cases where createdAt might be null
+            if (a.createdAt) return -1;
+            if (b.createdAt) return 1;
+            return 0;
+        });
+
         callback(workspaces);
     });
 };
