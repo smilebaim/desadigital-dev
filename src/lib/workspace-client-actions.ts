@@ -17,7 +17,6 @@ export const getWorkspacesStream = (userId: string, callback: (data: any[]) => v
 
     let ownedWorkspaces: any[] = [];
     let memberWorkspaces: any[] = [];
-    let combinedUnsub: (() => void) | null = null;
 
     const combineAndCallback = () => {
         const allWorkspacesMap = new Map();
