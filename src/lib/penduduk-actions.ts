@@ -6,7 +6,8 @@ import {
     updateDoc, 
     deleteDoc, 
     doc,
-    serverTimestamp
+    serverTimestamp,
+    writeBatch
 } from 'firebase/firestore';
 
 export interface PendudukData {
@@ -33,6 +34,23 @@ export const addPenduduk = async (data: Omit<PendudukData, 'createdAt'>) => {
             createdAt: serverTimestamp()
         });
         return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+export const addPendudukBatch = async (data: PendudukData[]) => {
+    const batch = writeBatch(db);
+    try {
+        data.forEach(penduduk => {
+            // Basic validation to ensure required fields are present
+            if (penduduk.nama && penduduk.nik) {
+                const docRef = doc(collection(db, 'penduduk'));
+                batch.set(docRef, { ...penduduk, createdAt: serverTimestamp() });
+            }
+        });
+        await batch.commit();
+        return { success: true, count: data.length };
     } catch (error: any) {
         return { success: false, error: error.message };
     }

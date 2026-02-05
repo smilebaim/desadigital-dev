@@ -20,6 +20,7 @@ import {
   Edit, 
   Trash2, 
   Download,
+  Upload,
   Save
 } from "lucide-react";
 import {
@@ -54,8 +55,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { parse } from 'papaparse';
 
-import { addPenduduk, updatePenduduk, deletePenduduk, type PendudukData } from "@/lib/penduduk-actions";
+import { addPenduduk, updatePenduduk, deletePenduduk, addPendudukBatch, type PendudukData } from "@/lib/penduduk-actions";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
 
 interface Penduduk extends PendudukData {
@@ -89,6 +91,11 @@ const PendudukPage = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<Penduduk | null>(null);
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+
+  // Import states
+  const [isImportOpen, setIsImportOpen] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
 
   const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm<PendudukFormValues>({
     resolver: zodResolver(pendudukSchema),
@@ -156,6 +163,44 @@ const PendudukPage = () => {
     }
     setIsDeleteOpen(false);
   };
+  
+  const handleImport = () => {
+    if (!importFile) {
+        toast({ title: "Tidak ada file yang dipilih.", variant: "destructive" });
+        return;
+    }
+
+    setIsImporting(true);
+
+    parse(importFile, {
+        header: true,
+        skipEmptyLines: true,
+        complete: async (results) => {
+            const dataToImport = results.data as PendudukData[];
+            
+            if (!dataToImport || dataToImport.length === 0) {
+                 toast({ title: "File CSV kosong atau format tidak valid.", variant: "destructive" });
+                 setIsImporting(false);
+                 return;
+            }
+            
+            const result = await addPendudukBatch(dataToImport);
+
+            if (result.success) {
+                toast({ title: `${result.count} data penduduk berhasil diimpor.` });
+                setIsImportOpen(false);
+            } else {
+                toast({ title: "Gagal mengimpor data.", description: result.error, variant: "destructive" });
+            }
+            setIsImporting(false);
+            setImportFile(null);
+        },
+        error: (error) => {
+            toast({ title: "Gagal memproses file CSV.", description: error.message, variant: "destructive" });
+            setIsImporting(false);
+        }
+    });
+  };
 
   const filteredData = data.filter(item => 
     item.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -172,6 +217,10 @@ const PendudukPage = () => {
             <p className="text-muted-foreground">Kelola semua data penduduk desa dari sini.</p>
           </div>
           <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setIsImportOpen(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Import Data
+            </Button>
             <Button variant="outline" size="sm" disabled>
               <Download className="h-4 w-4 mr-2" />
               Export Data
@@ -239,6 +288,34 @@ const PendudukPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={isImportOpen} onOpenChange={setIsImportOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import Data Penduduk</DialogTitle>
+            <DialogDescription>
+              Pilih file CSV untuk mengimpor data. Pastikan nama kolom di file CSV sesuai dengan format yang dibutuhkan: `nama`, `nik`, `kk`, `jenisKelamin`, `tempatLahir`, `tanggalLahir`, `agama`, `pendidikan`, `pekerjaan`, `statusPerkawinan`, `alamat`, `rt`, `rw`.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="import-file">File CSV</Label>
+              <Input 
+                id="import-file" 
+                type="file" 
+                accept=".csv" 
+                onChange={(e) => setImportFile(e.target.files ? e.target.files[0] : null)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsImportOpen(false)}>Batal</Button>
+            <Button onClick={handleImport} disabled={!importFile || isImporting}>
+              {isImporting ? 'Mengimpor...' : 'Import'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="sm:max-w-[625px]">
