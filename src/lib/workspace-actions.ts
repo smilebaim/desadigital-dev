@@ -25,16 +25,18 @@ export interface WorkspaceData {
   name: string;
   description: string;
   ownerUid: string;
+  members: string[];
   createdAt?: any;
 }
 
 // --- Workspace Actions ---
 
 // Add a new workspace
-export const addWorkspace = async (workspaceData: WorkspaceData) => {
+export const addWorkspace = async (workspaceData: Omit<WorkspaceData, 'members' | 'createdAt'>) => {
     try {
         await addDoc(collection(db, "workspaces"), {
             ...workspaceData,
+            members: [], // Initialize with an empty members array
             createdAt: serverTimestamp()
         });
         return true;

@@ -1,10 +1,77 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // WARNING: These rules are completely open and are not secure.
-    // They should only be used for initial development and testing.
+
+    // --- Workspace Rules (Owner & Members) ---
+    match /workspaces/{workspaceId} {
+      // Owner can do anything. Members can read/update, but not delete the workspace.
+      allow read, update: if request.auth.uid == resource.data.ownerUid || request.auth.uid in resource.data.members;
+      allow create: if request.auth.uid == request.resource.data.ownerUid;
+      allow delete: if request.auth.uid == resource.data.ownerUid;
+
+      // Rules for items within a workspace
+      match /items/{itemId} {
+        // Allow read/write to workspace owner and members
+        allow read, write: if get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.ownerUid == request.auth.uid || request.auth.uid in get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.members;
+      }
+    }
+
+    // --- Public Read, Admin Write Rules ---
+    match /posts/{postId} {
+      allow read: if resource.data.status == 'Published';
+      allow write: if request.auth.uid != null;
+    }
+
+    match /map_markers/{markerId} {
+      allow read: if true;
+      allow write: if request.auth.uid != null;
+    }
+    match /map_polygons/{polygonId} {
+      allow read: if true;
+      allow write: if request.auth.uid != null;
+    }
+    match /map_layer_categories/{categoryId} {
+      allow read: if true;
+      allow write: if request.auth.uid != null;
+    }
+    
+    match /site_settings/main {
+      allow read: if true;
+      allow write: if request.auth.uid != null;
+    }
+    match /profil_desa/main {
+      allow read: if true;
+      allow write: if request.auth.uid != null;
+    }
+    match /sejarah/main {
+      allow read: if true;
+      allow write: if request.auth.uid != null;
+    }
+    match /visi_misi/main {
+      allow read: if true;
+      allow write: if request.auth.uid != null;
+    }
+    
+    // --- Admin Write Only Rules ---
+    match /penduduk/{pendudukId} {
+      allow read, write: if request.auth.uid != null;
+    }
+    match /surat_usaha/{suratId} {
+       allow read, write: if request.auth.uid != null;
+    }
+    match /pemerintahan/{pemerintahanId} {
+       allow read, write: if request.auth.uid != null;
+    }
+    match /menus/{menuId} {
+      allow read, write: if request.auth.uid != null;
+      match /items/{itemId} {
+        allow read, write: if request.auth.uid != null;
+      }
+    }
+    
+    // Fallback for any other path - generally deny
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

@@ -89,6 +89,13 @@
         "ownerUid": {
           "type": "string",
           "description": "User ID dari pemilik workspace."
+        },
+        "members": {
+          "type": "array",
+          "description": "Array dari UID pengguna yang menjadi anggota workspace.",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": [
