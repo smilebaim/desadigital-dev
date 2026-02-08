@@ -1,5 +1,6 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { MapPin, Users, Building2, Leaf, Mountain, Waves } from "lucide-react";
 import type { ProfilDesaData } from "@/lib/profil-desa-actions";
 import { useEffect, useState } from "react";
@@ -111,7 +112,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
           {/* Section Umum */}
           <Card>
             <CardHeader className="flex flex-row items-center gap-4">
-              <Building2 className="h-8 w-8 text-emerald-600" />
+              <Building2 className="h-8 w-8 text-primary" />
               <div>
                 <CardTitle>Informasi Umum</CardTitle>
                 <p className="text-sm text-muted-foreground">
@@ -120,25 +121,25 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                 <div>
                   <h4 className="font-semibold mb-2">Identitas Desa</h4>
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Nama Desa</span>
-                      <span className="font-medium">{profilData.nama}</span>
+                      <span className="font-medium text-right">{profilData.nama}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Kecamatan</span>
-                      <span className="font-medium">{profilData.kecamatan}</span>
+                      <span className="font-medium text-right">{profilData.kecamatan}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Kabupaten</span>
-                      <span className="font-medium">{profilData.kabupaten}</span>
+                      <span className="font-medium text-right">{profilData.kabupaten}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Provinsi</span>
-                      <span className="font-medium">{profilData.provinsi}</span>
+                      <span className="font-medium text-right">{profilData.provinsi}</span>
                     </div>
                   </div>
                 </div>
@@ -147,19 +148,19 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Luas Wilayah</span>
-                      <span className="font-medium">{profilData.luas}</span>
+                      <span className="font-medium text-right">{profilData.luas}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Jumlah Penduduk</span>
-                      <span className="font-medium">{profilData.penduduk}</span>
+                      <span className="font-medium text-right">{profilData.penduduk}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Kepala Desa</span>
-                      <span className="font-medium">{profilData.kepalaDesa}</span>
+                      <span className="font-medium text-right">{profilData.kepalaDesa}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Periode</span>
-                      <span className="font-medium">{profilData.periode}</span>
+                      <span className="font-medium text-right">{profilData.periode}</span>
                     </div>
                   </div>
                 </div>
@@ -170,7 +171,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
           {/* Section Geografis */}
           <Card>
             <CardHeader className="flex flex-row items-center gap-4">
-              <MapPin className="h-8 w-8 text-emerald-600" />
+              <MapPin className="h-8 w-8 text-primary" />
               <div>
                 <CardTitle>{staticData.geografis.title}</CardTitle>
                 <p className="text-sm text-muted-foreground">
@@ -181,7 +182,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold mb-2">Batas Wilayah</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Utara</span>
                     <span className="font-medium">{staticData.geografis.data.batas.utara}</span>
@@ -200,6 +201,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
                   </div>
                 </div>
               </div>
+              <Separator />
               <div>
                 <h4 className="font-semibold mb-2">Topografi</h4>
                 <ul className="space-y-2">
@@ -211,6 +213,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
                   ))}
                 </ul>
               </div>
+              <Separator />
               <div>
                 <h4 className="font-semibold mb-2">Iklim</h4>
                 <ul className="space-y-2">
@@ -228,7 +231,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
           {/* Section Demografis */}
           <Card>
             <CardHeader className="flex flex-row items-center gap-4">
-              <Users className="h-8 w-8 text-emerald-600" />
+              <Users className="h-8 w-8 text-primary" />
               <div>
                 <CardTitle>{staticData.demografis.title}</CardTitle>
                 <p className="text-sm text-muted-foreground">
@@ -239,7 +242,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold mb-2">Jumlah Penduduk</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Total</span>
                     <span className="font-medium">{staticData.demografis.data.penduduk.total}</span>
@@ -258,9 +261,10 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
                   </div>
                 </div>
               </div>
+              <Separator />
               <div>
                 <h4 className="font-semibold mb-2">Tingkat Pendidikan</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">SD</span>
                     <span className="font-medium">{staticData.demografis.data.pendidikan.sd}</span>
@@ -279,9 +283,10 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
                   </div>
                 </div>
               </div>
+              <Separator />
               <div>
                 <h4 className="font-semibold mb-2">Mata Pencaharian</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Nelayan</span>
                     <span className="font-medium">{staticData.demografis.data.mata_pencaharian.nelayan}</span>
@@ -306,7 +311,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
           {/* Section Potensi */}
           <Card>
             <CardHeader className="flex flex-row items-center gap-4">
-              <Leaf className="h-8 w-8 text-emerald-600" />
+              <Leaf className="h-8 w-8 text-primary" />
               <div>
                 <CardTitle>{staticData.potensi.title}</CardTitle>
                 <p className="text-sm text-muted-foreground">
@@ -314,7 +319,7 @@ const ProfilDesa = ({ data }: { data: ProfilDesaData | null }) => {
                 </p>
               </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               <div>
                 <h4 className="font-semibold mb-2">Pertanian</h4>
                 <ul className="space-y-2">
