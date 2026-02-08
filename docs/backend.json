@@ -180,6 +180,37 @@
       "required": [
         "title"
       ]
+    },
+    "CustomPage": {
+      "title": "Custom Page",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the page."
+        },
+        "slug": {
+          "type": "string",
+          "description": "The URL-friendly slug for the page."
+        },
+        "content": {
+          "type": "string",
+          "description": "The main content of the page, can be Markdown or HTML."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "title",
+        "slug",
+        "content"
+      ]
     }
   },
   "auth": {
@@ -211,6 +242,12 @@
         "$ref": "#/entities/WorkspaceItem"
       },
       "description": "Menyimpan item-item yang ada di dalam sebuah workspace."
+    },
+    "/custom_pages/{pageId}": {
+      "schema": {
+        "$ref": "#/entities/CustomPage"
+      },
+      "description": "Stores content for user-created static pages."
     }
   }
 }
