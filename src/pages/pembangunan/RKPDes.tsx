@@ -1,9 +1,8 @@
 
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, Target, Clock, AlertTriangle } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
 
 const RKPDes = () => {
@@ -123,65 +122,62 @@ const RKPDes = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="program" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="program">Program Prioritas</TabsTrigger>
-            <TabsTrigger value="jadwal">Jadwal Pelaksanaan</TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+                <CardTitle>Program Prioritas</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {rkpdesData.prioritas.map((program, index) => (
+                  <Card key={index}>
+                      <CardHeader>
+                          <div className="flex justify-between items-start">
+                              <CardTitle>{program.nama}</CardTitle>
+                               <Badge className={`${getPriorityColor(program.prioritas)} text-white`}>{program.prioritas}</Badge>
+                          </div>
+                           <p className="text-sm text-muted-foreground">{program.bidang}</p>
+                      </CardHeader>
+                       <CardContent className="space-y-4">
+                           <div className="flex justify-between items-center text-sm">
+                              <span className="text-muted-foreground">Anggaran:</span>
+                              <span className="font-medium">{program.anggaran}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-sm">
+                              <span className="text-muted-foreground">Sumber Dana:</span>
+                              <span className="font-medium">{program.sumber}</span>
+                          </div>
+                          <div className="space-y-2">
+                              <div className="flex justify-between items-center text-sm">
+                                 <span className="text-muted-foreground">Status:</span>
+                                  <span className="font-medium">{program.status}</span>
+                              </div>
+                              <Progress value={program.progress} className="w-full" />
+                          </div>
+                       </CardContent>
+                  </Card>
+              ))}
+            </CardContent>
+          </Card>
           
-          <TabsContent value="program" className="space-y-4">
-            {rkpdesData.prioritas.map((program, index) => (
-                <Card key={index}>
-                    <CardHeader>
-                        <div className="flex justify-between items-start">
-                            <CardTitle>{program.nama}</CardTitle>
-                             <Badge className={`${getPriorityColor(program.prioritas)} text-white`}>{program.prioritas}</Badge>
-                        </div>
-                         <p className="text-sm text-muted-foreground">{program.bidang}</p>
-                    </CardHeader>
-                     <CardContent className="space-y-4">
-                         <div className="flex justify-between items-center text-sm">
-                            <span className="text-muted-foreground">Anggaran:</span>
-                            <span className="font-medium">{program.anggaran}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-sm">
-                            <span className="text-muted-foreground">Sumber Dana:</span>
-                            <span className="font-medium">{program.sumber}</span>
-                        </div>
-                        <div className="space-y-2">
-                            <div className="flex justify-between items-center text-sm">
-                               <span className="text-muted-foreground">Status:</span>
-                                <span className="font-medium">{program.status}</span>
-                            </div>
-                            <Progress value={program.progress} className="w-full" />
-                        </div>
-                     </CardContent>
-                </Card>
-            ))}
-          </TabsContent>
-          
-           <TabsContent value="jadwal" className="space-y-4">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Jadwal Pelaksanaan RKPDes {rkpdesData.tahun}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="relative pl-6">
-                        <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-                        {rkpdesData.jadwal.map((item, index) => (
-                             <div key={index} className="relative pb-8">
-                                <div className={`absolute -left-[29px] top-1.5 h-4 w-4 rounded-full ${getStatusColor(item.status)}`}></div>
-                                <p className="font-semibold">{item.kegiatan}</p>
-                                <p className="text-sm text-muted-foreground">{item.waktu}</p>
-                                <p className={`text-xs font-bold ${item.status === 'Selesai' ? 'text-green-600' : 'text-yellow-600'}`}>{item.status}</p>
-                            </div>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
-          </TabsContent>
-          
-        </Tabs>
+          <Card>
+              <CardHeader>
+                  <CardTitle>Jadwal Pelaksanaan RKPDes {rkpdesData.tahun}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                  <div className="relative pl-6">
+                      <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                      {rkpdesData.jadwal.map((item, index) => (
+                           <div key={index} className="relative pb-8">
+                              <div className={`absolute -left-[29px] top-1.5 h-4 w-4 rounded-full ${getStatusColor(item.status)}`}></div>
+                              <p className="font-semibold">{item.kegiatan}</p>
+                              <p className="text-sm text-muted-foreground">{item.waktu}</p>
+                              <p className={`text-xs font-bold ${item.status === 'Selesai' ? 'text-green-600' : 'text-yellow-600'}`}>{item.status}</p>
+                          </div>
+                      ))}
+                  </div>
+              </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

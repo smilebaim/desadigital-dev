@@ -1,8 +1,8 @@
+
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Target, Calendar, BarChart, Users, LineChart, Briefcase } from "lucide-react";
+import { FileText, Target, Calendar, Briefcase } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
-import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Treemap } from 'recharts';
 
 const RPJMDes = () => {
   const rpjmdesData = {
@@ -127,113 +127,98 @@ const RPJMDes = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="umum" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="umum">Informasi Umum</TabsTrigger>
-            <TabsTrigger value="visi_misi">Visi & Misi</TabsTrigger>
-            <TabsTrigger value="strategi">Strategi</TabsTrigger>
-            <TabsTrigger value="program">Program Prioritas</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="umum" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <FileText className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{rpjmdesData.umum.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    {rpjmdesData.umum.content.deskripsi}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {rpjmdesData.umum.content.data.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <span className="text-sm text-muted-foreground">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <FileText className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{rpjmdesData.umum.title}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  {rpjmdesData.umum.content.deskripsi}
+                </p>
+              </div>
+              <div className="space-y-2">
+                {rpjmdesData.umum.content.data.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-sm text-muted-foreground">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
           
-          <TabsContent value="visi_misi" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Target className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{rpjmdesData.visi_misi.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <h4 className="font-semibold mb-2">Visi</h4>
-                  <p className="text-muted-foreground italic">&quot;{rpjmdesData.visi_misi.content.visi}&quot;</p>
-                </div>
-                 <div>
-                  <h4 className="font-semibold mb-2">Misi</h4>
-                  <ul className="space-y-2">
-                    {rpjmdesData.visi_misi.content.misi.map((item, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <Target className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Target className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{rpjmdesData.visi_misi.title}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h4 className="font-semibold mb-2">Visi</h4>
+                <p className="text-muted-foreground italic">&quot;{rpjmdesData.visi_misi.content.visi}&quot;</p>
+              </div>
+               <div>
+                <h4 className="font-semibold mb-2">Misi</h4>
+                <ul className="space-y-2">
+                  {rpjmdesData.visi_misi.content.misi.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <Target className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                      <span className="text-muted-foreground">{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="strategi" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Calendar className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{rpjmdesData.strategi.title}</CardTitle>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Calendar className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{rpjmdesData.strategi.title}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {rpjmdesData.strategi.content.strategi.map((item, index) => (
+                <div key={index}>
+                  <h4 className="font-semibold">{item.nama}</h4>
+                  <p className="text-sm text-muted-foreground">{item.arah}</p>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {rpjmdesData.strategi.content.strategi.map((item, index) => (
-                  <div key={index}>
-                    <h4 className="font-semibold">{item.nama}</h4>
-                    <p className="text-sm text-muted-foreground">{item.arah}</p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              ))}
+            </CardContent>
+          </Card>
 
-          <TabsContent value="program" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Briefcase className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{rpjmdesData.program.title}</CardTitle>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Briefcase className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{rpjmdesData.program.title}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+               {rpjmdesData.program.content.kategori.map((kategori, index) => (
+                <div key={index}>
+                  <h4 className="font-semibold">{kategori.bidang}</h4>
+                   <ul className="space-y-2 mt-2">
+                      {kategori.program.map((program, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <Briefcase className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                          <span className="text-muted-foreground">{program}</span>
+                        </li>
+                      ))}
+                    </ul>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                 {rpjmdesData.program.content.kategori.map((kategori, index) => (
-                  <div key={index}>
-                    <h4 className="font-semibold">{kategori.bidang}</h4>
-                     <ul className="space-y-2 mt-2">
-                        {kategori.program.map((program, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <Briefcase className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                            <span className="text-muted-foreground">{program}</span>
-                          </li>
-                        ))}
-                      </ul>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

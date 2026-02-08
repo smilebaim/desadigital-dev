@@ -1,6 +1,7 @@
+
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Building2, LineChart, Users, Briefcase } from "lucide-react";
+import { FileText, Building2, LineChart, Briefcase } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
 
 const BUMDes = () => {
@@ -136,7 +137,7 @@ const BUMDes = () => {
     <div className="container mx-auto px-4 py-8 mt-16 mb-20">
       <Breadcrumb
         items={[
-          { title: "Layanan", path: "/layanan" },
+          { title: "Ekonomi", path: "/ekonomi" },
           { title: "BUMDes" }
         ]}
       />
@@ -148,141 +149,126 @@ const BUMDes = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="umum" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="umum">Informasi Umum</TabsTrigger>
-            <TabsTrigger value="unit">Unit Usaha</TabsTrigger>
-            <TabsTrigger value="kinerja">Kinerja</TabsTrigger>
-            <TabsTrigger value="pengelolaan">Pengelolaan</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="umum" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <FileText className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{bumdesData.umum.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Informasi dasar BUMDes
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-semibold mb-2">Deskripsi</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {bumdesData.umum.content.deskripsi}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {bumdesData.umum.content.data.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <span className="text-sm text-muted-foreground">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="unit" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Building2 className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{bumdesData.unit.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Unit-unit usaha BUMDes
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {bumdesData.unit.content.kategori.map((kategori, index) => (
-                  <div key={index} className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold">{kategori.nama}</h4>
-                      <ul className="space-y-2 mt-2">
-                        {kategori.unit.map((unit, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <Building2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                            <span className="text-muted-foreground">{unit}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <FileText className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{bumdesData.umum.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Informasi dasar BUMDes
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">Deskripsi</h4>
+                <p className="text-sm text-muted-foreground">
+                  {bumdesData.umum.content.deskripsi}
+                </p>
+              </div>
+              <div className="space-y-2">
+                {bumdesData.umum.content.data.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-sm text-muted-foreground">{item.value}</span>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="kinerja" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <LineChart className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{bumdesData.kinerja.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Kinerja keuangan BUMDes
-                  </p>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Building2 className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{bumdesData.unit.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Unit-unit usaha BUMDes
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {bumdesData.unit.content.kategori.map((kategori, index) => (
+                <div key={index} className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold">{kategori.nama}</h4>
+                    <ul className="space-y-2 mt-2">
+                      {kategori.unit.map((unit, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <Building2 className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                          <span className="text-muted-foreground">{unit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  {bumdesData.kinerja.content.tahun.map((tahun, index) => (
-                    <div key={index} className="space-y-2">
-                      <h4 className="font-semibold">{tahun.tahun}</h4>
-                      <div className="space-y-1">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">Pendapatan</span>
-                          <span className="text-sm text-muted-foreground">{tahun.pendapatan}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">Laba</span>
-                          <span className="text-sm text-muted-foreground">{tahun.laba}</span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm font-medium">SHU</span>
-                          <span className="text-sm text-muted-foreground">{tahun.shu}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+              ))}
+            </CardContent>
+          </Card>
 
-          <TabsContent value="pengelolaan" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Briefcase className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{bumdesData.pengelolaan.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Struktur pengelolaan BUMDes
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {bumdesData.pengelolaan.content.struktur.map((jabatan, index) => (
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <LineChart className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{bumdesData.kinerja.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Kinerja keuangan BUMDes
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                {bumdesData.kinerja.content.tahun.map((tahun, index) => (
                   <div key={index} className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-semibold">{jabatan.nama}</h4>
-                        <p className="text-sm text-muted-foreground">{jabatan.tugas}</p>
+                    <h4 className="font-semibold">{tahun.tahun}</h4>
+                    <div className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Pendapatan</span>
+                        <span className="text-sm text-muted-foreground">{tahun.pendapatan}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Laba</span>
+                        <span className="text-sm text-muted-foreground">{tahun.laba}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">SHU</span>
+                        <span className="text-sm text-muted-foreground">{tahun.shu}</span>
                       </div>
                     </div>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Briefcase className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{bumdesData.pengelolaan.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Struktur pengelolaan BUMDes
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {bumdesData.pengelolaan.content.struktur.map((jabatan, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h4 className="font-semibold">{jabatan.nama}</h4>
+                      <p className="text-sm text-muted-foreground">{jabatan.tugas}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
 };
 
-export default BUMDes; 
+export default BUMDes;

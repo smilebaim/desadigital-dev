@@ -1,6 +1,7 @@
+
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText, Map, Users, Building, Leaf, School, Heart } from "lucide-react";
+import { FileText, Map, Users, Building, Leaf } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
 
 const MonografiDesa = () => {
@@ -194,158 +195,140 @@ const MonografiDesa = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="umum" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="umum">Informasi Umum</TabsTrigger>
-            <TabsTrigger value="geografis">Geografis</TabsTrigger>
-            <TabsTrigger value="demografis">Demografis</TabsTrigger>
-            <TabsTrigger value="infrastruktur">Infrastruktur</TabsTrigger>
-            <TabsTrigger value="potensi">Potensi</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="umum" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <FileText className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{monografiData.umum.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Informasi dasar desa
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h4 className="font-semibold mb-2">Deskripsi</h4>
-                  <p className="text-sm text-muted-foreground">
-                    {monografiData.umum.content.deskripsi}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  {monografiData.umum.content.data.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <span className="text-sm text-muted-foreground">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="geografis" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Map className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{monografiData.geografis.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Kondisi geografis desa
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {monografiData.geografis.content.data.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <span className="text-sm text-muted-foreground">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="demografis" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Users className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{monografiData.demografis.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Data kependudukan desa
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  {monografiData.demografis.content.data.map((item, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm font-medium">{item.label}</span>
-                      <span className="text-sm text-muted-foreground">{item.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="infrastruktur" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Building className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{monografiData.infrastruktur.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Sarana dan prasarana desa
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {monografiData.infrastruktur.content.kategori.map((kategori, index) => (
-                  <div key={index} className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold">{kategori.nama}</h4>
-                      <ul className="space-y-2 mt-2">
-                        {kategori.fasilitas.map((fasilitas, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <Building className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                            <span className="text-muted-foreground">{fasilitas}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <FileText className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{monografiData.umum.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Informasi dasar desa
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <h4 className="font-semibold mb-2">Deskripsi</h4>
+                <p className="text-sm text-muted-foreground">
+                  {monografiData.umum.content.deskripsi}
+                </p>
+              </div>
+              <div className="space-y-2">
+                {monografiData.umum.content.data.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-sm text-muted-foreground">{item.value}</span>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
 
-          <TabsContent value="potensi" className="space-y-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Leaf className="h-8 w-8 text-primary" />
-                <div>
-                  <CardTitle>{monografiData.potensi.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground">
-                    Potensi dan sumber daya desa
-                  </p>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {monografiData.potensi.content.kategori.map((kategori, index) => (
-                  <div key={index} className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold">{kategori.nama}</h4>
-                      <ul className="space-y-2 mt-2">
-                        {kategori.potensi.map((potensi, idx) => (
-                          <li key={idx} className="flex items-start gap-2">
-                            <Leaf className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
-                            <span className="text-muted-foreground">{potensi}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Map className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{monografiData.geografis.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Kondisi geografis desa
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                {monografiData.geografis.content.data.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-sm text-muted-foreground">{item.value}</span>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Users className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{monografiData.demografis.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Data kependudukan desa
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                {monografiData.demografis.content.data.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center">
+                    <span className="text-sm font-medium">{item.label}</span>
+                    <span className="text-sm text-muted-foreground">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Building className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{monografiData.infrastruktur.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Sarana dan prasarana desa
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {monografiData.infrastruktur.content.kategori.map((kategori, index) => (
+                <div key={index} className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold">{kategori.nama}</h4>
+                    <ul className="space-y-2 mt-2">
+                      {kategori.fasilitas.map((fasilitas, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <Building className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                          <span className="text-muted-foreground">{fasilitas}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center gap-4">
+              <Leaf className="h-8 w-8 text-primary" />
+              <div>
+                <CardTitle>{monografiData.potensi.title}</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Potensi dan sumber daya desa
+                </p>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {monografiData.potensi.content.kategori.map((kategori, index) => (
+                <div key={index} className="space-y-4">
+                  <div>
+                    <h4 className="font-semibold">{kategori.nama}</h4>
+                    <ul className="space-y-2 mt-2">
+                      {kategori.potensi.map((potensi, idx) => (
+                        <li key={idx} className="flex items-start gap-2">
+                          <Leaf className="h-5 w-5 mt-0.5 text-primary flex-shrink-0" />
+                          <span className="text-muted-foreground">{potensi}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
 };
 
-export default MonografiDesa; 
+export default MonografiDesa;
