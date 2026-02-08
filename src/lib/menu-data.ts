@@ -1,4 +1,4 @@
-import type { StaticPage } from './static-pages';
+import type { CustomPageData } from './static-pages-actions';
 
 export interface MenuItem {
   id: string; // Will be the document ID from Firestore
@@ -19,4 +19,4 @@ export interface Menu {
   createdAt?: string; // Corrected to be a string
 }
 
-export { type StaticPage };
+export type StaticPage = CustomPageData & { id: string };

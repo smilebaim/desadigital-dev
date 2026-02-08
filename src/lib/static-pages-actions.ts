@@ -11,8 +11,9 @@ import {
     query,
     where,
     getDocs,
-    orderBy
+    writeBatch
 } from 'firebase/firestore';
+import { initialPages } from './initial-pages';
 
 export interface CustomPageData {
     title: string;
@@ -21,6 +22,40 @@ export interface CustomPageData {
     createdAt?: any;
     updatedAt?: any;
 }
+
+export const ensureInitialPages = async () => {
+    try {
+        const pagesCollection = collection(db, 'custom_pages');
+        const existingPagesSnap = await getDocs(pagesCollection);
+        const existingSlugs = new Set(existingPagesSnap.docs.map(doc => doc.data().slug));
+
+        const batch = writeBatch(db);
+        let pagesAdded = 0;
+
+        for (const page of initialPages) {
+            if (!existingSlugs.has(page.slug)) {
+                const newPageRef = doc(pagesCollection);
+                batch.set(newPageRef, {
+                    ...page,
+                    createdAt: serverTimestamp()
+                });
+                pagesAdded++;
+            }
+        }
+
+        if (pagesAdded > 0) {
+            await batch.commit();
+            console.log(`${pagesAdded} initial pages have been seeded.`);
+            return { success: true, count: pagesAdded };
+        }
+
+        return { success: true, count: 0, message: "All initial pages already exist." };
+    } catch (error: any) {
+        console.error("Error seeding initial pages:", error);
+        return { success: false, error: error.message };
+    }
+};
+
 
 export const addCustomPage = async (data: Omit<CustomPageData, 'createdAt' | 'updatedAt'>) => {
     const q = query(collection(db, "custom_pages"), where("slug", "==", data.slug));
@@ -68,8 +103,8 @@ export const getCustomPageBySlug = async (slug: string) => {
             return {
                 id: docSnap.id,
                 ...data,
-                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
-                updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null
+                createdAt: data.createdAt ? data.createdAt : null,
+                updatedAt: data.updatedAt ? data.updatedAt : null
             } as CustomPageData & { id: string };
         }
         return null;

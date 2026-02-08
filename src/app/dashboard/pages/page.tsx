@@ -17,9 +17,7 @@ import {
   Edit, 
   Trash2, 
   Eye,
-  Download,
-  Book,
-  File as FileIcon
+  Download
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -39,68 +37,56 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { staticPages, type StaticPage as BuiltInPage } from "@/lib/static-pages";
 import { getCustomPagesStream } from "@/lib/static-pages-client-actions";
-import { deleteCustomPage, type CustomPageData } from "@/lib/static-pages-actions";
+import { deleteCustomPage, ensureInitialPages, type CustomPageData } from "@/lib/static-pages-actions";
 import { useToast } from "@/components/ui/use-toast";
-import { Badge } from "@/components/ui/badge";
 
 interface CustomPage extends CustomPageData {
   id: string;
 }
 
-type CombinedPage = (BuiltInPage & { type: 'Bawaan' }) | (CustomPage & { type: 'Kustom' });
-
-
 const PagesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [customPages, setCustomPages] = useState<CustomPage[]>([]);
+  const [pages, setPages] = useState<CustomPage[]>([]);
   const [loading, setLoading] = useState(true);
   const [pageToDelete, setPageToDelete] = useState<CustomPage | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    setLoading(true);
-    const unsubscribe = getCustomPagesStream((data) => {
-      setCustomPages(data as CustomPage[]);
-      setLoading(false);
-    });
-    return () => unsubscribe();
+    const setupPages = async () => {
+        setLoading(true);
+        // Ensure initial pages exist, then set up the stream
+        await ensureInitialPages();
+        const unsubscribe = getCustomPagesStream((data) => {
+          setPages(data as CustomPage[]);
+          setLoading(false);
+        });
+        return unsubscribe;
+    };
+
+    const unsubscribePromise = setupPages();
+    
+    return () => {
+        unsubscribePromise.then(unsub => {
+            if (unsub) unsub();
+        });
+    };
   }, []);
 
-  const allPages: CombinedPage[] = useMemo(() => {
-    const builtIn: CombinedPage[] = staticPages.map(p => ({ ...p, type: 'Bawaan' }));
-    const custom: CombinedPage[] = customPages.map(p => ({ ...p, type: 'Kustom', path: `/p/${p.slug}` }));
-    return [...builtIn, ...custom].sort((a, b) => a.title.localeCompare(b.title));
-  }, [customPages]);
-
-  const filteredPages = allPages.filter(page => 
+  const filteredPages = pages.filter(page => 
     page.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    page.path.toLowerCase().includes(searchQuery.toLowerCase())
+    page.slug.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
-  const getEditPath = (page: CombinedPage) => {
-      if (page.type === 'Kustom') {
-          return `/dashboard/pages/edit/${page.id}`;
-      }
-      const pathMap: { [key: string]: string } = {
-          '/profil/profil-desa': '/dashboard/pages/profil-desa',
-          '/profil/sejarah-desa': '/dashboard/pages/sejarah-desa',
-          '/profil/visi-misi': '/dashboard/pages/visi-misi',
-          '/profil/struktur-pemerintah': '/dashboard/pages/struktur-pemerintah',
-      };
-      return pathMap[page.path] || null;
-  }
-
   const handleDelete = async () => {
       if (!pageToDelete) return;
       const result = await deleteCustomPage(pageToDelete.id);
       if (result.success) {
           toast({ title: "Halaman berhasil dihapus." });
       } else {
-          toast({ title: "Gagal menghapus halaman.", variant: "destructive" });
+          toast({ title: "Gagal menghapus halaman.", variant: "destructive", description: result.error });
       }
       setPageToDelete(null);
   }
@@ -112,7 +98,7 @@ const PagesPage = () => {
             <div>
             <h2 className="text-3xl font-bold tracking-tight">Kelola Halaman</h2>
             <p className="text-muted-foreground">
-                Edit dan buat halaman statis untuk situs Anda.
+                Edit, tambah, dan hapus halaman statis untuk situs Anda.
             </p>
             </div>
             <div className="flex gap-2">
@@ -135,7 +121,7 @@ const PagesPage = () => {
                 <div>
                 <CardTitle>Daftar Halaman</CardTitle>
                 <CardDescription>
-                    Total halaman: {allPages.length}
+                    Total halaman: {pages.length}
                 </CardDescription>
                 </div>
                 <div className="flex items-center gap-4">
@@ -156,38 +142,27 @@ const PagesPage = () => {
                 <TableHeader>
                 <TableRow>
                     <TableHead>Judul Halaman</TableHead>
-                    <TableHead>Path</TableHead>
-                    <TableHead>Tipe</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Path (Slug)</TableHead>
+                    <TableHead>Tanggal Dibuat</TableHead>
                     <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
                 </TableHeader>
                 <TableBody>
                 {loading ? (
                     <TableRow>
-                        <TableCell colSpan={5} className="text-center">Memuat data halaman...</TableCell>
+                        <TableCell colSpan={4} className="text-center">Memuat data halaman...</TableCell>
                     </TableRow>
                 ) : filteredPages.length > 0 ? (
-                    filteredPages.map((page) => {
-                    const editPath = getEditPath(page);
-                    return (
-                        <TableRow key={`${page.type}-${page.id}`}>
-                        <TableCell className="font-medium flex items-center gap-2">
-                          {page.type === 'Bawaan' ? <Book className="h-4 w-4 text-muted-foreground" /> : <FileIcon className="h-4 w-4 text-muted-foreground" />}
-                          {page.title}
-                        </TableCell>
+                    filteredPages.map((page) => (
+                        <TableRow key={page.id}>
+                        <TableCell className="font-medium">{page.title}</TableCell>
                         <TableCell>
-                            <Link href={page.path} className="text-blue-600 hover:underline" target="_blank">
-                            {page.path}
+                            <Link href={`/${page.slug}`} className="text-blue-600 hover:underline" target="_blank">
+                            /{page.slug}
                             </Link>
                         </TableCell>
                         <TableCell>
-                            <Badge variant={page.type === 'Bawaan' ? 'secondary' : 'outline'}>{page.type}</Badge>
-                        </TableCell>
-                        <TableCell>
-                            <span className={'px-2 py-1 rounded-full text-xs bg-green-100 text-green-800'}>
-                            Published
-                            </span>
+                            {page.createdAt ? new Date(page.createdAt.seconds * 1000).toLocaleDateString('id-ID') : 'N/A'}
                         </TableCell>
                         <TableCell className="text-right">
                             <DropdownMenu>
@@ -197,31 +172,22 @@ const PagesPage = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                                <DropdownMenuSeparator />
                                 <DropdownMenuItem asChild>
-                                <Link href={page.path} target="_blank">
+                                <Link href={`/${page.slug}`} target="_blank">
                                     <Eye className="h-4 w-4 mr-2" />
                                     Preview
                                 </Link>
                                 </DropdownMenuItem>
-                                <DropdownMenuItem asChild disabled={!editPath}>
-                                {editPath ? (
-                                    <Link href={editPath}>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Ubah Konten
+                                <DropdownMenuItem asChild>
+                                    <Link href={`/dashboard/pages/edit/${page.id}`}>
+                                        <Edit className="h-4 w-4 mr-2" />
+                                        Ubah Konten
                                     </Link>
-                                ) : (
-                                    <span>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Ubah Konten
-                                    </span>
-                                )}
                                 </DropdownMenuItem>
+                                <DropdownMenuSeparator />
                                 <DropdownMenuItem 
                                   className="text-red-600" 
-                                  disabled={page.type !== 'Kustom'}
-                                  onClick={() => page.type === 'Kustom' && setPageToDelete(page)}
+                                  onClick={() => setPageToDelete(page)}
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Hapus
@@ -230,11 +196,10 @@ const PagesPage = () => {
                             </DropdownMenu>
                         </TableCell>
                         </TableRow>
-                    );
-                    })
+                    ))
                 ) : (
                     <TableRow>
-                    <TableCell colSpan={5} className="text-center">Tidak ada halaman yang cocok.</TableCell>
+                    <TableCell colSpan={4} className="text-center">Tidak ada halaman yang cocok.</TableCell>
                     </TableRow>
                 )}
                 </TableBody>

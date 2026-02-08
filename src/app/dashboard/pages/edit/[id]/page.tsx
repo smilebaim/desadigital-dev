@@ -16,7 +16,7 @@ import { getCustomPage, updateCustomPage } from '@/lib/static-pages-actions';
 
 const pageSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi'),
-  slug: z.string().min(1, 'Slug wajib diisi').regex(/^[a-z0-9-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung (-)'),
+  slug: z.string().min(1, 'Slug wajib diisi').regex(/^[a-z0-9\/-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, tanda hubung (-), dan garis miring (/)'),
   content: z.string().min(1, 'Konten wajib diisi'),
 });
 
@@ -54,9 +54,8 @@ const EditCustomPage = () => {
     };
     
     const titleValue = watch('title');
-    useEffect(() => {
-        setValue('slug', generateSlug(titleValue));
-    }, [titleValue, setValue]);
+    // We don't auto-update the slug on edit to prevent breaking links unintentionally.
+    // The user must change it manually if they want to.
 
     const onSubmit = async (data: PageFormValues) => {
         const result = await updateCustomPage(pageId, data);
@@ -99,10 +98,10 @@ const EditCustomPage = () => {
                         <div className="space-y-2">
                             <Label htmlFor="slug">Slug (URL)</Label>
                             <Controller name="slug" control={control} render={({ field }) => (
-                                <Input id="slug" {...field} placeholder="slug-url-halaman" />
+                                <Input id="slug" {...field} placeholder="contoh/slug-url-halaman" />
                             )} />
                             {errors.slug && <p className="text-xs text-red-500">{errors.slug.message}</p>}
-                            <p className="text-xs text-muted-foreground">Contoh: /p/{watch('slug')}</p>
+                            <p className="text-xs text-muted-foreground">URL akan menjadi: {window.location.origin}/{watch('slug')}</p>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="content">Isi Konten</Label>

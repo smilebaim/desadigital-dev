@@ -41,12 +41,13 @@ import {
 import { getMenuDetails, addMenuItem, updateMenuItem, deleteMenuItem, swapMenuItemOrder } from "@/lib/menu-actions";
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from 'next/navigation';
-import type { Menu, MenuItem, StaticPage } from '@/lib/menu-data';
+import type { Menu, MenuItem } from '@/lib/menu-data';
 import Breadcrumb from "@/components/Breadcrumb";
 import React from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { staticPages } from "@/lib/static-pages";
+import { getCustomPagesStream } from "@/lib/static-pages-client-actions";
+import { CustomPageData } from "@/lib/static-pages-actions";
 
 
 const MenuItemsPage = () => {
@@ -64,6 +65,7 @@ const MenuItemsPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formValues, setFormValues] = useState({ title: '', path: '', icon: '', parentId: '' });
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+  const [availablePages, setAvailablePages] = useState<(CustomPageData & {id: string})[]>([]);
 
   const fetchMenuDetails = useCallback(async () => {
     if (menuId) {
@@ -83,6 +85,11 @@ const MenuItemsPage = () => {
   useEffect(() => {
     fetchMenuDetails();
   }, [fetchMenuDetails]);
+
+  useEffect(() => {
+    const unsub = getCustomPagesStream(pages => setAvailablePages(pages));
+    return () => unsub();
+  }, []);
   
   const openAddForm = () => {
     setFormMode('add');
@@ -231,8 +238,8 @@ const MenuItemsPage = () => {
     "Watch", "Waves", "Webhook", "Wifi", "Wine", "Wrench", "Zap"
   ];
   
-  const groupedPages = staticPages.reduce<Record<string, StaticPage[]>>((acc, page) => {
-    const group = page.path.split('/')[1] || 'lainnya';
+  const groupedPages = availablePages.reduce<Record<string, any[]>>((acc, page) => {
+    const group = page.slug.split('/')[0] || 'lainnya';
     const groupTitle = group.charAt(0).toUpperCase() + group.slice(1);
     if (!acc[groupTitle]) {
         acc[groupTitle] = [];
@@ -392,7 +399,7 @@ const MenuItemsPage = () => {
                             <SelectGroup key={group}>
                                 <SelectLabel>{group}</SelectLabel>
                                 {pages.map(page => (
-                                    <SelectItem key={page.id} value={page.path}>{page.title} ({page.path})</SelectItem>
+                                    <SelectItem key={page.id} value={page.slug}>{page.title} ({page.slug})</SelectItem>
                                 ))}
                             </SelectGroup>
                         ))}
