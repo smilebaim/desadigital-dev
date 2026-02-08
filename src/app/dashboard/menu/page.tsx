@@ -1,4 +1,3 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,7 +19,10 @@ import {
   Trash2, 
   Eye,
   Download,
-  Save
+  Save,
+  ArrowUpToLine,
+  ArrowDownToLine,
+  PanelLeft
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -48,7 +50,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getMenus, addMenu, updateMenu, deleteMenu } from "@/lib/menu-actions";
+import { getMenusWithItems, addMenu, updateMenu, deleteMenu } from "@/lib/menu-actions";
 import type { Menu } from "@/lib/menu-data";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
@@ -81,7 +83,7 @@ const MenuPage = () => {
 
   const fetchMenus = useCallback(async () => {
     setLoading(true);
-    const data = await getMenus();
+    const data = await getMenusWithItems();
     setMenus(data);
     setLoading(false);
   }, []);
@@ -170,6 +172,29 @@ const MenuPage = () => {
     setMenuToDelete(null);
   };
 
+  const LocationDisplay = ({ location }: { location?: 'topnav' | 'bottomnav' | 'sidebar' | string }) => {
+    if (!location) return <span>N/A</span>;
+
+    const Icon = {
+        topnav: ArrowUpToLine,
+        bottomnav: ArrowDownToLine,
+        sidebar: PanelLeft
+    }[location as 'topnav' | 'bottomnav' | 'sidebar'];
+
+    const text = {
+        topnav: 'Navigasi Atas',
+        bottomnav: 'Navigasi Bawah',
+        sidebar: 'Sidebar'
+    }[location as 'topnav' | 'bottomnav' | 'sidebar'];
+
+    return (
+        <div className="flex items-center gap-2">
+            {Icon && <Icon className="h-4 w-4 text-muted-foreground" />}
+            <span>{text || 'N/A'}</span>
+        </div>
+    );
+  };
+
 
   return (
     <>
@@ -220,6 +245,7 @@ const MenuPage = () => {
                 <TableRow>
                   <TableHead>Nama Menu</TableHead>
                   <TableHead>Lokasi</TableHead>
+                  <TableHead>Jumlah Item</TableHead>
                   <TableHead>Deskripsi</TableHead>
                   <TableHead className="text-right">Aksi</TableHead>
                 </TableRow>
@@ -227,17 +253,18 @@ const MenuPage = () => {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center">Memuat data menu...</TableCell>
+                    <TableCell colSpan={5} className="text-center">Memuat data menu...</TableCell>
                   </TableRow>
                 ) : menus.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center">Belum ada menu, silakan tambahkan menu baru.</TableCell>
+                    <TableCell colSpan={5} className="text-center">Belum ada menu, silakan tambahkan menu baru.</TableCell>
                   </TableRow>
                 ) : (
                   menus.map((menu) => (
                     <TableRow key={menu.id}>
                       <TableCell className="font-medium">{menu.name}</TableCell>
-                      <TableCell className="capitalize">{menu.location || 'N/A'}</TableCell>
+                      <TableCell><LocationDisplay location={menu.location} /></TableCell>
+                      <TableCell>{menu.items?.length || 0}</TableCell>
                       <TableCell>{menu.description}</TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -275,7 +302,6 @@ const MenuPage = () => {
         </Card>
       </div>
 
-      {/* Add Menu Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -334,7 +360,6 @@ const MenuPage = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Edit Menu Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -389,7 +414,6 @@ const MenuPage = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -1,4 +1,3 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -203,7 +202,11 @@ const MenuItemsPage = () => {
     "Home", "Info", "Newspaper", "Map", "BookOpen", "Users", "Building2", "Scale",
     "HeartHandshake", "FileText", "Calendar", "Globe", "Briefcase", "LayoutGrid",
     "ListTodo", "Activity", "Target", "Compass", "Store", "FileSpreadsheet",
-    "ScrollText", "Palette", "MessageSquareWarning", "ArrowUp", "ArrowDown"
+    "ScrollText", "Palette", "MessageSquareWarning", "ArrowUp", "ArrowDown",
+    "LayoutDashboard", "GanttChartSquare", "BookUser", "Landmark", "Sprout", 
+    "Tent", "Warehouse", "Car", "Ship", "Plane", "Mountain", "Sun", "Moon", 
+    "Cloud", "Wind", "Wallet", "Banknote", "HandCoins", "GraduationCap", 
+    "HeartPulse", "Library", "School", "Hospital", "Factory", "Trees", "Wheat", "Fish"
   ];
 
   return (
