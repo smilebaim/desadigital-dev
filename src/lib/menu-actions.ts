@@ -43,6 +43,14 @@ export const updateMenu = async (menuId: string, data: Partial<Omit<Menu, 'id' |
 // Delete a menu and all its items
 export const deleteMenu = async (menuId: string) => {
     try {
+        const menuDocRef = doc(db, 'menus', menuId);
+        const menuDocSnap = await getDoc(menuDocRef);
+
+        // If the document doesn't exist, we can consider it a success
+        if (!menuDocSnap.exists()) {
+            return { success: true, message: "Menu tidak ditemukan, mungkin sudah dihapus." };
+        }
+
         const batch = writeBatch(db);
 
         // 1. Get all items in the subcollection
@@ -55,7 +63,6 @@ export const deleteMenu = async (menuId: string) => {
         });
 
         // 3. Add the delete operation for the menu document itself
-        const menuDocRef = doc(db, 'menus', menuId);
         batch.delete(menuDocRef);
 
         // 4. Commit the batch
