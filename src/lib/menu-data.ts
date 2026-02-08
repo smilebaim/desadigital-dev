@@ -1,3 +1,5 @@
+import type { StaticPage } from './static-pages';
+
 export interface MenuItem {
   id: string; // Will be the document ID from Firestore
   title: string;
@@ -16,3 +18,5 @@ export interface Menu {
   items?: MenuItem[]; // This will now be a subcollection
   createdAt?: string; // Corrected to be a string
 }
+
+export { type StaticPage };

@@ -41,11 +41,11 @@ import {
 import { getMenuDetails, addMenuItem, updateMenuItem, deleteMenuItem, swapMenuItemOrder } from "@/lib/menu-actions";
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from 'next/navigation';
-import type { Menu, MenuItem } from '@/lib/menu-data';
+import type { Menu, MenuItem, StaticPage } from '@/lib/menu-data';
 import Breadcrumb from "@/components/Breadcrumb";
 import React from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { staticPages } from "@/lib/static-pages";
 
 
@@ -206,8 +206,40 @@ const MenuItemsPage = () => {
     "LayoutDashboard", "GanttChartSquare", "BookUser", "Landmark", "Sprout", 
     "Tent", "Warehouse", "Car", "Ship", "Plane", "Mountain", "Sun", "Moon", 
     "Cloud", "Wind", "Wallet", "Banknote", "HandCoins", "GraduationCap", 
-    "HeartPulse", "Library", "School", "Hospital", "Factory", "Trees", "Wheat", "Fish"
+    "HeartPulse", "Library", "School", "Hospital", "Factory", "Trees", "Wheat", "Fish",
+    "Archive", "Camera", "CircleDollarSign", "ClipboardList", "Cog", "Database",
+    "Drama", "Droplets", "FerrisWheel", "FileCode", "FileImage", "FileJson",
+    "FileKey", "FileLock", "FilePlus", "FileQuestion", "FileSearch",
+    "FileSignature", "FileSliders", "FileType", "FileVideo", "FileWarning",
+    "Files", "Film", "Filter", "Flag", "Flame", "Flower", "Folder",
+    "Footprints", "Forklift", "FormInput", "Fuel", "GalleryThumbnails", "Gem",
+    "Gift", "Goal", "Hammer", "HardHat", "HelpCircle", "Image", "Inbox",
+    "Languages", "Laptop", "LayoutList", "Leaf", "LifeBuoy", "Lightbulb",
+    "Link", "ListChecks", "ListOrdered", "Lock", "Mail", "MapPin",
+    "Megaphone", "Menu", "Milestone", "Monitor", "MousePointer", "Music",
+    "Network", "Package", "Paperclip", "PartyPopper", "Pen", "Pencil",
+    "Percent", "PersonStanding", "Phone", "PictureInPicture", "PieChart",
+    "Pin", "Play", "Plug", "Podcast", "Printer", "Projector", "Puzzle",
+    "Recycle", "Rocket", "Rss", "Ruler", "Save", "Scaling", "Scan",
+    "Scissors", "ScreenShare", "Scroll", "Send", "Server", "Settings2",
+    "Share", "Sheet", "Shield", "ShoppingBag", "ShoppingCart", "Signal",
+    "Siren", "Sliders", "Smartphone", "Snowflake", "Sparkles", "Speaker",
+    "Star", "Sunrise", "Sunset", "Table", "Tablet", "Tag", "Thermometer",
+    "ThumbsUp", "ThumbsDown", "Timer", "Tractor", "Train", "Trash",
+    "Trophy", "Truck", "Tv", "Umbrella", "UserCheck", "UserPlus",
+    "UserCog", "Utensils", "Video", "Voicemail", "Volume", "Vote",
+    "Watch", "Waves", "Webhook", "Wifi", "Wine", "Wrench", "Zap"
   ];
+  
+  const groupedPages = staticPages.reduce<Record<string, StaticPage[]>>((acc, page) => {
+    const group = page.path.split('/')[1] || 'lainnya';
+    const groupTitle = group.charAt(0).toUpperCase() + group.slice(1);
+    if (!acc[groupTitle]) {
+        acc[groupTitle] = [];
+    }
+    acc[groupTitle].push(page);
+    return acc;
+  }, {});
 
   return (
     <>
@@ -356,8 +388,13 @@ const MenuItemsPage = () => {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="/">Halaman Utama (/)</SelectItem>
-                        {staticPages.map(page => (
-                            <SelectItem key={page.id} value={page.path}>{page.title} ({page.path})</SelectItem>
+                        {Object.entries(groupedPages).map(([group, pages]) => (
+                            <SelectGroup key={group}>
+                                <SelectLabel>{group}</SelectLabel>
+                                {pages.map(page => (
+                                    <SelectItem key={page.id} value={page.path}>{page.title} ({page.path})</SelectItem>
+                                ))}
+                            </SelectGroup>
                         ))}
                     </SelectContent>
                 </Select>
