@@ -1,3 +1,4 @@
+
 'use server';
 import { db } from '@/firebase/config';
 import { 
@@ -22,19 +23,6 @@ export const addMenu = async (menuData: Omit<Menu, 'id' | 'items' | 'createdAt'>
             ...menuData,
             createdAt: serverTimestamp()
         });
-        
-        // If it's a bottomnav, automatically add 'Tata Ruang'
-        if (menuData.location === 'bottomnav') {
-            const tataRuangItem: Omit<MenuItem, 'id'> = {
-                title: 'Tata Ruang',
-                path: '/tata-ruang',
-                icon: 'Map',
-                order: 0,
-                parentId: null
-            };
-            await addMenuItem(docRef.id, tataRuangItem);
-        }
-
         return { success: true, id: docRef.id };
     } catch (error: any) {
         return { success: false, error: error.message };
