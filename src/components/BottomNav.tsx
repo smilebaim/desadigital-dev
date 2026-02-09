@@ -43,16 +43,13 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
     if (!targetMenu?.items || targetMenu.items.length === 0) return null;
 
     const isRouteActive = targetMenu.items.some(item => {
-        const normalizedItemPath = item.path.startsWith('/') ? item.path.substring(1) : item.path;
-        const normalizedPathname = pathname.startsWith('/') ? pathname.substring(1) : pathname;
+        const normalizedItemPath = (item.path || '').startsWith('/') ? (item.path || '').substring(1) : (item.path || '');
+        const normalizedPathname = (pathname || '').startsWith('/') ? (pathname || '').substring(1) : (pathname || '');
+        
+        const itemRoot = normalizedItemPath.split('/')[0] || '';
+        const pathnameRoot = normalizedPathname.split('/')[0] || '';
 
-        const itemRoot = normalizedItemPath.split('/')[0];
-        const pathnameRoot = normalizedPathname.split('/')[0];
-
-        if (itemRoot && pathnameRoot) {
-            return itemRoot === pathnameRoot;
-        }
-        return false;
+        return itemRoot && pathnameRoot && itemRoot === pathnameRoot;
     });
 
     if (!isRouteActive) return null;
@@ -107,9 +104,6 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
     <>
       {allMenus?.filter(m => m.location === 'sidebar').map(m => <Sidebar key={m.id} menuId={m.id} />)}
 
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40">
-        <p className="text-xs sm:text-sm font-medium text-orange-500">©2024 spasial.net</p>
-      </div>
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-[600px] max-w-full rounded-full bg-white/40 border-t border-black/10 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 transition-all">
         <div className="flex justify-center items-center h-14 sm:h-16 rounded-full overflow-hidden">
           {loading ? (
@@ -194,5 +188,4 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
 };
 
 export default BottomNav;
-
     
