@@ -1,3 +1,4 @@
+
 'use client';
 import { usePathname } from 'next/navigation';
 import TopNav from '@/components/TopNav';
@@ -38,16 +39,19 @@ const PublicLayout = ({
   const topNavMenu = menus.find(m => m.location === 'topnav');
   const bottomNavMenu = menus.find(m => m.location === 'bottomnav');
   
-  // Check if any sidebar menu is active for the current path
   const sidebarMenuIsActive = menus.some(m => {
     if (m.location !== 'sidebar' || !m.items || m.items.length === 0) {
       return false;
     }
-    // A sidebar is considered active if the current path starts with the root of any of its items.
     return m.items.some(item => {
-        const itemRootPath = item.path.split('/')[1];
-        if (itemRootPath) {
-            return pathname.startsWith(`/${itemRootPath}`);
+        const normalizedItemPath = item.path.startsWith('/') ? item.path.substring(1) : item.path;
+        const normalizedPathname = pathname.startsWith('/') ? pathname.substring(1) : pathname;
+
+        const itemRoot = normalizedItemPath.split('/')[0];
+        const pathnameRoot = normalizedPathname.split('/')[0];
+
+        if (itemRoot && pathnameRoot) {
+            return itemRoot === pathnameRoot;
         }
         return false;
     });

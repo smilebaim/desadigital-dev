@@ -43,9 +43,14 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
     if (!targetMenu?.items || targetMenu.items.length === 0) return null;
 
     const isRouteActive = targetMenu.items.some(item => {
-        const itemRootPath = item.path.split('/')[1];
-        if (itemRootPath) {
-            return pathname.startsWith(`/${itemRootPath}`);
+        const normalizedItemPath = item.path.startsWith('/') ? item.path.substring(1) : item.path;
+        const normalizedPathname = pathname.startsWith('/') ? pathname.substring(1) : pathname;
+
+        const itemRoot = normalizedItemPath.split('/')[0];
+        const pathnameRoot = normalizedPathname.split('/')[0];
+
+        if (itemRoot && pathnameRoot) {
+            return itemRoot === pathnameRoot;
         }
         return false;
     });
