@@ -1,4 +1,3 @@
-
 'use server';
 import { db } from '@/firebase/config';
 import { 
@@ -212,15 +211,16 @@ export const deleteMenuItem = async (menuId: string, itemId: string) => {
     }
 };
 
-// Swap the order of two menu items
-export const swapMenuItemOrder = async (menuId: string, itemId1: string, order1: number, itemId2: string, order2: number) => {
+// Updates the order of a list of menu items
+export const updateMenuItemsOrder = async (menuId: string, items: { id: string, order: number }[]) => {
     try {
         const batch = writeBatch(db);
-        const item1Ref = doc(db, 'menus', menuId, 'items', itemId1);
-        const item2Ref = doc(db, 'menus', menuId, 'items', itemId2);
+        const itemsCollectionRef = collection(db, 'menus', menuId, 'items');
 
-        batch.update(item1Ref, { order: order2 });
-        batch.update(item2Ref, { order: order1 });
+        items.forEach(item => {
+            const itemRef = doc(itemsCollectionRef, item.id);
+            batch.update(itemRef, { order: item.order });
+        });
 
         await batch.commit();
         return { success: true };

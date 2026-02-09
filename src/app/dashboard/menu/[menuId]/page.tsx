@@ -39,7 +39,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { getMenuDetails, addMenuItem, updateMenuItem, deleteMenuItem, swapMenuItemOrder } from "@/lib/menu-actions";
+import { getMenuDetails, addMenuItem, updateMenuItem, deleteMenuItem, updateMenuItemsOrder } from "@/lib/menu-actions";
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from 'next/navigation';
 import type { Menu, MenuItem } from '@/lib/menu-data';
@@ -177,22 +177,27 @@ const MenuItemsPage = () => {
       : menuDetails?.items?.filter(i => !i.parentId).sort((a,b) => a.order - b.order) || [];
       
     const currentIndex = list.findIndex(i => i.id === item.id);
-    let otherItem: MenuItem | undefined;
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
 
-    if (direction === 'up' && currentIndex > 0) {
-      otherItem = list[currentIndex - 1];
-    } else if (direction === 'down' && currentIndex < list.length - 1) {
-      otherItem = list[currentIndex + 1];
+    if (newIndex < 0 || newIndex >= list.length) {
+      return; // Cannot move outside of bounds
     }
+    
+    const newList = [...list];
+    const [movedItem] = newList.splice(currentIndex, 1);
+    newList.splice(newIndex, 0, movedItem);
 
-    if (otherItem) {
-      const result = await swapMenuItemOrder(menuId, item.id, item.order, otherItem.id, otherItem.order);
-      if (result.success) {
-          toast({ title: "Urutan berhasil diubah." });
-          await fetchMenuDetails();
-      } else {
-          toast({ title: "Gagal mengubah urutan.", description: result.error, variant: "destructive" });
-      }
+    const itemsToUpdate = newList.map((listItem, index) => ({
+      id: listItem.id,
+      order: index,
+    }));
+
+    const result = await updateMenuItemsOrder(menuId, itemsToUpdate);
+    if (result.success) {
+        toast({ title: "Urutan berhasil diubah." });
+        await fetchMenuDetails();
+    } else {
+        toast({ title: "Gagal mengubah urutan.", description: result.error, variant: "destructive" });
     }
   };
 
