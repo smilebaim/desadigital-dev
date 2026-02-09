@@ -117,11 +117,6 @@ const DashboardLayout = ({
                   <span>Beranda</span>
                 </Link>
 
-                <Link href="/dashboard/statistik" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                  <BarChart3 size={18} className="text-emerald-100" />
-                  <span>Statistik</span>
-                </Link>
-
                 <Link href="/dashboard/penduduk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                   <Users size={18} className="text-emerald-100" />
                   <span>Data Penduduk</span>
@@ -153,6 +148,10 @@ const DashboardLayout = ({
                       </AccordionTrigger>
                       <AccordionContent>
                         <ul className="space-y-1 pl-4">
+                           <li><Link href="/dashboard/statistik" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <BarChart3 size={16} className="text-emerald-100" />
+                              <span>Statistik Desa</span>
+                           </Link></li>
                           <li><Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                             <ListTodo size={16} className="text-emerald-100" />
                             <span>Daftar Halaman</span>
