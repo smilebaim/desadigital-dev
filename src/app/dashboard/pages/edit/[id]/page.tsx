@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { getCustomPage, updateCustomPage } from '@/lib/static-pages-actions';
 
@@ -29,7 +29,7 @@ const EditCustomPage = () => {
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
 
-    const { control, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm<PageFormValues>({
+    const { control, handleSubmit, setValue, watch, reset, getValues, formState: { errors, isSubmitting } } = useForm<PageFormValues>({
         resolver: zodResolver(pageSchema)
     });
 
@@ -49,13 +49,7 @@ const EditCustomPage = () => {
         fetchPage();
     }, [pageId, reset, router, toast]);
     
-    const generateSlug = (str: string) => {
-        return str.toLowerCase().replace(/[^a-z0-9\s-]/g, '').trim().replace(/\s+/g, '-');
-    };
-    
     const titleValue = watch('title');
-    // We don't auto-update the slug on edit to prevent breaking links unintentionally.
-    // The user must change it manually if they want to.
 
     const onSubmit = async (data: PageFormValues) => {
         const result = await updateCustomPage(pageId, data);
@@ -67,6 +61,12 @@ const EditCustomPage = () => {
         }
     };
     
+    const handleInsertChart = () => {
+      const currentContent = getValues('content');
+      const placeholder = '\n\n[STATISTIK_PENDUDUK_CHART]\n\n';
+      setValue('content', currentContent + placeholder);
+    };
+
     if (isLoading) {
         return <div>Memuat data halaman...</div>
     }
@@ -110,7 +110,10 @@ const EditCustomPage = () => {
                             )} />
                             {errors.content && <p className="text-xs text-red-500">{errors.content.message}</p>}
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-between items-center">
+                            <Button type="button" variant="outline" onClick={handleInsertChart}>
+                                <BarChart3 className="h-4 w-4 mr-2" /> Sisipkan Grafik Penduduk
+                            </Button>
                             <Button type="submit" disabled={isSubmitting}>
                                 <Save className="h-4 w-4 mr-2" />{isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
                             </Button>

@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { addCustomPage } from '@/lib/static-pages-actions';
 
@@ -25,7 +25,7 @@ type PageFormValues = z.infer<typeof pageSchema>;
 const NewCustomPage = () => {
     const router = useRouter();
     const { toast } = useToast();
-    const { control, handleSubmit, setValue, watch, formState: { errors, isSubmitting } } = useForm<PageFormValues>({
+    const { control, handleSubmit, setValue, watch, getValues, formState: { errors, isSubmitting } } = useForm<PageFormValues>({
         resolver: zodResolver(pageSchema),
         defaultValues: { title: '', slug: '', content: '' }
     });
@@ -52,6 +52,12 @@ const NewCustomPage = () => {
         } else {
             toast({ title: "Gagal membuat halaman.", description: result.error, variant: 'destructive' });
         }
+    };
+
+    const handleInsertChart = () => {
+      const currentContent = getValues('content');
+      const placeholder = '\n\n[STATISTIK_PENDUDUK_CHART]\n\n';
+      setValue('content', currentContent + placeholder);
     };
 
     return (
@@ -84,7 +90,7 @@ const NewCustomPage = () => {
                                 <Input id="slug" {...field} placeholder="contoh/slug-url-halaman" />
                             )} />
                             {errors.slug && <p className="text-xs text-red-500">{errors.slug.message}</p>}
-                             <p className="text-xs text-muted-foreground">URL akan menjadi: {window.location.origin}/{watch('slug')}</p>
+                             <p className="text-xs text-muted-foreground">URL akan menjadi: {typeof window !== 'undefined' ? window.location.origin : ''}/{watch('slug')}</p>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="content">Isi Konten</Label>
@@ -93,7 +99,10 @@ const NewCustomPage = () => {
                             )} />
                             {errors.content && <p className="text-xs text-red-500">{errors.content.message}</p>}
                         </div>
-                        <div className="flex justify-end">
+                        <div className="flex justify-between items-center">
+                             <Button type="button" variant="outline" onClick={handleInsertChart}>
+                                <BarChart3 className="h-4 w-4 mr-2" /> Sisipkan Grafik Penduduk
+                            </Button>
                             <Button type="submit" disabled={isSubmitting}>
                                 <Save className="h-4 w-4 mr-2" />{isSubmitting ? "Menyimpan..." : "Simpan Halaman"}
                             </Button>
