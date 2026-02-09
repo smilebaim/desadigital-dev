@@ -10,6 +10,7 @@ import {
     updateDoc,
     deleteDoc,
     query,
+    where,
     orderBy,
     serverTimestamp,
     writeBatch
@@ -46,26 +47,20 @@ export const deleteMenu = async (menuId: string) => {
         const menuDocRef = doc(db, 'menus', menuId);
         const menuDocSnap = await getDoc(menuDocRef);
 
-        // If the document doesn't exist, we can consider it a success
         if (!menuDocSnap.exists()) {
             return { success: true, message: "Menu tidak ditemukan, mungkin sudah dihapus." };
         }
 
         const batch = writeBatch(db);
 
-        // 1. Get all items in the subcollection
         const itemsCollectionRef = collection(db, 'menus', menuId, 'items');
         const itemsSnapshot = await getDocs(itemsCollectionRef);
-
-        // 2. Add delete operations for each item to the batch
         itemsSnapshot.forEach(itemDoc => {
             batch.delete(itemDoc.ref);
         });
 
-        // 3. Add the delete operation for the menu document itself
         batch.delete(menuDocRef);
 
-        // 4. Commit the batch
         await batch.commit();
 
         return { success: true };
@@ -193,13 +188,26 @@ export const updateMenuItem = async (menuId: string, itemId: string, itemData: P
     }
 };
 
-// Delete a menu item
+// Delete a menu item and its children
 export const deleteMenuItem = async (menuId: string, itemId: string) => {
     try {
-        const itemDocRef = doc(db, 'menus', menuId, 'items', itemId);
-        await deleteDoc(itemDocRef);
+        const batch = writeBatch(db);
+        const itemsCollectionRef = collection(db, 'menus', menuId, 'items');
+        
+        const itemToDeleteRef = doc(itemsCollectionRef, itemId);
+        batch.delete(itemToDeleteRef);
+
+        const qChildren = query(itemsCollectionRef, where("parentId", "==", itemId));
+        const childrenSnapshot = await getDocs(qChildren);
+        childrenSnapshot.forEach(childDoc => {
+            batch.delete(childDoc.ref);
+        });
+
+        await batch.commit();
+        
         return { success: true };
     } catch (error: any) {
+        console.error("Error deleting menu item and its children:", error);
         return { success: false, error: error.message };
     }
 };

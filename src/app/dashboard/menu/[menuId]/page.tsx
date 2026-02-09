@@ -1,3 +1,4 @@
+
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -116,16 +117,22 @@ const MenuItemsPage = () => {
 
     setIsSubmitting(true);
     let result;
-    const parentItems = menuDetails?.items?.filter(item => !item.parentId) || [];
-    const subItems = formValues.parentId ? menuDetails?.items?.filter(i => i.parentId === formValues.parentId) || [] : [];
     
     if (formMode === 'add') {
+        const siblingItems = formValues.parentId 
+            ? menuDetails?.items?.filter(i => i.parentId === formValues.parentId) || []
+            : menuDetails?.items?.filter(item => !item.parentId) || [];
+        
+        const maxOrder = siblingItems.length > 0 
+            ? Math.max(...siblingItems.map(i => i.order)) 
+            : -1;
+
         const newItem: Omit<MenuItem, 'id'> = {
             title: formValues.title,
             path: formValues.path,
             icon: formValues.icon,
             parentId: formValues.parentId || null,
-            order: formValues.parentId ? subItems.length : parentItems.length,
+            order: maxOrder + 1,
         };
         result = await addMenuItem(menuId, newItem);
     } else if (selectedItem) {
