@@ -100,7 +100,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
         <p className="text-xs sm:text-sm font-medium text-orange-500">©2024 spasial.net</p>
       </div>
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] sm:w-[600px] max-w-full rounded-full bg-white/40 border-t border-black/10 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 transition-all">
-        <div className="flex justify-center items-center h-14 sm:h-16">
+        <div className="flex justify-center items-center h-14 sm:h-16 rounded-full overflow-hidden">
           {loading ? (
              <div className="flex items-center justify-center w-full h-full">
                 <Icons.Loader className="animate-spin" />
