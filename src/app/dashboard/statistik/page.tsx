@@ -3,8 +3,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BarChart3, Users, Building2, TrendingUp, TrendingDown, Wallet } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const StatistikPage = () => {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <div className="space-y-6">
       <div>
@@ -65,82 +72,84 @@ const StatistikPage = () => {
         </Card>
       </div>
 
-      <Tabs defaultValue="penduduk" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="penduduk">Penduduk</TabsTrigger>
-          <TabsTrigger value="ekonomi">Ekonomi</TabsTrigger>
-          <TabsTrigger value="sosial">Sosial</TabsTrigger>
-          <TabsTrigger value="pemerintahan">Pemerintahan</TabsTrigger>
-        </TabsList>
+      {isClient && (
+        <Tabs defaultValue="penduduk" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="penduduk">Penduduk</TabsTrigger>
+            <TabsTrigger value="ekonomi">Ekonomi</TabsTrigger>
+            <TabsTrigger value="sosial">Sosial</TabsTrigger>
+            <TabsTrigger value="pemerintahan">Pemerintahan</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="penduduk" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistik Penduduk</CardTitle>
-              <CardDescription>
-                Data demografi dan kependudukan Desa Remau Bakotuo
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center border rounded-lg">
-                <BarChart3 className="h-8 w-8 text-muted-foreground" />
-                <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="penduduk" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Statistik Penduduk</CardTitle>
+                <CardDescription>
+                  Data demografi dan kependudukan Desa Remau Bakotuo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px] flex items-center justify-center border rounded-lg">
+                  <BarChart3 className="h-8 w-8 text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="ekonomi" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistik Ekonomi</CardTitle>
-              <CardDescription>
-                Data perekonomian Desa Remau Bakotuo
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center border rounded-lg">
-                <TrendingUp className="h-8 w-8 text-muted-foreground" />
-                <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="ekonomi" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Statistik Ekonomi</CardTitle>
+                <CardDescription>
+                  Data perekonomian Desa Remau Bakotuo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px] flex items-center justify-center border rounded-lg">
+                  <TrendingUp className="h-8 w-8 text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="sosial" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistik Sosial</CardTitle>
-              <CardDescription>
-                Data sosial dan kesejahteraan masyarakat Desa Remau Bakotuo
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center border rounded-lg">
-                <Users className="h-8 w-8 text-muted-foreground" />
-                <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+          <TabsContent value="sosial" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Statistik Sosial</CardTitle>
+                <CardDescription>
+                  Data sosial dan kesejahteraan masyarakat Desa Remau Bakotuo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px] flex items-center justify-center border rounded-lg">
+                  <Users className="h-8 w-8 text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="pemerintahan" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Statistik Pemerintahan</CardTitle>
-              <CardDescription>
-                Data pemerintahan dan kelembagaan Desa Remau Bakotuo
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-[300px] flex items-center justify-center border rounded-lg">
-                <Building2 className="h-8 w-8 text-muted-foreground" />
-                <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="pemerintahan" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Statistik Pemerintahan</CardTitle>
+                <CardDescription>
+                  Data pemerintahan dan kelembagaan Desa Remau Bakotuo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px] flex items-center justify-center border rounded-lg">
+                  <Building2 className="h-8 w-8 text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 };
