@@ -41,7 +41,8 @@ import {
   Palette,
   Newspaper,
   LayoutGrid,
-  Briefcase
+  Briefcase,
+  BarChart3
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -114,6 +115,11 @@ const DashboardLayout = ({
                  <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                   <Home size={18} className="text-emerald-100" />
                   <span>Beranda</span>
+                </Link>
+
+                <Link href="/dashboard/statistik" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                  <BarChart3 size={18} className="text-emerald-100" />
+                  <span>Statistik</span>
                 </Link>
 
                 <Link href="/dashboard/penduduk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
