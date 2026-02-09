@@ -40,10 +40,16 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
 
   const Sidebar = ({ menuId }: { menuId: string }) => {
     const targetMenu = allMenus?.find(m => m.id === menuId);
-    if (!targetMenu?.items) return null;
-    
-    const rootPath = targetMenu.items[0]?.path.split('/')[1];
-    const isRouteActive = pathname.startsWith(`/${rootPath}`);
+    if (!targetMenu?.items || targetMenu.items.length === 0) return null;
+
+    const isRouteActive = targetMenu.items.some(item => {
+        const itemRootPath = item.path.split('/')[1];
+        if (itemRootPath) {
+            return pathname.startsWith(`/${itemRootPath}`);
+        }
+        return false;
+    });
+
     if (!isRouteActive) return null;
 
     const MenuIcon = getIcon(targetMenu.icon);
