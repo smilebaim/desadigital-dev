@@ -15,7 +15,7 @@ const StatistikPage = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Statistik Desa</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Daftar Statistik</h2>
         <p className="text-muted-foreground">
           Data statistik Desa Remau Bakotuo
         </p>
