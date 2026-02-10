@@ -22,7 +22,8 @@ import {
   Save,
   ArrowUpToLine,
   ArrowDownToLine,
-  PanelLeft
+  PanelLeft,
+  Sparkles
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -50,7 +51,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getMenusWithItems, addMenu, updateMenu, deleteMenu } from "@/lib/menu-actions";
+import { getMenusWithItems, addMenu, updateMenu, deleteMenu, seedDefaultMenus } from "@/lib/menu-actions";
 import type { Menu } from "@/lib/menu-data";
 import Link from "next/link";
 import { useEffect, useState, useCallback } from "react";
@@ -62,6 +63,7 @@ const MenuPage = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
 
   // State for Add Menu Dialog
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -91,6 +93,18 @@ const MenuPage = () => {
   useEffect(() => {
     fetchMenus();
   }, [fetchMenus]);
+
+  const handleSeedMenus = async () => {
+    setIsSeeding(true);
+    const result = await seedDefaultMenus();
+    if (result.success) {
+      toast({ title: "Berhasil!", description: result.message });
+      await fetchMenus();
+    } else {
+      toast({ title: "Gagal", description: result.error, variant: "destructive" });
+    }
+    setIsSeeding(false);
+  }
 
   const handleAddMenu = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,13 +221,15 @@ const MenuPage = () => {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" disabled>
-              <Download className="h-4 w-4 mr-2" />
-              Export Data
-            </Button>
+            {menus.length === 0 && (
+                <Button variant="outline" size="sm" onClick={handleSeedMenus} disabled={isSeeding}>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    {isSeeding ? 'Membuat...' : 'Buat Menu Default'}
+                </Button>
+            )}
             <Button size="sm" onClick={() => setIsAddDialogOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Tambah Menu
+              Tambah Menu Baru
             </Button>
           </div>
         </div>
@@ -257,7 +273,7 @@ const MenuPage = () => {
                   </TableRow>
                 ) : menus.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center">Belum ada menu, silakan tambahkan menu baru.</TableCell>
+                    <TableCell colSpan={5} className="text-center">Belum ada menu. Klik "Buat Menu Default" untuk memulai.</TableCell>
                   </TableRow>
                 ) : (
                   menus.map((menu) => (

@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Settings, BarChart3, Map } from "lucide-react";
+import { Users, FileText, Settings, BarChart3, Map, Mail } from "lucide-react";
 import Link from "next/link";
 import {
   LineChart,
@@ -13,6 +13,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
+import { useState, useEffect } from "react";
+import { getPendudukStream } from "@/lib/penduduk-client-actions";
+import { getPostsStream } from "@/lib/posts-client-actions";
+import { getSuratUsahaStream } from "@/lib/surat-usaha-client-actions";
 
 const data = [
   { name: "Jan", visitors: 400, pageViews: 2400 },
@@ -25,6 +29,26 @@ const data = [
 ];
 
 const DashboardHome = () => {
+  const [residentCount, setResidentCount] = useState(0);
+  const [postCount, setPostCount] = useState(0);
+  const [letterCount, setLetterCount] = useState(0);
+
+  useEffect(() => {
+    const unsubPenduduk = getPendudukStream((data) => setResidentCount(data.length));
+    const unsubPosts = getPostsStream((data) => setPostCount(data.length));
+    const unsubSurat = getSuratUsahaStream((data) => {
+      const pending = data.filter(s => s.status === 'Diproses').length;
+      setLetterCount(pending);
+    });
+
+    return () => {
+      unsubPenduduk();
+      unsubPosts();
+      unsubSurat();
+    };
+  }, []);
+
+
   return (
     <div className="space-y-6">
       <div>
@@ -38,28 +62,28 @@ const DashboardHome = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Pengunjung Hari Ini
+              Total Penduduk
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,250</div>
+            <div className="text-2xl font-bold">{residentCount}</div>
             <p className="text-xs text-muted-foreground">
-              +10% dari kemarin
+              Total penduduk terdaftar
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Berita
+              Total Berita & Info
             </CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">54</div>
+            <div className="text-2xl font-bold">{postCount}</div>
             <p className="text-xs text-muted-foreground">
-              +2 berita baru bulan ini
+              Total artikel dipublikasikan
             </p>
           </CardContent>
         </Card>
@@ -68,10 +92,10 @@ const DashboardHome = () => {
             <CardTitle className="text-sm font-medium">
               Permintaan Surat
             </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <Mail className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{letterCount}</div>
             <p className="text-xs text-muted-foreground">
               Menunggu persetujuan
             </p>
@@ -80,14 +104,14 @@ const DashboardHome = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Data Penduduk
+              Pengunjung Hari Ini
             </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2,500</div>
+            <div className="text-2xl font-bold">1,250</div>
             <p className="text-xs text-muted-foreground">
-              Total penduduk terdaftar
+              +10% dari kemarin
             </p>
           </CardContent>
         </Card>

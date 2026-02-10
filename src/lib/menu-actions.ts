@@ -15,6 +15,7 @@ import {
     writeBatch
 } from 'firebase/firestore';
 import type { Menu, MenuItem } from './menu-data';
+import { initialPages } from './initial-pages';
 
 // Add a new menu
 export const addMenu = async (menuData: Omit<Menu, 'id' | 'items' | 'createdAt'>) => {
@@ -73,7 +74,7 @@ export const deleteMenu = async (menuId: string) => {
 export const getMenusWithItems = async (): Promise<Menu[]> => {
   try {
     const menusCollectionRef = collection(db, 'menus');
-    const menuSnapshot = await getDocs(menusCollectionRef);
+    const menuSnapshot = await getDocs(query(menusCollectionRef, orderBy('createdAt')));
     
     const menus = await Promise.all(menuSnapshot.docs.map(async (menuDoc) => {
       const menuData = menuDoc.data();
@@ -225,6 +226,62 @@ export const updateMenuItemsOrder = async (menuId: string, items: { id: string, 
         await batch.commit();
         return { success: true };
     } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+// Seed default menus and items
+export const seedDefaultMenus = async () => {
+    const menusCollection = collection(db, 'menus');
+    const snapshot = await getDocs(menusCollection);
+    
+    if (!snapshot.empty) {
+        return { success: true, message: 'Menu sudah ada.' };
+    }
+    
+    const batch = writeBatch(db);
+
+    try {
+        // --- BOTTOM NAV ---
+        const bottomNavRef = doc(menusCollection);
+        batch.set(bottomNavRef, { name: 'Navigasi Bawah', description: 'Menu utama di bagian bawah layar.', location: 'bottomnav', createdAt: serverTimestamp() });
+        const bottomNavItems = [
+            { title: 'Beranda', path: '/', icon: 'Home', order: 0 },
+            { title: 'Profil', path: '/profil', icon: 'User', order: 1 },
+            { title: 'Layanan', path: '/layanan', icon: 'Briefcase', order: 2 },
+            { title: 'Peta', path: '/tata-ruang', icon: 'Map', order: 3 },
+            { title: 'Info', path: '/info', icon: 'Newspaper', order: 4 },
+        ];
+        bottomNavItems.forEach(item => {
+            const itemRef = doc(collection(db, bottomNavRef.path, 'items'));
+            batch.set(itemRef, item);
+        });
+
+        // --- TOP NAV (for sub-menus) ---
+        const topNavRef = doc(menusCollection);
+        batch.set(topNavRef, { name: 'Navigasi Atas', description: 'Menu utama di bagian atas layar.', location: 'topnav', createdAt: serverTimestamp() });
+        const topNavMenuStructure = [
+            { title: 'Pemerintahan', icon: 'Landmark', order: 0, children: initialPages.filter(p => p.slug.startsWith('profil/')) },
+            { title: 'Pembangunan', icon: 'Construction', order: 1, children: initialPages.filter(p => p.slug.startsWith('pembangunan/')) },
+            { title: 'Kelembagaan', icon: 'Library', order: 2, children: initialPages.filter(p => p.slug.startsWith('kelembagaan/')) },
+            { title: 'Ekonomi', icon: 'TrendingUp', order: 3, children: initialPages.filter(p => p.slug.startsWith('ekonomi/')) },
+            { title: 'Dana Desa', icon: 'Wallet', order: 4, children: initialPages.filter(p => p.slug.startsWith('dana-desa/')) },
+        ];
+
+        for (const parent of topNavMenuStructure) {
+            const parentItemRef = doc(collection(db, topNavRef.path, 'items'));
+            batch.set(parentItemRef, { title: parent.title, path: '#', icon: parent.icon, order: parent.order, parentId: null });
+            
+            parent.children.forEach((child, index) => {
+                const childItemRef = doc(collection(db, topNavRef.path, 'items'));
+                batch.set(childItemRef, { title: child.title, path: `/${child.slug}`, icon: 'FileText', order: index, parentId: parentItemRef.id });
+            });
+        }
+        
+        await batch.commit();
+        return { success: true, message: 'Menu default berhasil dibuat.' };
+    } catch (error: any) {
+        console.error("Error seeding default menus:", error);
         return { success: false, error: error.message };
     }
 };

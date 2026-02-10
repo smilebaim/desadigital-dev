@@ -9,172 +9,117 @@ export const initialPages: InitialPage[] = [
   { 
     title: "Profil Desa", 
     slug: "profil/profil-desa", 
-    content: "Konten awal untuk Profil Desa. Silakan edit di dasbor." 
+    content: "<h1>Profil Desa</h1><p>Halaman ini berisi informasi umum mengenai profil Desa Remau Bako Tuo. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
     title: "Sejarah Desa", 
     slug: "profil/sejarah-desa", 
-    content: "Konten awal untuk Sejarah Desa. Silakan edit di dasbor." 
+    content: "<h1>Sejarah Desa</h1><p>Halaman ini akan menceritakan sejarah terbentuknya Desa Remau Bako Tuo. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
     title: "Visi & Misi", 
     slug: "profil/visi-misi", 
-    content: "Konten awal untuk Visi & Misi. Silakan edit di dasbor." 
+    content: "<h1>Visi & Misi</h1><p>Berikut adalah visi dan misi Desa Remau Bako Tuo. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
     title: "Struktur Pemerintahan", 
-    slug: "profil/struktur-pemerintah", 
-    content: "Konten awal untuk Struktur Pemerintahan. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Arah Kebijakan", 
-    slug: "profil/arah-kebijakan", 
-    content: "Konten awal untuk Arah Kebijakan. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Perkembangan", 
-    slug: "profil/perkembangan", 
-    content: "Konten awal untuk Perkembangan Desa. Silakan edit di dasbor." 
+    slug: "profil/struktur-pemerintahan", 
+    content: "<h1>Struktur Pemerintahan</h1><p>Struktur organisasi dan perangkat pemerintahan desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   
   // Pembangunan
   { 
     title: "RPJMDes", 
     slug: "pembangunan/rpjmdes", 
-    content: "Konten awal untuk RPJMDes. Silakan edit di dasbor." 
+    content: "<h1>RPJMDes</h1><p>Informasi mengenai Rencana Pembangunan Jangka Menengah Desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
     title: "RKPDes", 
     slug: "pembangunan/rkpdes", 
-    content: "Konten awal untuk RKPDes. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Daftar Program", 
-    slug: "pembangunan/daftar-program", 
-    content: "Konten awal untuk Daftar Program. Silakan edit di dasbor." 
+    content: "<h1>RKPDes</h1><p>Informasi mengenai Rencana Kerja Pemerintah Desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
 
   // Layanan
   { 
-    title: "Persuratan", 
+    title: "Layanan Persuratan", 
     slug: "layanan/persuratan", 
-    content: "Konten awal untuk Persuratan. Silakan edit di dasbor." 
+    content: "<h1>Layanan Persuratan</h1><p>Informasi mengenai prosedur dan jenis surat yang dapat diurus di kantor desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
     title: "Penanganan Keluhan", 
     slug: "layanan/penanganan-keluhan", 
-    content: "Konten awal untuk Penanganan Keluhan. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Peraturan Desa", 
-    slug: "layanan/peraturan-desa", 
-    content: "Konten awal untuk Peraturan Desa. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Monografi Desa", 
-    slug: "layanan/monografi-desa", 
-    content: "Konten awal untuk Monografi Desa. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Posyandu", 
-    slug: "layanan/posyandu", 
-    content: "Konten awal untuk Posyandu. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Perlindungan Sosial", 
-    slug: "layanan/perlindungan-sosial", 
-    content: "Konten awal untuk Perlindungan Sosial. Silakan edit di dasbor." 
+    content: "<h1>Penanganan Keluhan</h1><p>Sistem dan prosedur untuk menyampaikan keluhan atau aspirasi. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   
   // Kelembagaan
   { 
     title: "PKK", 
     slug: "kelembagaan/pkk", 
-    content: "Konten awal untuk PKK. Silakan edit di dasbor." 
+    content: "<h1>PKK</h1><p>Informasi mengenai kegiatan dan struktur organisasi PKK Desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
-    title: "LKMD", 
-    slug: "kelembagaan/lkmd", 
-    content: "Konten awal untuk LKMD. Silakan edit di dasbor." 
+    title: "Lembaga Kemasyarakatan Desa (LKD)", 
+    slug: "kelembagaan/lkd", 
+    content: "<h1>LKD</h1><p>Daftar dan informasi mengenai Lembaga Kemasyarakatan Desa. Silakan edit konten ini melalui dasbor admin.</p>" 
+  },
+  { 
+    title: "Karang Taruna", 
+    slug: "kelembagaan/karang-taruna", 
+    content: "<h1>Karang Taruna</h1><p>Kegiatan dan informasi seputar Karang Taruna desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
 
   // Ekonomi
   { 
     title: "BUMDes", 
     slug: "ekonomi/bumdes", 
-    content: "Konten awal untuk BUMDes. Silakan edit di dasbor." 
+    content: "<h1>BUMDes</h1><p>Profil dan unit usaha Badan Usaha Milik Desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
-    title: "UMKM", 
+    title: "UMKM Desa", 
     slug: "ekonomi/umkm", 
-    content: "Konten awal untuk UMKM. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Koperasi", 
-    slug: "ekonomi/koperasi", 
-    content: "Konten awal untuk Koperasi. Silakan edit di dasbor." 
+    content: "<h1>UMKM Desa</h1><p>Daftar dan promosi produk-produk UMKM yang ada di desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
 
   // Dana Desa
   { 
-    title: "Pendapatan", 
+    title: "Laporan Pendapatan Desa", 
     slug: "dana-desa/pendapatan", 
-    content: "Konten awal untuk Pendapatan. Silakan edit di dasbor." 
+    content: "<h1>Pendapatan Desa</h1><p>Laporan Transparansi Pendapatan Desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
-    title: "Belanja", 
+    title: "Laporan Belanja Desa", 
     slug: "dana-desa/belanja", 
-    content: "Konten awal untuk Belanja. Silakan edit di dasbor." 
+    content: "<h1>Belanja Desa</h1><p>Laporan Transparansi Belanja Desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
-  { 
-    title: "Pembiayaan", 
-    slug: "dana-desa/pembiayaan", 
-    content: "Konten awal untuk Pembiayaan. Silakan edit di dasbor." 
-  },
-  
+
   // Aktivitas
   { 
-    title: "Agenda", 
+    title: "Agenda Kegiatan", 
     slug: "aktivitas/agenda", 
-    content: "Konten awal untuk Agenda. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Kalender Kegiatan", 
-    slug: "aktivitas/kalender-kegiatan", 
-    content: "Konten awal untuk Kalender Kegiatan. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Kalender Pangan", 
-    slug: "aktivitas/kalender-pangan", 
-    content: "Konten awal untuk Kalender Pangan. Silakan edit di dasbor." 
+    content: "<h1>Agenda Kegiatan Desa</h1><p>Jadwal dan agenda kegiatan yang akan datang di desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
 
   // Pustaka
   { 
-    title: "Pustaka Desa", 
+    title: "Pustaka Digital Desa", 
     slug: "pustaka/pustaka-desa", 
-    content: "Konten awal untuk Pustaka Desa. Silakan edit di dasbor." 
-  },
-  { 
-    title: "Publikasi", 
-    slug: "pustaka/publikasi", 
-    content: "Konten awal untuk Publikasi. Silakan edit di dasbor." 
+    content: "<h1>Pustaka Digital</h1><p>Arsip dan dokumen digital milik desa. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   
-  // Indeks
+  // Indeks Desa Membangun
   { 
     title: "Ketahanan Sosial", 
     slug: "indeks/ketahanan-sosial", 
-    content: "Konten awal untuk Ketahanan Sosial. Silakan edit di dasbor." 
+    content: "<h1>Indeks Ketahanan Sosial</h1><p>Informasi mengenai skor dan komponen Indeks Ketahanan Sosial. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
     title: "Ketahanan Ekonomi", 
     slug: "indeks/ketahanan-ekonomi", 
-    content: "Konten awal untuk Ketahanan Ekonomi. Silakan edit di dasbor." 
+    content: "<h1>Indeks Ketahanan Ekonomi</h1><p>Informasi mengenai skor dan komponen Indeks Ketahanan Ekonomi. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
   { 
     title: "Ketahanan Lingkungan", 
     slug: "indeks/ketahanan-lingkungan", 
-    content: "Konten awal untuk Ketahanan Lingkungan. Silakan edit di dasbor." 
+    content: "<h1>Indeks Ketahanan Lingkungan</h1><p>Informasi mengenai skor dan komponen Indeks Ketahanan Lingkungan. Silakan edit konten ini melalui dasbor admin.</p>" 
   },
 ];

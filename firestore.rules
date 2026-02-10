@@ -2,10 +2,84 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // PERINGATAN: Aturan keamanan sangat longgar untuk pengembangan.
-    // Mengizinkan siapa saja untuk membaca dan menulis ke database.
-    match /{document=**} {
-      allow read, write: if true;
+
+    // Helper Functions
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // USERS: Profil pengguna hanya bisa diubah oleh pemiliknya sendiri.
+    // Siapa pun yang sudah login bisa membaca profil pengguna lain.
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId);
+    }
+    
+    // PENDUDUK: Hanya pengguna yang sudah login (admin) yang bisa mengelola data penduduk.
+    match /penduduk/{pendudukId} {
+      allow read, write: if isSignedIn();
+    }
+    
+    // WORKSPACES: Pengguna bisa membuat workspace. Pemilik bisa mengedit/menghapus. Anggota bisa membaca.
+    match /workspaces/{workspaceId} {
+      allow read: if isSignedIn() && (resource.data.ownerUid == request.auth.uid || request.auth.uid in resource.data.members);
+      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.ownerUid == request.auth.uid;
+      
+      // WORKSPACE ITEMS: Anggota workspace bisa mengelola item di dalamnya.
+      match /items/{itemId} {
+        allow read, write: if isSignedIn() && (get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.ownerUid == request.auth.uid || request.auth.uid in get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.members);
+      }
+    }
+
+    // POSTS: Siapa pun bisa membaca artikel yang sudah 'Published'. Hanya admin yang bisa mengelola.
+    match /posts/{postId} {
+      allow read: if resource.data.status == 'Published' || (isSignedIn() && resource.data.userId == request.auth.uid);
+      allow create, update, delete: if isSignedIn();
+    }
+    
+    // CUSTOM PAGES: Siapa pun bisa membaca halaman kustom. Hanya admin yang bisa mengelola.
+    match /custom_pages/{pageId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    
+    // SURAT USAHA: Hanya admin yang bisa mengelola surat.
+    match /surat_usaha/{suratId} {
+        allow read, write: if isSignedIn();
+    }
+    
+    // MAP DATA: Hanya admin yang bisa mengelola data peta.
+    match /map_markers/{markerId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    match /map_polygons/{polygonId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    match /map_layer_categories/{categoryId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // MENUS: Siapa pun bisa membaca. Hanya admin yang bisa mengelola.
+    match /menus/{menuId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+      match /items/{itemId} {
+        allow read: if true;
+        allow write: if isSignedIn();
+      }
+    }
+    
+    // SITE SETTINGS: Siapa pun bisa membaca. Hanya admin yang bisa mengelola.
+    match /site_settings/main {
+       allow read: if true;
+       allow write: if isSignedIn();
     }
   }
 }
