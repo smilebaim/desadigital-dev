@@ -1,155 +1,64 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, Users, Building2, TrendingUp, TrendingDown, Wallet } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Copy } from "lucide-react";
+import PopulationStatChart from "@/components/charts/PopulationStatChart";
+import { useToast } from "@/components/ui/use-toast";
+import { Label } from "@/components/ui/label";
 
 const StatistikPage = () => {
-  const [isClient, setIsClient] = useState(false);
+  const { toast } = useToast();
+  const placeholder = "[STATISTIK_PENDUDUK_CHART]";
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(placeholder).then(() => {
+      toast({
+        title: "Disalin!",
+        description: "Placeholder telah disalin ke clipboard.",
+      });
+    });
+  };
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Daftar Statistik</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Daftar Statistik & Visualisasi</h2>
         <p className="text-muted-foreground">
-          Data statistik Desa Remau Bakotuo
+          Gunakan placeholder di bawah ini untuk menyisipkan tabel dan diagram ke dalam halaman kustom Anda.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Jumlah Penduduk</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">2,500</div>
-            <p className="text-xs text-muted-foreground">
-              +2% dari bulan lalu
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Jumlah KK</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">750</div>
-            <p className="text-xs text-muted-foreground">
-              +5 KK dari bulan lalu
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Luas Wilayah</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1,250 Ha</div>
-            <p className="text-xs text-muted-foreground">
-              Terdiri dari 3 Dusun
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Anggaran Desa</CardTitle>
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Rp 3.5M</div>
-            <p className="text-xs text-muted-foreground">
-              Tahun Anggaran 2024
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {isClient && (
-        <Tabs defaultValue="penduduk" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="penduduk">Penduduk</TabsTrigger>
-            <TabsTrigger value="ekonomi">Ekonomi</TabsTrigger>
-            <TabsTrigger value="sosial">Sosial</TabsTrigger>
-            <TabsTrigger value="pemerintahan">Pemerintahan</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="penduduk" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Statistik Penduduk</CardTitle>
-                <CardDescription>
-                  Data demografi dan kependudukan Desa Remau Bakotuo
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center border rounded-lg">
-                  <BarChart3 className="h-8 w-8 text-muted-foreground" />
-                  <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
+      <Card>
+        <CardHeader>
+          <CardTitle>Piramida Penduduk</CardTitle>
+          <CardDescription>
+            Menampilkan diagram piramida penduduk berdasarkan kelompok usia dan jenis kelamin.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+            <div className="p-4 border rounded-lg bg-muted/50">
+                <h4 className="font-semibold mb-4 text-center">Preview</h4>
+                <div className="h-[250px]">
+                    <PopulationStatChart />
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="ekonomi" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Statistik Ekonomi</CardTitle>
-                <CardDescription>
-                  Data perekonomian Desa Remau Bakotuo
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center border rounded-lg">
-                  <TrendingUp className="h-8 w-8 text-muted-foreground" />
-                  <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
+            </div>
+            <div>
+                <Label htmlFor="placeholder-code">Placeholder</Label>
+                <div className="flex items-center gap-2 mt-1">
+                    <Input id="placeholder-code" readOnly value={placeholder} />
+                    <Button variant="outline" size="icon" onClick={copyToClipboard}>
+                        <span className="sr-only">Salin Placeholder</span>
+                        <Copy className="h-4 w-4" />
+                    </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Salin dan tempel kode di atas ke dalam konten halaman mana pun untuk menampilkan diagram ini.
+                </p>
+            </div>
+        </CardContent>
+      </Card>
 
-          <TabsContent value="sosial" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Statistik Sosial</CardTitle>
-                <CardDescription>
-                  Data sosial dan kesejahteraan masyarakat Desa Remau Bakotuo
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center border rounded-lg">
-                  <Users className="h-8 w-8 text-muted-foreground" />
-                  <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="pemerintahan" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Statistik Pemerintahan</CardTitle>
-                <CardDescription>
-                  Data pemerintahan dan kelembagaan Desa Remau Bakotuo
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] flex items-center justify-center border rounded-lg">
-                  <Building2 className="h-8 w-8 text-muted-foreground" />
-                  <span className="ml-2 text-muted-foreground">Grafik akan ditampilkan di sini</span>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      )}
     </div>
   );
 };
