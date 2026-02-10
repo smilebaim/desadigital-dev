@@ -13,36 +13,18 @@ import {
   ChevronRight, 
   User, 
   Settings, 
-  Globe, 
   Map, 
   AppWindow, 
-  Settings2,
   Home,
-  History,
-  Target,
-  Compass,
-  Building2,
-  FileText,
-  ListTodo,
-  HeartHandshake,
-  MessageSquareWarning,
-  BookOpen,
-  Scale,
-  HandshakeIcon,
-  Store,
   Users,
-  Activity,
-  Apple,
-  Calendar,
-  Library,
   FileSpreadsheet,
-  ScrollText,
-  ChevronDown,
+  ListTodo,
   Palette,
   Newspaper,
   LayoutGrid,
   Briefcase,
-  BarChart3
+  BarChart3,
+  ChevronDown
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -58,9 +40,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent
 } from "@/components/ui/dropdown-menu";
 import {
   Accordion,
@@ -68,7 +47,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
@@ -82,7 +60,6 @@ const DashboardLayout = ({
   const auth = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-  const { setTheme } = useTheme();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -97,8 +74,6 @@ const DashboardLayout = ({
     await signOut(auth);
     router.push('/');
   };
-
-  const webControlMenuItems: any[] = [];
 
   return (
       <SidebarProvider>
@@ -140,7 +115,7 @@ const DashboardLayout = ({
                 {isClient && (
                   <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="halaman" className="border-none">
-                      <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors">
+                      <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                         <div className="flex items-center gap-2">
                           <FileSpreadsheet size={18} className="text-emerald-100" />
                           <span className="text-emerald-100">Kelola Halaman</span>
@@ -169,54 +144,18 @@ const DashboardLayout = ({
                     </AccordionItem>
                     
                     <AccordionItem value="apps" className="border-none">
-                      <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors">
+                      <AccordionTrigger className="px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                         <div className="flex items-center gap-2">
                           <AppWindow size={18} className="text-emerald-100" />
                           <span className="text-emerald-100">Aplikasi Desa</span>
                         </div>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <ul className="space-y-1 pl-4">
-                          <li><Link href="/dashboard/apps/surat-masuk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Masuk</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-keluar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Keluar</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-keterangan" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Keterangan</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-pengantar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Pengantar</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-nikah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Nikah</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-domisili" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Domisili</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Usaha</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-kematian" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Kematian</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-kelahiran" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Kelahiran</span>
-                          </Link></li>
-                          <li><Link href="/dashboard/apps/surat-pindah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                            <FileText size={16} className="text-emerald-100" />
-                            <span>Surat Pindah</span>
-                          </Link></li>
+                         <ul className="space-y-1 pl-4">
+                           <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                              <Briefcase size={16} className="text-emerald-100" />
+                              <span>Surat Usaha</span>
+                           </Link></li>
                         </ul>
                       </AccordionContent>
                     </AccordionItem>

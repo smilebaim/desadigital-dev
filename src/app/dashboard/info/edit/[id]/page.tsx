@@ -69,9 +69,9 @@ const EditPostPage = () => {
             status,
         };
 
-        const success = await updatePost(postId, postData);
+        const result = await updatePost(postId, postData);
 
-        if (success) {
+        if (result.success) {
             toast({ title: "Artikel berhasil diperbarui!" });
             router.push('/dashboard/info');
         } else {

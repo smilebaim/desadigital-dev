@@ -83,7 +83,9 @@ export const getCustomPage = async (id: string) => {
             const data = docSnap.data();
             return {
                 id: docSnap.id,
-                ...data
+                ...data,
+                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
+                updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null,
             } as CustomPageData & { id: string };
         }
         return null;
@@ -103,8 +105,8 @@ export const getCustomPageBySlug = async (slug: string) => {
             return {
                 id: docSnap.id,
                 ...data,
-                createdAt: data.createdAt ? data.createdAt : null,
-                updatedAt: data.updatedAt ? data.updatedAt : null
+                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
+                updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null,
             } as CustomPageData & { id: string };
         }
         return null;

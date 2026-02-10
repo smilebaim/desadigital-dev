@@ -162,7 +162,7 @@ const PagesPage = () => {
                             </Link>
                         </TableCell>
                         <TableCell>
-                            {page.createdAt ? new Date(page.createdAt.seconds * 1000).toLocaleDateString('id-ID') : 'N/A'}
+                            {page.createdAt ? new Date(page.createdAt as string).toLocaleDateString('id-ID') : 'N/A'}
                         </TableCell>
                         <TableCell className="text-right">
                             <DropdownMenu>

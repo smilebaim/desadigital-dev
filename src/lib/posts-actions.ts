@@ -78,10 +78,10 @@ export const addPost = async (postData: Omit<PostData, 'createdAt' | 'updatedAt'
             views: 0,
             createdAt: serverTimestamp()
         });
-        return true;
+        return { success: true };
     } catch (error) {
         console.error("Error adding post: ", error);
-        return false;
+        return { success: false };
     }
 };
 
@@ -122,10 +122,10 @@ export const updatePost = async (postId: string, dataToUpdate: Partial<PostData>
             ...rest,
             updatedAt: serverTimestamp()
         });
-        return true;
+        return { success: true };
     } catch (error) {
         console.error("Error updating post: ", error);
-        return false;
+        return { success: false };
     }
 };
 
@@ -133,9 +133,9 @@ export const updatePost = async (postId: string, dataToUpdate: Partial<PostData>
 export const deletePost = async (postId: string) => {
     try {
         await deleteDoc(doc(db, "posts", postId));
-        return true;
+        return { success: true };
     } catch (error) {
         console.error("Error deleting post: ", error);
-        return false;
+        return { success: false };
     }
 };

@@ -23,7 +23,7 @@ import {
 const pageSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi'),
   slug: z.string().min(1, 'Slug wajib diisi').regex(/^[a-z0-9\/-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, tanda hubung (-), dan garis miring (/)'),
-  content: z.string().min(1, 'Konten wajib diisi'),
+  content: z.string(),
 });
 
 type PageFormValues = z.infer<typeof pageSchema>;
@@ -38,7 +38,7 @@ const EditCustomPage = () => {
     const { control, handleSubmit, setValue, watch, reset, getValues, formState: { errors, isSubmitting } } = useForm<PageFormValues>({
         resolver: zodResolver(pageSchema)
     });
-
+    
     useEffect(() => {
         if (!pageId) return;
         const fetchPage = async () => {
@@ -55,8 +55,6 @@ const EditCustomPage = () => {
         fetchPage();
     }, [pageId, reset, router, toast]);
     
-    const titleValue = watch('title');
-
     const onSubmit = async (data: PageFormValues) => {
         const result = await updateCustomPage(pageId, data);
         if (result.success) {
@@ -68,7 +66,7 @@ const EditCustomPage = () => {
     };
     
     const handleInsertPlaceholder = (placeholder: string) => {
-      const currentContent = getValues('content');
+      const currentContent = getValues('content') || '';
       const textToInsert = `\n\n${placeholder}\n\n`;
       setValue('content', currentContent + textToInsert, { shouldDirty: true });
     };
@@ -107,7 +105,7 @@ const EditCustomPage = () => {
                                 <Input id="slug" {...field} placeholder="contoh/slug-url-halaman" />
                             )} />
                             {errors.slug && <p className="text-xs text-red-500">{errors.slug.message}</p>}
-                            <p className="text-xs text-muted-foreground">URL akan menjadi: {window.location.origin}/{watch('slug')}</p>
+                             <p className="text-xs text-muted-foreground">URL akan menjadi: {typeof window !== 'undefined' ? window.location.origin : ''}/{watch('slug')}</p>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="content">Isi Konten</Label>

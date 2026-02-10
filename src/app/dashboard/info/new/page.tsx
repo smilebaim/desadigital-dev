@@ -47,9 +47,9 @@ const NewPostPage = () => {
             userId: user.uid,
         };
 
-        const success = await addPost(postData);
+        const result = await addPost(postData);
 
-        if (success) {
+        if (result.success) {
             toast({ title: "Artikel berhasil ditambahkan!" });
             router.push('/dashboard/info');
         } else {

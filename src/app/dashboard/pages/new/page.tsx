@@ -23,7 +23,7 @@ import {
 const pageSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi'),
   slug: z.string().min(1, 'Slug wajib diisi').regex(/^[a-z0-9\/-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, tanda hubung (-), dan garis miring (/)'),
-  content: z.string().min(1, 'Konten wajib diisi'),
+  content: z.string(),
 });
 
 type PageFormValues = z.infer<typeof pageSchema>;
@@ -61,7 +61,7 @@ const NewCustomPage = () => {
     };
 
     const handleInsertPlaceholder = (placeholder: string) => {
-      const currentContent = getValues('content');
+      const currentContent = getValues('content') || '';
       const textToInsert = `\n\n${placeholder}\n\n`;
       setValue('content', currentContent + textToInsert, { shouldDirty: true });
     };

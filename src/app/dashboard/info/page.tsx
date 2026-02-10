@@ -74,8 +74,8 @@ const BeritaDashboardPage = () => {
 
   const handleDelete = async () => {
     if (!postToDelete) return;
-    const success = await deletePost(postToDelete);
-    if (success) {
+    const result = await deletePost(postToDelete);
+    if (result.success) {
       toast({ title: "Artikel berhasil dihapus." });
     } else {
       toast({ title: "Gagal menghapus artikel.", variant: "destructive" });
