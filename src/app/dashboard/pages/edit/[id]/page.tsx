@@ -10,9 +10,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Save, BarChart3 } from 'lucide-react';
+import { ArrowLeft, Save, BarChart3, PieChart, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { getCustomPage, updateCustomPage } from '@/lib/static-pages-actions';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const pageSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi'),
@@ -61,10 +67,10 @@ const EditCustomPage = () => {
         }
     };
     
-    const handleInsertChart = () => {
+    const handleInsertPlaceholder = (placeholder: string) => {
       const currentContent = getValues('content');
-      const placeholder = '\n\n[STATISTIK_PENDUDUK_CHART]\n\n';
-      setValue('content', currentContent + placeholder);
+      const textToInsert = `\n\n${placeholder}\n\n`;
+      setValue('content', currentContent + textToInsert, { shouldDirty: true });
     };
 
     if (isLoading) {
@@ -111,9 +117,29 @@ const EditCustomPage = () => {
                             {errors.content && <p className="text-xs text-red-500">{errors.content.message}</p>}
                         </div>
                         <div className="flex justify-between items-center">
-                            <Button type="button" variant="outline" onClick={handleInsertChart}>
-                                <BarChart3 className="h-4 w-4 mr-2" /> Sisipkan Grafik Penduduk
-                            </Button>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button type="button" variant="outline">
+                                        <BarChart3 className="h-4 w-4 mr-2" />
+                                        Sisipkan Visualisasi
+                                        <ChevronDown className="h-4 w-4 ml-2" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[STATISTIK_PENDUDUK_CHART]')}>
+                                        <BarChart3 className="h-4 w-4 mr-2" />
+                                        Piramida Penduduk
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[STATISTIK_PENDIDIKAN_CHART]')}>
+                                        <PieChart className="h-4 w-4 mr-2" />
+                                        Diagram Pendidikan
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[STATISTIK_PEKERJAAN_CHART]')}>
+                                        <BarChart3 className="h-4 w-4 mr-2" />
+                                        Diagram Pekerjaan
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                             <Button type="submit" disabled={isSubmitting}>
                                 <Save className="h-4 w-4 mr-2" />{isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
                             </Button>

@@ -1,6 +1,8 @@
 'use client';
 import StatCard from "@/components/dashboard/StatCard";
 import PopulationStatChart from "@/components/charts/PopulationStatChart";
+import PendidikanChart from "@/components/charts/PendidikanChart";
+import PekerjaanChart from "@/components/charts/PekerjaanChart";
 
 const StatistikPage = () => {
   
@@ -11,13 +13,18 @@ const StatistikPage = () => {
       placeholder: "[STATISTIK_PENDUDUK_CHART]",
       previewComponent: <PopulationStatChart />,
     },
-    // Future templates can be added here
-    // {
-    //   title: "Tabel Sebaran Penduduk",
-    //   description: "Menampilkan tabel jumlah penduduk per wilayah/dusun.",
-    //   placeholder: "[TABEL_SEBARAN_PENDUDUK]",
-    //   previewComponent: <div>Preview Tabel Sebaran</div>,
-    // },
+    {
+      title: "Diagram Tingkat Pendidikan",
+      description: "Menampilkan diagram lingkaran komposisi penduduk berdasarkan tingkat pendidikan terakhir.",
+      placeholder: "[STATISTIK_PENDIDIKAN_CHART]",
+      previewComponent: <PendidikanChart />,
+    },
+    {
+      title: "Diagram Sebaran Pekerjaan",
+      description: "Menampilkan diagram batang 10 pekerjaan paling umum di kalangan penduduk.",
+      placeholder: "[STATISTIK_PEKERJAAN_CHART]",
+      previewComponent: <PekerjaanChart />,
+    },
   ];
 
   return (
@@ -29,7 +36,7 @@ const StatistikPage = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {visualizationTemplates.map((template, index) => (
           <StatCard
             key={index}
