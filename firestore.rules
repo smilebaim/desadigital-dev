@@ -8,83 +8,12 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-
-    // --- Collection Rules ---
-
-    // USERS: Publicly readable, but only the owner can write.
-    match /users/{userId} {
-      allow read: if isSignedIn();
-      allow write: if isOwner(userId);
-    }
-
-    // PENDUDUK: Only authenticated users (admins) can manage population data.
-    match /penduduk/{pendudukId} {
-      allow read, write: if isSignedIn();
-    }
-    
-    // CUSTOM_PAGES: Publicly readable, but only admins can manage content.
-    match /custom_pages/{pageId} {
+    // WARNING: These rules are very permissive and are intended for development only.
+    // They allow any user to read any data, and any authenticated user to write any data.
+    // You should secure your data before deploying to production.
+    match /{document=**} {
       allow read: if true;
       allow write: if isSignedIn();
-    }
-
-    // POSTS: Published posts are public. Drafts/management only for admins.
-    match /posts/{postId} {
-      allow read: if resource.data.status == 'Published' || isSignedIn();
-      allow create, update, delete: if isSignedIn();
-    }
-    
-    // SURAT_USAHA: Only admins can manage business certificate applications.
-    match /surat_usaha/{suratId} {
-      allow read, write: if isSignedIn();
-    }
-    
-    // SITE_SETTINGS: Publicly readable for display, admin-only for writing.
-    match /site_settings/main {
-      allow read: if true;
-      allow write: if isSignedIn();
-    }
-
-    // MENUS: Publicly readable for navigation, admin-only for management.
-    match /menus/{menuId} {
-      allow read: if true;
-      allow write: if isSignedIn();
-
-      match /items/{itemId} {
-        allow read: if true;
-        allow write: if isSignedIn();
-      }
-    }
-    
-    // MAP DATA: Publicly readable for display, admin-only for management.
-    match /map_markers/{markerId} {
-      allow read: if true;
-      allow write: if isSignedIn();
-    }
-    match /map_polygons/{polygonId} {
-      allow read: if true;
-      allow write: if isSignedIn();
-    }
-    match /map_layer_categories/{categoryId} {
-      allow read: if true;
-      allow write: if isSignedIn();
-    }
-
-    // WORKSPACES: Must be owner or member to read/write items.
-    match /workspaces/{workspaceId} {
-      allow read: if isSignedIn() && (resource.data.ownerUid == request.auth.uid || request.auth.uid in resource.data.members);
-      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.ownerUid == request.auth.uid;
-
-      match /items/{itemId} {
-        allow read, write: if isSignedIn() && (
-          get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.ownerUid == request.auth.uid ||
-          request.auth.uid in get(/databases/$(database)/documents/workspaces/$(workspaceId)).data.members
-        );
-      }
     }
   }
 }
