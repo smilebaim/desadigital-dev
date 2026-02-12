@@ -24,7 +24,16 @@ import {
   LayoutGrid,
   Briefcase,
   BarChart3,
-  ChevronDown
+  ChevronDown,
+  Mail,
+  HomeIcon,
+  HeartPulse,
+  Baby,
+  Skull,
+  BookUser,
+  ArrowRightLeft,
+  FileBadge,
+  Send
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -152,10 +161,16 @@ const DashboardLayout = ({
                       </AccordionTrigger>
                       <AccordionContent>
                          <ul className="space-y-1 pl-4">
-                           <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <Briefcase size={16} className="text-emerald-100" />
-                              <span>Surat Usaha</span>
-                           </Link></li>
+                           <li><Link href="/dashboard/apps/surat-masuk" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><Mail size={16} className="text-emerald-100" /><span>Surat Masuk</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-keluar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><Send size={16} className="text-emerald-100" /><span>Surat Keluar</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-domisili" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><HomeIcon size={16} className="text-emerald-100" /><span>Surat Domisili</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-usaha" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><Briefcase size={16} className="text-emerald-100" /><span>Surat Usaha</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-kelahiran" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><Baby size={16} className="text-emerald-100" /><span>Surat Kelahiran</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-kematian" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><Skull size={16} className="text-emerald-100" /><span>Surat Kematian</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-pindah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><ArrowRightLeft size={16} className="text-emerald-100" /><span>Surat Pindah</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-nikah" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><HeartPulse size={16} className="text-emerald-100" /><span>Surat Nikah</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-pengantar" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><BookUser size={16} className="text-emerald-100" /><span>Surat Pengantar</span></Link></li>
+                           <li><Link href="/dashboard/apps/surat-keterangan" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100"><FileBadge size={16} className="text-emerald-100" /><span>Surat Keterangan</span></Link></li>
                         </ul>
                       </AccordionContent>
                     </AccordionItem>
