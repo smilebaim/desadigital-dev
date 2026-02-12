@@ -44,7 +44,7 @@ export default async function CustomPage({ params }: { params: { slug: string[] 
         <PublicLayout>
              <div className="container mx-auto px-4 py-8 mt-24 mb-20">
                 <Breadcrumb items={breadcrumbItems} />
-                <article className="prose lg:prose-xl max-w-4xl mx-auto">
+                <article className="prose lg:prose-xl max-w-none">
                     <div className="mb-8 border-b pb-4">
                         <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{page.title}</h1>
                         {page.createdAt && (
