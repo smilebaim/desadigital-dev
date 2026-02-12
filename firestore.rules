@@ -8,12 +8,12 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // WARNING: These rules are very permissive and are intended for development only.
-    // They allow any user to read any data, and any authenticated user to write any data.
-    // You should secure your data before deploying to production.
+    // WARNING: These rules are extremely permissive and are for development convenience only.
+    // They allow ANY user (authenticated or not) to read AND write to your entire database.
+    // You MUST secure your data before deploying to production.
     match /{document=**} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow write: if true;
     }
   }
 }
