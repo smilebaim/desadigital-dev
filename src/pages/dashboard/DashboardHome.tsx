@@ -3,30 +3,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Users, FileText, Settings, BarChart3, Map, Mail } from "lucide-react";
 import Link from "next/link";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
 import { useState, useEffect } from "react";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
 import { getPostsStream } from "@/lib/posts-client-actions";
 import { getSuratUsahaStream } from "@/lib/surat-usaha-client-actions";
+import dynamic from 'next/dynamic';
 
-const data = [
-  { name: "Jan", visitors: 400, pageViews: 2400 },
-  { name: "Feb", visitors: 300, pageViews: 1398 },
-  { name: "Mar", visitors: 200, pageViews: 9800 },
-  { name: "Apr", visitors: 278, pageViews: 3908 },
-  { name: "Mei", visitors: 189, pageViews: 4800 },
-  { name: "Jun", visitors: 239, pageViews: 3800 },
-  { name: "Jul", visitors: 349, pageViews: 4300 },
-];
+const VisitorChart = dynamic(() => import('@/components/dashboard/VisitorChart'), {
+    ssr: false,
+    loading: () => <div className="h-[300px] flex items-center justify-center"><p>Memuat diagram...</p></div>
+});
 
 const DashboardHome = () => {
   const [residentCount, setResidentCount] = useState(0);
@@ -125,24 +111,7 @@ const DashboardHome = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="visitors"
-                  stroke="#8884d8"
-                  activeDot={{ r: 8 }}
-                />
-                <Line type="monotone" dataKey="pageViews" stroke="#82ca9d" />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+          <VisitorChart />
         </CardContent>
       </Card>
       
