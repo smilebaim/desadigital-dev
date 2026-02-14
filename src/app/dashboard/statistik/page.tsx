@@ -3,6 +3,9 @@ import StatCard from "@/components/dashboard/StatCard";
 import PopulationStatChart from "@/components/charts/PopulationStatChart";
 import PendidikanChart from "@/components/charts/PendidikanChart";
 import PekerjaanChart from "@/components/charts/PekerjaanChart";
+import IndeksSosial from "@/components/charts/IndeksSosial";
+import IndeksEkonomi from "@/components/charts/IndeksEkonomi";
+import IndeksLingkungan from "@/components/charts/IndeksLingkungan";
 
 const StatistikPage = () => {
   
@@ -24,6 +27,24 @@ const StatistikPage = () => {
       description: "Menampilkan diagram batang 10 pekerjaan paling umum di kalangan penduduk.",
       placeholder: "[STATISTIK_PEKERJAAN_CHART]",
       previewComponent: <PekerjaanChart />,
+    },
+    {
+      title: "Indeks Ketahanan Sosial (IKS)",
+      description: "Menampilkan ringkasan skor Indeks Ketahanan Sosial desa.",
+      placeholder: "[INDEKS_KETAHANAN_SOSIAL]",
+      previewComponent: <IndeksSosial isPreview={true} />,
+    },
+    {
+      title: "Indeks Ketahanan Ekonomi (IKE)",
+      description: "Menampilkan ringkasan skor Indeks Ketahanan Ekonomi desa.",
+      placeholder: "[INDEKS_KETAHANAN_EKONOMI]",
+      previewComponent: <IndeksEkonomi isPreview={true} />,
+    },
+    {
+      title: "Indeks Ketahanan Lingkungan (IKL)",
+      description: "Menampilkan ringkasan skor Indeks Ketahanan Lingkungan desa.",
+      placeholder: "[INDEKS_KETAHANAN_LINGKUNGAN]",
+      previewComponent: <IndeksLingkungan isPreview={true} />,
     },
   ];
 

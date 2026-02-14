@@ -1,10 +1,19 @@
-import KetahananSosial from "@/pages/indeks/KetahananSosial";
 import PublicLayout from "@/layouts/PublicLayout";
+import IndeksSosial from "@/components/charts/IndeksSosial";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export default function Page() {
   return (
     <PublicLayout>
-      <KetahananSosial />
+       <div className="container mx-auto px-4 py-8 mt-16 mb-20">
+        <Breadcrumb
+          items={[
+            { title: "Indeks", path: "/indeks" },
+            { title: "Ketahanan Sosial" }
+          ]}
+        />
+        <IndeksSosial />
+      </div>
     </PublicLayout>
   );
 }

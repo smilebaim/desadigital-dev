@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Save, BarChart3, PieChart, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Save, BarChart3, PieChart, ChevronDown, Shield, TrendingUp, Leaf } from 'lucide-react';
 import Link from 'next/link';
 import { getCustomPage, updateCustomPage } from '@/lib/static-pages-actions';
 import {
@@ -135,6 +135,18 @@ const EditCustomPage = () => {
                                     <DropdownMenuItem onClick={() => handleInsertPlaceholder('[STATISTIK_PEKERJAAN_CHART]')}>
                                         <BarChart3 className="h-4 w-4 mr-2" />
                                         Diagram Pekerjaan
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[INDEKS_KETAHANAN_SOSIAL]')}>
+                                        <Shield className="h-4 w-4 mr-2" />
+                                        Indeks Ketahanan Sosial
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[INDEKS_KETAHANAN_EKONOMI]')}>
+                                        <TrendingUp className="h-4 w-4 mr-2" />
+                                        Indeks Ketahanan Ekonomi
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[INDEKS_KETAHANAN_LINGKUNGAN]')}>
+                                        <Leaf className="h-4 w-4 mr-2" />
+                                        Indeks Ketahanan Lingkungan
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
