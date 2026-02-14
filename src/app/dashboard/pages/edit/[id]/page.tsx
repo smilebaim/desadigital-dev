@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Save, BarChart3, PieChart, ChevronDown, Shield, TrendingUp, Leaf } from 'lucide-react';
+import { ArrowLeft, Save, BarChart3, PieChart, ChevronDown, Shield, TrendingUp, Leaf, LineChart as LineChartIcon } from 'lucide-react';
 import Link from 'next/link';
 import { getCustomPage, updateCustomPage } from '@/lib/static-pages-actions';
 import {
@@ -135,6 +135,18 @@ const EditCustomPage = () => {
                                     <DropdownMenuItem onClick={() => handleInsertPlaceholder('[STATISTIK_PEKERJAAN_CHART]')}>
                                         <BarChart3 className="h-4 w-4 mr-2" />
                                         Diagram Pekerjaan
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[STATISTIK_PENGUNJUNG_CHART]')}>
+                                        <LineChartIcon className="h-4 w-4 mr-2" />
+                                        Grafik Pengunjung
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[DIAGRAM_PENDAPATAN_DESA]')}>
+                                        <PieChart className="h-4 w-4 mr-2" />
+                                        Diagram Pendapatan Desa
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleInsertPlaceholder('[DIAGRAM_BELANJA_DESA]')}>
+                                        <PieChart className="h-4 w-4 mr-2" />
+                                        Diagram Belanja Desa
                                     </DropdownMenuItem>
                                     <DropdownMenuItem onClick={() => handleInsertPlaceholder('[INDEKS_KETAHANAN_SOSIAL]')}>
                                         <Shield className="h-4 w-4 mr-2" />

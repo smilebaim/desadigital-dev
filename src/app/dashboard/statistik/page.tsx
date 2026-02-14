@@ -6,6 +6,9 @@ import PekerjaanChart from "@/components/charts/PekerjaanChart";
 import IndeksSosial from "@/components/charts/IndeksSosial";
 import IndeksEkonomi from "@/components/charts/IndeksEkonomi";
 import IndeksLingkungan from "@/components/charts/IndeksLingkungan";
+import VisitorStatChart from "@/components/charts/VisitorStatChart";
+import PendapatanDesaChart from "@/components/charts/PendapatanDesaChart";
+import BelanjaDesaChart from "@/components/charts/BelanjaDesaChart";
 
 const StatistikPage = () => {
   
@@ -27,6 +30,24 @@ const StatistikPage = () => {
       description: "Menampilkan diagram batang 10 pekerjaan paling umum di kalangan penduduk.",
       placeholder: "[STATISTIK_PEKERJAAN_CHART]",
       previewComponent: <PekerjaanChart />,
+    },
+    {
+      title: "Diagram Pengunjung Situs",
+      description: "Menampilkan grafik garis tren pengunjung situs selama beberapa waktu terakhir.",
+      placeholder: "[STATISTIK_PENGUNJUNG_CHART]",
+      previewComponent: <VisitorStatChart />,
+    },
+    {
+      title: "Diagram Pendapatan Desa",
+      description: "Diagram lingkaran yang menampilkan distribusi sumber pendapatan desa.",
+      placeholder: "[DIAGRAM_PENDAPATAN_DESA]",
+      previewComponent: <PendapatanDesaChart />,
+    },
+    {
+      title: "Diagram Belanja Desa",
+      description: "Diagram lingkaran yang menampilkan distribusi belanja desa per bidang.",
+      placeholder: "[DIAGRAM_BELANJA_DESA]",
+      previewComponent: <BelanjaDesaChart />,
     },
     {
       title: "Indeks Ketahanan Sosial (IKS)",

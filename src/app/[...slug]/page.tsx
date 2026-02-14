@@ -8,6 +8,9 @@ import PekerjaanChart from "@/components/charts/PekerjaanChart";
 import IndeksSosial from "@/components/charts/IndeksSosial";
 import IndeksEkonomi from "@/components/charts/IndeksEkonomi";
 import IndeksLingkungan from "@/components/charts/IndeksLingkungan";
+import VisitorStatChart from "@/components/charts/VisitorStatChart";
+import PendapatanDesaChart from "@/components/charts/PendapatanDesaChart";
+import BelanjaDesaChart from "@/components/charts/BelanjaDesaChart";
 import React from "react";
 
 const CHART_PLACEHOLDERS = {
@@ -17,6 +20,9 @@ const CHART_PLACEHOLDERS = {
     '[INDEKS_KETAHANAN_SOSIAL]': <IndeksSosial />,
     '[INDEKS_KETAHANAN_EKONOMI]': <IndeksEkonomi />,
     '[INDEKS_KETAHANAN_LINGKUNGAN]': <IndeksLingkungan />,
+    '[STATISTIK_PENGUNJUNG_CHART]': <VisitorStatChart />,
+    '[DIAGRAM_PENDAPATAN_DESA]': <PendapatanDesaChart />,
+    '[DIAGRAM_BELANJA_DESA]': <BelanjaDesaChart />,
 };
 
 // Create a regex to find all placeholders
