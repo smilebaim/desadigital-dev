@@ -28,12 +28,12 @@ const StatCard: React.FC<StatCardProps> = ({ title, description, placeholder, ch
   };
 
   return (
-    <Card>
+    <Card className="flex flex-col">
       <CardHeader>
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="flex flex-col flex-grow justify-between space-y-4">
         <div className="p-4 border rounded-lg bg-muted/50">
           <h4 className="font-semibold mb-4 text-center">Preview</h4>
           <div className="h-[250px] flex items-center justify-center">
@@ -41,16 +41,16 @@ const StatCard: React.FC<StatCardProps> = ({ title, description, placeholder, ch
           </div>
         </div>
         <div>
-          <Label htmlFor={`placeholder-code-${title.replace(/\s+/g, '-')}`}>Placeholder</Label>
+          <Label htmlFor={`placeholder-code-${title.replace(/\s+/g, '-')}`} className="text-xs font-medium">Placeholder</Label>
           <div className="flex items-center gap-2 mt-1">
-            <Input id={`placeholder-code-${title.replace(/\s+/g, '-')}`} readOnly value={placeholder} />
-            <Button variant="outline" size="icon" onClick={copyToClipboard}>
+            <Input id={`placeholder-code-${title.replace(/\s+/g, '-')}`} readOnly value={placeholder} className="h-8 text-xs" />
+            <Button variant="outline" size="icon" className="h-8 w-8" onClick={copyToClipboard}>
               <span className="sr-only">Salin Placeholder</span>
               <Copy className="h-4 w-4" />
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Salin dan tempel kode di atas ke dalam editor halaman kustom untuk menampilkan visualisasi ini.
+            Salin dan tempel kode ini di editor halaman untuk menampilkan visualisasi.
           </p>
         </div>
       </CardContent>
