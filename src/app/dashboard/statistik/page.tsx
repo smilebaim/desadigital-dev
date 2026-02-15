@@ -9,6 +9,8 @@ import IndeksLingkungan from "@/components/charts/IndeksLingkungan";
 import VisitorStatChart from "@/components/charts/VisitorStatChart";
 import PendapatanDesaChart from "@/components/charts/PendapatanDesaChart";
 import BelanjaDesaChart from "@/components/charts/BelanjaDesaChart";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Sparkles } from "lucide-react";
 
 const StatistikPage = () => {
   
@@ -89,6 +91,31 @@ const StatistikPage = () => {
             {template.previewComponent}
           </StatCard>
         ))}
+
+        <Card className="flex flex-col border-dashed border-2 bg-muted/30 hover:bg-muted/50 transition-colors">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                    Buat Visualisasi Sendiri
+                </CardTitle>
+                <CardDescription>
+                    Butuh diagram atau tabel yang belum tersedia? Anda dapat meminta untuk dibuatkan visualisasi data kustom.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col flex-grow justify-center items-center text-center">
+                <div className="p-4 border-2 border-dashed rounded-lg bg-background/50 w-full h-full flex flex-col justify-center items-center">
+                    <div className="space-y-2">
+                        <p className="text-sm font-semibold">Contoh Permintaan:</p>
+                        <p className="text-xs text-muted-foreground italic">
+                            &quot;Buatkan saya diagram batang untuk perbandingan jumlah penduduk per RT.&quot;
+                        </p>
+                    </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-4 px-4">
+                    Sampaikan kebutuhan Anda, dan template baru akan dibuatkan untuk Anda gunakan di sini.
+                </p>
+            </CardContent>
+        </Card>
       </div>
 
     </div>
