@@ -114,28 +114,6 @@ export const initialPages: InitialPage[] = [
 </ul>
 <p>Setiap masukan dari Anda sangat berharga bagi kami untuk kemajuan Desa Remau Bako Tuo.</p>` 
   },
-
-  // Kelembagaan
-  { 
-    title: "PKK", 
-    slug: "kelembagaan/pkk", 
-    content: `<h1>PKK (Pemberdayaan dan Kesejahteraan Keluarga)</h1>
-<p>Tim Penggerak PKK Desa Remau Bako Tuo adalah motor penggerak utama dalam upaya peningkatan kesejahteraan keluarga. Dengan 10 program pokoknya, PKK aktif dalam berbagai kegiatan yang berfokus pada kesehatan, pendidikan anak usia dini (PAUD), pengelolaan posyandu, hingga pengembangan industri rumah tangga.</p>
-<h3>Program Unggulan:</h3>
-<ul>
-    <li>Penyuluhan Gizi dan Pencegahan Stunting.</li>
-    <li>Pengelolaan Taman Bacaan Masyarakat (TBM).</li>
-    <li>Pelatihan Keterampilan Kerajinan Tangan untuk Ibu Rumah Tangga.</li>
-    <li>Gerakan Tanam Sayur di Pekarangan Rumah (Hatinya PKK).</li>
-</ul>`
-  },
-  { 
-    title: "Lembaga Kemasyarakatan Desa (LKD)", 
-    slug: "kelembagaan/lkd", 
-    content: `<h1>LKD (Lembaga Kemasyarakatan Desa)</h1>
-<p>Lembaga Kemasyarakatan Desa (LKD) merupakan mitra strategis pemerintah desa dalam menyerap aspirasi dan menggerakkan partisipasi masyarakat dalam pembangunan. LKD di desa kami mencakup Lembaga Pemberdayaan Masyarakat (LPM), Rukun Tetangga (RT), Rukun Warga (RW), dan lembaga adat.</p>
-<p>Lembaga-lembaga ini berperan aktif dalam musyawarah perencanaan pembangunan, pelaksanaan kegiatan gotong royong, dan menjaga harmoni sosial di lingkungan masing-masing.</p>` 
-  },
   
   // Dana Desa
   { 
