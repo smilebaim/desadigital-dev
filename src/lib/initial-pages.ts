@@ -83,40 +83,6 @@ export const initialPages: InitialPage[] = [
     <li><strong>Kepala Dusun III:</strong> Rahmat</li>
 </ul>`
   },
-  { 
-    title: "Struktur BPD", 
-    slug: "profil/struktur-badan", 
-    content: `<h1>Struktur Badan Permusyawaratan Desa</h1><p>Informasi mengenai struktur BPD.</p>` 
-  },
-  { 
-    title: "Biodata Pemerintah Desa", 
-    slug: "profil/biodata-pemerintah", 
-    content: `<h1>Biodata Pemerintah Desa</h1><p>Biodata aparat pemerintah desa.</p>` 
-  },
-  { 
-    title: "Biodata BPD", 
-    slug: "profil/biodata-badan", 
-    content: `<h1>Biodata Anggota BPD</h1><p>Biodata anggota Badan Permusyawaratan Desa.</p>` 
-  },
-  
-  // Pembangunan
-  { 
-    title: "RPJMDes", 
-    slug: "pembangunan/rpjmdes", 
-    content: `<h1>RPJMDes (Rencana Pembangunan Jangka Menengah Desa)</h1>
-<p>Rencana Pembangunan Jangka Menengah Desa (RPJMDes) adalah dokumen perencanaan strategis untuk periode enam tahunan yang menjadi acuan utama dalam pembangunan desa. Dokumen ini disusun secara partisipatif dengan melibatkan seluruh elemen masyarakat untuk menggali potensi, mengidentifikasi masalah, dan merumuskan program prioritas.</p>
-<p>Diagram di bawah ini memberikan gambaran umum alokasi anggaran belanja desa yang direncanakan dalam RPJMDes.</p>
-[DIAGRAM_BELANJA_DESA]` 
-  },
-  { 
-    title: "RKPDes", 
-    slug: "pembangunan/rkpdes", 
-    content: `<h1>RKPDes (Rencana Kerja Pemerintah Desa)</h1>
-<p>Rencana Kerja Pemerintah Desa (RKPDes) adalah penjabaran dari RPJMDes untuk jangka waktu satu tahun. Dokumen ini lebih operasional dan menjadi dasar penyusunan Anggaran Pendapatan dan Belanja Desa (APBDes) setiap tahunnya.</p>
-<p>Berikut adalah komposisi sumber pendapatan yang direncanakan dalam RKPDes tahun berjalan.</p>
-[DIAGRAM_PENDAPATAN_DESA]`
-  },
-
   // Layanan
   { 
     title: "Layanan Persuratan", 
@@ -148,22 +114,7 @@ export const initialPages: InitialPage[] = [
 </ul>
 <p>Setiap masukan dari Anda sangat berharga bagi kami untuk kemajuan Desa Remau Bako Tuo.</p>` 
   },
-  { 
-    title: "Pos Kesehatan Desa", 
-    slug: "layanan/poskesdes", 
-    content: `<h1>Pos Kesehatan Desa (Poskesdes)</h1><p>Informasi layanan Poskesdes.</p>` 
-  },
-  { 
-    title: "Pos Keamanan Lingkungan", 
-    slug: "layanan/poskamling", 
-    content: `<h1>Pos Keamanan Lingkungan (Poskamling)</h1><p>Informasi kegiatan Poskamling.</p>` 
-  },
-  { 
-    title: "Bank Sampah", 
-    slug: "layanan/bank-sampah", 
-    content: `<h1>Bank Sampah</h1><p>Informasi mengenai Bank Sampah desa.</p>` 
-  },
-  
+
   // Kelembagaan
   { 
     title: "PKK", 
@@ -185,37 +136,7 @@ export const initialPages: InitialPage[] = [
 <p>Lembaga Kemasyarakatan Desa (LKD) merupakan mitra strategis pemerintah desa dalam menyerap aspirasi dan menggerakkan partisipasi masyarakat dalam pembangunan. LKD di desa kami mencakup Lembaga Pemberdayaan Masyarakat (LPM), Rukun Tetangga (RT), Rukun Warga (RW), dan lembaga adat.</p>
 <p>Lembaga-lembaga ini berperan aktif dalam musyawarah perencanaan pembangunan, pelaksanaan kegiatan gotong royong, dan menjaga harmoni sosial di lingkungan masing-masing.</p>` 
   },
-  { 
-    title: "Karang Taruna", 
-    slug: "kelembagaan/karang-taruna", 
-    content: `<h1>Karang Taruna "Tunas Harapan"</h1>
-<p>Sebagai wadah generasi muda, Karang Taruna "Tunas Harapan" Desa Remau Bako Tuo aktif dalam berbagai kegiatan positif di bidang sosial, olahraga, kesenian, dan keagamaan. Organisasi ini bertujuan untuk membangun karakter pemuda yang tangguh, kreatif, dan memiliki kepedulian sosial yang tinggi.</p>
-<h3>Kegiatan Rutin:</h3>
-<ul>
-    <li>Turnamen Olahraga antar-dusun (voli, sepak takraw).</li>
-    <li>Pengelolaan acara peringatan hari besar nasional.</li>
-    <li>Bakti sosial dan penggalangan dana untuk warga yang membutuhkan.</li>
-    <li>Pelatihan kewirausahaan digital untuk pemuda.</li>
-</ul>` 
-  },
-
-  // Ekonomi
-  { 
-    title: "BUMDes", 
-    slug: "ekonomi/bumdes", 
-    content: `<h1>BUMDes (Badan Usaha Milik Desa) "Maju Bersama"</h1>
-<p>Badan Usaha Milik Desa (BUMDes) "Maju Bersama" menjadi motor penggerak ekonomi desa melalui berbagai unit usaha yang dikelola secara profesional. Tujuan utama BUMDes adalah untuk meningkatkan Pendapatan Asli Desa (PADes), membuka lapangan kerja, dan memberikan pelayanan kepada masyarakat.</p>
-<p>Saat ini, unit usaha yang dikelola meliputi penyediaan air bersih, pengelolaan pasar desa, dan jasa lainnya.</p>` 
-  },
-  { 
-    title: "UMKM Desa", 
-    slug: "ekonomi/umkm", 
-    content: `<h1>Potensi UMKM Desa</h1>
-<p>Desa kami memiliki banyak potensi Usaha Mikro, Kecil, dan Menengah (UMKM) yang menjadi tulang punggung perekonomian warga. Temukan berbagai produk unggulan dari para pelaku usaha lokal di sini, mulai dari olahan hasil laut, kerajinan tangan dari anyaman pandan, hingga kuliner khas seperti gulai ikan salai.</p>
-<p>Diagram di bawah menunjukkan sebaran jenis pekerjaan penduduk, yang sebagian besar ditopang oleh sektor wiraswasta dan UMKM.</p>
-[STATISTIK_PEKERJAAN_CHART]` 
-  },
-
+  
   // Dana Desa
   { 
     title: "Laporan Pendapatan Desa", 
@@ -232,23 +153,6 @@ export const initialPages: InitialPage[] = [
 <p>Halaman ini menyajikan alokasi belanja desa yang diprioritaskan untuk berbagai bidang pembangunan, pembinaan kemasyarakatan, dan pemberdayaan masyarakat sesuai dengan dokumen APBDes. Masyarakat dapat melihat bagaimana anggaran desa dimanfaatkan untuk program-program yang telah direncanakan bersama.</p>
 
 [DIAGRAM_BELANJA_DESA]`
-  },
-
-  // Aktivitas
-  { 
-    title: "Agenda Kegiatan", 
-    slug: "aktivitas/agenda", 
-    content: `<h1>Agenda Kegiatan Desa</h1>
-<p>Jangan sampai ketinggalan informasi! Halaman ini berisi jadwal lengkap berbagai kegiatan dan acara yang akan diselenggarakan di Desa Remau Bako Tuo, mulai dari musyawarah desa, pelatihan, kegiatan posyandu, hingga perayaan hari besar. Tandai kalender Anda dan mari berpartisipasi aktif dalam setiap kegiatan.</p>
-<p><i>(Untuk jadwal detail, silakan kunjungi halaman Kalender Kegiatan. Data pada halaman ini bersifat contoh dan dapat berubah.)</i></p>` 
-  },
-
-  // Pustaka
-  { 
-    title: "Pustaka Digital Desa", 
-    slug: "pustaka/pustaka-desa", 
-    content: `<h1>Pustaka Digital</h1>
-<p>Temukan berbagai dokumen penting, laporan, produk hukum desa, serta karya tulis yang berkaitan dengan Desa Remau Bako Tuo. Pustaka digital ini kami bangun sebagai pusat pengetahuan dan referensi bagi masyarakat, akademisi, dan siapa saja yang tertarik untuk mempelajari lebih dalam tentang desa kami.</p>`
   },
   
   // Indeks Desa Membangun
