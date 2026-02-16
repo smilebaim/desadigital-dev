@@ -83,6 +83,21 @@ export const initialPages: InitialPage[] = [
     <li><strong>Kepala Dusun III:</strong> Rahmat</li>
 </ul>`
   },
+  { 
+    title: "Struktur BPD", 
+    slug: "profil/struktur-badan", 
+    content: `<h1>Struktur Badan Permusyawaratan Desa</h1><p>Informasi mengenai struktur BPD.</p>` 
+  },
+  { 
+    title: "Biodata Pemerintah Desa", 
+    slug: "profil/biodata-pemerintah", 
+    content: `<h1>Biodata Pemerintah Desa</h1><p>Biodata aparat pemerintah desa.</p>` 
+  },
+  { 
+    title: "Biodata BPD", 
+    slug: "profil/biodata-badan", 
+    content: `<h1>Biodata Anggota BPD</h1><p>Biodata anggota Badan Permusyawaratan Desa.</p>` 
+  },
   
   // Pembangunan
   { 
@@ -132,6 +147,21 @@ export const initialPages: InitialPage[] = [
   <li><strong>Langsung:</strong> Menemui Kepala Dusun atau Perangkat Desa terkait pada saat jam kerja.</li>
 </ul>
 <p>Setiap masukan dari Anda sangat berharga bagi kami untuk kemajuan Desa Remau Bako Tuo.</p>` 
+  },
+  { 
+    title: "Pos Kesehatan Desa", 
+    slug: "layanan/poskesdes", 
+    content: `<h1>Pos Kesehatan Desa (Poskesdes)</h1><p>Informasi layanan Poskesdes.</p>` 
+  },
+  { 
+    title: "Pos Keamanan Lingkungan", 
+    slug: "layanan/poskamling", 
+    content: `<h1>Pos Keamanan Lingkungan (Poskamling)</h1><p>Informasi kegiatan Poskamling.</p>` 
+  },
+  { 
+    title: "Bank Sampah", 
+    slug: "layanan/bank-sampah", 
+    content: `<h1>Bank Sampah</h1><p>Informasi mengenai Bank Sampah desa.</p>` 
   },
   
   // Kelembagaan
