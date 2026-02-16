@@ -9,32 +9,42 @@ export const initialPages: InitialPage[] = [
   { 
     title: "Profil Desa", 
     slug: "profil/profil-desa", 
-    content: `<h1>Profil Lengkap Desa</h1>
-<p>Desa Remau Bako Tuo adalah sebuah komunitas yang dinamis dengan sejarah yang kaya dan masa depan yang cerah. Terletak di wilayah pesisir, desa kami dianugerahi keindahan alam dan potensi sumber daya yang melimpah. Masyarakat kami terdiri dari beragam latar belakang yang hidup berdampingan secara harmonis, menjunjung tinggi nilai-nilai gotong royong dan kebersamaan.</p>
-<p>Di halaman ini, Anda akan menemukan gambaran umum tentang desa kami, mulai dari kondisi geografis, demografi penduduk, hingga potensi ekonomi yang sedang kami kembangkan bersama. Visualisasi data di bawah ini memberikan potret statistik desa kami secara real-time.</p>
+    content: `<h1>Profil Desa Remau Bako Tuo</h1>
+<p>Selamat datang di profil digital Desa Remau Bako Tuo, sebuah komunitas pesisir yang dinamis dengan sejarah yang kaya dan masa depan yang cerah. Terletak strategis di Kabupaten Tanjung Jabung Timur, desa kami diberkahi keindahan alam, tanah yang subur, dan potensi sumber daya kelautan yang melimpah.</p>
+<p>Masyarakat kami yang beragam hidup berdampingan secara harmonis, menjunjung tinggi nilai-nilai gotong royong dan kebersamaan. Kami percaya bahwa kekuatan terbesar desa terletak pada warganya. Halaman ini memberikan gambaran umum tentang desa kami, mulai dari kondisi geografis, demografi, hingga potensi ekonomi yang terus kami kembangkan.</p>
+
+<h3>Kondisi Geografis & Potensi</h3>
+<p>Secara geografis, wilayah kami didominasi oleh dataran rendah dengan akses langsung ke perairan, menjadikannya ideal untuk sektor perikanan dan pertanian. Potensi utama kami meliputi hasil perikanan tangkap, budidaya tambak, serta perkebunan kelapa dan pinang.</p>
+
+<h3>Demografi Desa</h3>
+<p>Visualisasi data di bawah ini memberikan potret statistik desa kami secara real-time, menjadi landasan kami dalam merencanakan program-program pembangunan yang tepat sasaran, mulai dari sektor pendidikan, kesehatan, hingga pemberdayaan ekonomi.</p>
 
 [STATISTIK_PENDUDUK_CHART]
 
 [STATISTIK_PENDIDIKAN_CHART]
 
-<p>Data demografi ini menjadi landasan kami dalam merencanakan program-program pembangunan yang tepat sasaran, mulai dari sektor pendidikan, kesehatan, hingga pemberdayaan ekonomi, demi mewujudkan masyarakat yang lebih maju dan sejahtera.</p>
+<p>Dengan memahami data ini, kami berupaya mewujudkan masyarakat yang lebih maju, sehat, dan sejahtera.</p>
 `
   },
   { 
     title: "Sejarah Desa", 
     slug: "profil/sejarah-desa", 
-    content: `<h1>Sejarah Desa Remau Bako Tuo</h1>
-<p>Setiap sudut desa ini menyimpan cerita. Halaman ini akan membawa Anda menelusuri jejak-jejak masa lalu, dari awal mula berdirinya desa yang konon dibuka oleh para perantau pemberani, hingga kisah-kisah perjuangan para tetua dalam membangun komunitas yang solid. Kami percaya, dengan memahami sejarah, kita dapat membangun masa depan yang lebih baik.</p>
-<h3>Era Permulaan</h3>
-<p>Menurut cerita turun-temurun, nama Remau Bako Tuo memiliki arti tersendiri. 'Remau' yang berarti Harimau, melambangkan keberanian dan kekuatan para pendiri. 'Bako Tuo' merujuk pada pohon bakau tua yang menjadi penanda utama wilayah ini di masa lampau. Konon, di bawah pohon itulah para tetua pertama kali bermusyawarah untuk mendirikan pemukiman.</p>
-<h3>Masa Pembangunan</h3>
-<p>Seiring berjalannya waktu, desa kami berkembang dari sebuah pemukiman nelayan kecil menjadi pusat aktivitas masyarakat yang lebih kompleks. Pembangunan infrastruktur seperti jalan, jembatan, dan sarana ibadah dilakukan secara gotong royong, mencerminkan semangat kebersamaan yang masih kami pegang teguh hingga hari ini.</p>
-<p><i>(Konten sejarah lengkap sedang dalam proses pengumpulan dari berbagai narasumber dan catatan yang ada. Kami akan segera memperbaruinya dengan lebih detail.)</i></p>`
+    content: `<h1>Jejak Langkah: Sejarah Desa Remau Bako Tuo</h1>
+<p>Setiap sudut desa ini menyimpan cerita. Halaman ini akan membawa Anda menelusuri jejak-jejak masa lalu, dari awal mula berdirinya desa hingga menjadi komunitas yang kita kenal sekarang. Kami percaya, dengan memahami sejarah, kita dapat membangun masa depan yang lebih kokoh.</p>
+
+<h3>Era Permulaan: Legenda Sang Harimau dan Bakau Tua</h3>
+<p>Menurut cerita turun-temurun yang diwariskan para tetua, nama Remau Bako Tuo memiliki makna mendalam. 'Remau' yang berarti Harimau, melambangkan keberanian dan semangat juang para perantau pemberani yang pertama kali membuka lahan di wilayah ini. 'Bako Tuo' merujuk pada sebatang pohon bakau tua yang menjulang tinggi dan menjadi penanda utama bagi para pelaut dan nelayan. Konon, di bawah pohon bakau itulah para pendiri pertama kali bermusyawarah, menyatukan tekad untuk mendirikan sebuah pemukiman yang aman dan makmur.</p>
+
+<h3>Masa Pembangunan: Semangat Gotong Royong</h3>
+<p>Seiring berjalannya waktu, desa kami berkembang dari sebuah pemukiman nelayan kecil menjadi pusat aktivitas masyarakat yang lebih kompleks. Pembangunan infrastruktur krusial seperti jalan setapak, jembatan kayu, dan sarana ibadah pertama kali dibangun murni dari semangat gotong royong. Semangat kebersamaan inilah yang menjadi fondasi sosial desa dan terus kami lestarikan hingga hari ini.</p>
+
+<h3>Era Modern: Menuju Desa Digital</h3>
+<p>Memasuki abad ke-21, Desa Remau Bako Tuo terus beradaptasi dengan tantangan zaman. Peluncuran Sistem Informasi Desa ini adalah salah satu tonggak sejarah baru kami dalam upaya menuju tata kelola pemerintahan yang transparan, partisipatif, dan modern, demi melayani masyarakat dengan lebih baik.</p>`
   },
   { 
     title: "Visi & Misi", 
     slug: "profil/visi-misi", 
-    content: `<h1>Visi & Misi Desa</h1>
+    content: `<h1>Visi & Misi Pembangunan Desa</h1>
 <p>Visi dan Misi ini adalah kompas yang memandu setiap langkah dan kebijakan Pemerintah Desa Remau Bako Tuo dalam menjalankan amanah untuk mewujudkan cita-cita bersama seluruh masyarakat.</p>
 <br/>
 <h2>Visi</h2>
@@ -54,8 +64,24 @@ export const initialPages: InitialPage[] = [
     title: "Struktur Pemerintahan", 
     slug: "profil/struktur-pemerintahan", 
     content: `<h1>Struktur Pemerintahan Desa</h1>
-<p>Pemerintahan Desa Remau Bako Tuo dijalankan oleh Kepala Desa beserta jajaran perangkat desa yang berdedikasi untuk melayani masyarakat. Halaman ini akan menampilkan bagan struktur organisasi serta profil singkat dari setiap perangkat desa yang bertugas, mulai dari Sekretaris Desa, Kepala Urusan, hingga Kepala Dusun.</p>
-<p><i>(Konten visual bagan struktur organisasi akan segera ditambahkan untuk memberikan gambaran yang lebih jelas mengenai alur komando dan tanggung jawab masing-masing perangkat desa.)</i></p>`
+<p>Pemerintahan Desa Remau Bako Tuo dijalankan oleh Kepala Desa beserta jajaran perangkat desa yang berdedikasi untuk melayani masyarakat. Berikut adalah bagan struktur organisasi serta daftar perangkat desa yang bertugas.</p>
+<br>
+<p><i>[Gambar bagan struktur organisasi akan ditampilkan di sini]</i></p>
+<br>
+<h3>Perangkat Desa Periode 2021-2027:</h3>
+<ul>
+    <li><strong>Kepala Desa:</strong> H. Abdullah</li>
+    <li><strong>Sekretaris Desa:</strong> Muhammad Saleh, S.Kom</li>
+    <li><strong>Kaur Keuangan:</strong> Siti Aminah, A.Md</li>
+    <li><strong>Kaur Perencanaan:</strong> Ahmad Yani</li>
+    <li><strong>Kaur Tata Usaha dan Umum:</strong> Fatimah</li>
+    <li><strong>Kasi Pemerintahan:</strong> La Ode Idrus</li>
+    <li><strong>Kasi Kesejahteraan:</strong> Wa Ode Rahma</li>
+    <li><strong>Kasi Pelayanan:</strong> Suparman</li>
+    <li><strong>Kepala Dusun I:</strong> Sulaiman</li>
+    <li><strong>Kepala Dusun II:</strong> Junaidi</li>
+    <li><strong>Kepala Dusun III:</strong> Rahmat</li>
+</ul>`
   },
   
   // Pembangunan
@@ -113,34 +139,49 @@ export const initialPages: InitialPage[] = [
     title: "PKK", 
     slug: "kelembagaan/pkk", 
     content: `<h1>PKK (Pemberdayaan dan Kesejahteraan Keluarga)</h1>
-<p>Tim Penggerak PKK Desa Remau Bako Tuo adalah motor penggerak utama dalam upaya peningkatan kesejahteraan keluarga. Dengan 10 program pokoknya, PKK aktif dalam berbagai kegiatan yang berfokus pada kesehatan, pendidikan anak usia dini (PAUD), pengelolaan posyandu, hingga pengembangan industri rumah tangga.</p>`
+<p>Tim Penggerak PKK Desa Remau Bako Tuo adalah motor penggerak utama dalam upaya peningkatan kesejahteraan keluarga. Dengan 10 program pokoknya, PKK aktif dalam berbagai kegiatan yang berfokus pada kesehatan, pendidikan anak usia dini (PAUD), pengelolaan posyandu, hingga pengembangan industri rumah tangga.</p>
+<h3>Program Unggulan:</h3>
+<ul>
+    <li>Penyuluhan Gizi dan Pencegahan Stunting.</li>
+    <li>Pengelolaan Taman Bacaan Masyarakat (TBM).</li>
+    <li>Pelatihan Keterampilan Kerajinan Tangan untuk Ibu Rumah Tangga.</li>
+    <li>Gerakan Tanam Sayur di Pekarangan Rumah (Hatinya PKK).</li>
+</ul>`
   },
   { 
     title: "Lembaga Kemasyarakatan Desa (LKD)", 
     slug: "kelembagaan/lkd", 
     content: `<h1>LKD (Lembaga Kemasyarakatan Desa)</h1>
-<p>Lembaga Kemasyarakatan Desa (LKD) merupakan mitra strategis pemerintah desa dalam menyerap aspirasi dan menggerakkan partisipasi masyarakat dalam pembangunan. LKD di desa kami mencakup Lembaga Pemberdayaan Masyarakat (LPM), RT, RW, dan lembaga adat. Halaman ini akan menampilkan daftar LKD yang aktif beserta program kerjanya.</p>` 
+<p>Lembaga Kemasyarakatan Desa (LKD) merupakan mitra strategis pemerintah desa dalam menyerap aspirasi dan menggerakkan partisipasi masyarakat dalam pembangunan. LKD di desa kami mencakup Lembaga Pemberdayaan Masyarakat (LPM), Rukun Tetangga (RT), Rukun Warga (RW), dan lembaga adat.</p>
+<p>Lembaga-lembaga ini berperan aktif dalam musyawarah perencanaan pembangunan, pelaksanaan kegiatan gotong royong, dan menjaga harmoni sosial di lingkungan masing-masing.</p>` 
   },
   { 
     title: "Karang Taruna", 
     slug: "kelembagaan/karang-taruna", 
-    content: `<h1>Karang Taruna</h1>
-<p>Sebagai wadah generasi muda, Karang Taruna Desa Remau Bako Tuo aktif dalam berbagai kegiatan positif di bidang sosial, olahraga, kesenian, dan keagamaan. Organisasi ini bertujuan untuk membangun karakter pemuda yang tangguh, kreatif, dan memiliki kepedulian sosial yang tinggi.</p>` 
+    content: `<h1>Karang Taruna "Tunas Harapan"</h1>
+<p>Sebagai wadah generasi muda, Karang Taruna "Tunas Harapan" Desa Remau Bako Tuo aktif dalam berbagai kegiatan positif di bidang sosial, olahraga, kesenian, dan keagamaan. Organisasi ini bertujuan untuk membangun karakter pemuda yang tangguh, kreatif, dan memiliki kepedulian sosial yang tinggi.</p>
+<h3>Kegiatan Rutin:</h3>
+<ul>
+    <li>Turnamen Olahraga antar-dusun (voli, sepak takraw).</li>
+    <li>Pengelolaan acara peringatan hari besar nasional.</li>
+    <li>Bakti sosial dan penggalangan dana untuk warga yang membutuhkan.</li>
+    <li>Pelatihan kewirausahaan digital untuk pemuda.</li>
+</ul>` 
   },
 
   // Ekonomi
   { 
     title: "BUMDes", 
     slug: "ekonomi/bumdes", 
-    content: `<h1>BUMDes (Badan Usaha Milik Desa)</h1>
+    content: `<h1>BUMDes (Badan Usaha Milik Desa) "Maju Bersama"</h1>
 <p>Badan Usaha Milik Desa (BUMDes) "Maju Bersama" menjadi motor penggerak ekonomi desa melalui berbagai unit usaha yang dikelola secara profesional. Tujuan utama BUMDes adalah untuk meningkatkan Pendapatan Asli Desa (PADes), membuka lapangan kerja, dan memberikan pelayanan kepada masyarakat.</p>
 <p>Saat ini, unit usaha yang dikelola meliputi penyediaan air bersih, pengelolaan pasar desa, dan jasa lainnya.</p>` 
   },
   { 
     title: "UMKM Desa", 
     slug: "ekonomi/umkm", 
-    content: `<h1>UMKM Desa</h1>
-<p>Desa kami memiliki banyak potensi Usaha Mikro, Kecil, dan Menengah (UMKM) yang menjadi tulang punggung perekonomian warga. Temukan berbagai produk unggulan dari para pelaku usaha lokal di sini, mulai dari olahan hasil laut, kerajinan tangan, hingga kuliner khas.</p>
+    content: `<h1>Potensi UMKM Desa</h1>
+<p>Desa kami memiliki banyak potensi Usaha Mikro, Kecil, dan Menengah (UMKM) yang menjadi tulang punggung perekonomian warga. Temukan berbagai produk unggulan dari para pelaku usaha lokal di sini, mulai dari olahan hasil laut, kerajinan tangan dari anyaman pandan, hingga kuliner khas seperti gulai ikan salai.</p>
 <p>Diagram di bawah menunjukkan sebaran jenis pekerjaan penduduk, yang sebagian besar ditopang oleh sektor wiraswasta dan UMKM.</p>
 [STATISTIK_PEKERJAAN_CHART]` 
   },
@@ -169,7 +210,7 @@ export const initialPages: InitialPage[] = [
     slug: "aktivitas/agenda", 
     content: `<h1>Agenda Kegiatan Desa</h1>
 <p>Jangan sampai ketinggalan informasi! Halaman ini berisi jadwal lengkap berbagai kegiatan dan acara yang akan diselenggarakan di Desa Remau Bako Tuo, mulai dari musyawarah desa, pelatihan, kegiatan posyandu, hingga perayaan hari besar. Tandai kalender Anda dan mari berpartisipasi aktif dalam setiap kegiatan.</p>
-<p><i>(Untuk jadwal detail, silakan kunjungi halaman Kalender Kegiatan.)</i></p>` 
+<p><i>(Untuk jadwal detail, silakan kunjungi halaman Kalender Kegiatan. Data pada halaman ini bersifat contoh dan dapat berubah.)</i></p>` 
   },
 
   // Pustaka
