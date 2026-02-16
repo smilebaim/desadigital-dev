@@ -1,11 +1,11 @@
 'use client';
 import PublicLayout from "@/layouts/PublicLayout";
-import BiodataPemerintah from "@/pages/profile/BiodataPemerintah";
+import StrukturPemerintahan from "@/pages/profile/StrukturPemerintahan";
 
 export default function Page() {
   return (
     <PublicLayout>
-      <BiodataPemerintah />
+      <StrukturPemerintahan />
     </PublicLayout>
   );
 }

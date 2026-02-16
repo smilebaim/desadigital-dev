@@ -60,29 +60,6 @@ export const initialPages: InitialPage[] = [
   <li>Menciptakan lingkungan yang aman, tertib, dan harmonis melalui peningkatan kesadaran hukum dan partisipasi masyarakat.</li>
 </ol>`
   },
-  { 
-    title: "Struktur Pemerintahan", 
-    slug: "profil/struktur-pemerintahan", 
-    content: `<h1>Struktur Pemerintahan Desa</h1>
-<p>Pemerintahan Desa Remau Bako Tuo dijalankan oleh Kepala Desa beserta jajaran perangkat desa yang berdedikasi untuk melayani masyarakat. Berikut adalah bagan struktur organisasi serta daftar perangkat desa yang bertugas.</p>
-<br>
-<p><i>[Gambar bagan struktur organisasi akan ditampilkan di sini]</i></p>
-<br>
-<h3>Perangkat Desa Periode 2021-2027:</h3>
-<ul>
-    <li><strong>Kepala Desa:</strong> H. Abdullah</li>
-    <li><strong>Sekretaris Desa:</strong> Muhammad Saleh, S.Kom</li>
-    <li><strong>Kaur Keuangan:</strong> Siti Aminah, A.Md</li>
-    <li><strong>Kaur Perencanaan:</strong> Ahmad Yani</li>
-    <li><strong>Kaur Tata Usaha dan Umum:</strong> Fatimah</li>
-    <li><strong>Kasi Pemerintahan:</strong> La Ode Idrus</li>
-    <li><strong>Kasi Kesejahteraan:</strong> Wa Ode Rahma</li>
-    <li><strong>Kasi Pelayanan:</strong> Suparman</li>
-    <li><strong>Kepala Dusun I:</strong> Sulaiman</li>
-    <li><strong>Kepala Dusun II:</strong> Junaidi</li>
-    <li><strong>Kepala Dusun III:</strong> Rahmat</li>
-</ul>`
-  },
   // Layanan
   { 
     title: "Layanan Persuratan", 
