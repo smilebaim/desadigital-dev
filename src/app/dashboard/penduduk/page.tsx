@@ -1,4 +1,3 @@
-
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,7 +20,8 @@ import {
   Trash2, 
   Download,
   Upload,
-  Save
+  Save,
+  Sparkles
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -56,7 +56,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { addPenduduk, updatePenduduk, deletePenduduk, addPendudukBatch, type PendudukData } from "@/lib/penduduk-actions";
+import { addPenduduk, updatePenduduk, deletePenduduk, addPendudukBatch, type PendudukData, seedDummyPenduduk } from "@/lib/penduduk-actions";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
 
 interface Penduduk extends PendudukData {
@@ -95,6 +95,7 @@ const PendudukPage = () => {
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
 
   const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm<PendudukFormValues>({
     resolver: zodResolver(pendudukSchema),
@@ -203,6 +204,24 @@ const PendudukPage = () => {
     });
   };
 
+  const handleSeedData = async () => {
+      setIsSeeding(true);
+      const result = await seedDummyPenduduk();
+      if (result.success) {
+          toast({
+              title: "Data Dummy Berhasil Ditambahkan",
+              description: `${result.count} data penduduk dummy telah ditambahkan ke database.`,
+          });
+      } else {
+          toast({
+              title: "Gagal Menambahkan Data Dummy",
+              description: result.error,
+              variant: "destructive",
+          });
+      }
+      setIsSeeding(false);
+  };
+
   const filteredData = data.filter(item => 
     item.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.nik.includes(searchQuery) ||
@@ -221,6 +240,10 @@ const PendudukPage = () => {
             <Button variant="outline" size="sm" onClick={() => setIsImportOpen(true)}>
               <Upload className="h-4 w-4 mr-2" />
               Import Data
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              {isSeeding ? 'Menambahkan...' : 'Tambah Data Dummy'}
             </Button>
             <Button variant="outline" size="sm" disabled>
               <Download className="h-4 w-4 mr-2" />
