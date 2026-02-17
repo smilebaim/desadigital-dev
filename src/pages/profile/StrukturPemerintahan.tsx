@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Breadcrumb from "@/components/Breadcrumb";
 import { User } from "lucide-react";
+import Image from "next/image";
 
 const perangkatDesa = [
   {
@@ -83,8 +84,7 @@ const StrukturPemerintahan = () => {
             <CardHeader className="text-center">
                 <div className="mx-auto bg-background rounded-full p-2 border inline-block">
                     <Avatar className="h-24 w-24">
-                        <AvatarImage src={perangkatDesa[0].fotoUrl} alt={perangkatDesa[0].nama} data-ai-hint={perangkatDesa[0].imageHint} />
-                        <AvatarFallback><User className="h-12 w-12" /></AvatarFallback>
+                        <Image src={perangkatDesa[0].fotoUrl} alt={perangkatDesa[0].nama} width={96} height={96} data-ai-hint={perangkatDesa[0].imageHint} className="rounded-full" />
                     </Avatar>
                 </div>
                 <CardTitle className="mt-4">{perangkatDesa[0].nama}</CardTitle>
@@ -101,8 +101,7 @@ const StrukturPemerintahan = () => {
             <Card key={index} className="text-center">
               <CardContent className="pt-6">
                 <Avatar className="h-20 w-20 mx-auto mb-4">
-                  <AvatarImage src={perangkat.fotoUrl} alt={perangkat.nama} data-ai-hint={perangkat.imageHint} />
-                  <AvatarFallback><User className="h-10 w-10" /></AvatarFallback>
+                  <Image src={perangkat.fotoUrl} alt={perangkat.nama} width={80} height={80} data-ai-hint={perangkat.imageHint} className="rounded-full" />
                 </Avatar>
                 <h3 className="font-semibold">{perangkat.nama}</h3>
                 <p className="text-sm text-muted-foreground">{perangkat.jabatan}</p>
@@ -120,8 +119,7 @@ const StrukturPemerintahan = () => {
                 <Card key={index} className="text-center">
                 <CardContent className="pt-6">
                     <Avatar className="h-20 w-20 mx-auto mb-4">
-                    <AvatarImage src={kadus.fotoUrl} alt={kadus.nama} data-ai-hint={kadus.imageHint} />
-                    <AvatarFallback><User className="h-10 w-10" /></AvatarFallback>
+                      <Image src={kadus.fotoUrl} alt={kadus.nama} width={80} height={80} data-ai-hint={kadus.imageHint} className="rounded-full" />
                     </Avatar>
                     <h3 className="font-semibold">{kadus.nama}</h3>
                     <p className="text-sm text-muted-foreground">{kadus.jabatan}</p>
