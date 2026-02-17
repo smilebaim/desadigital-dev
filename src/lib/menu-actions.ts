@@ -259,21 +259,19 @@ export const seedDefaultMenus = async () => {
         const topNavRef = doc(menusCollection);
         batch.set(topNavRef, { name: 'Menu Utama', description: 'Menu utama di dalam menu geser (sheet).', location: 'topnav', createdAt: serverTimestamp() });
         
-        const layananChildren = [
-            ...initialPages.filter(p => p.slug.startsWith('layanan/')),
-            { title: "Pos Kesehatan Desa", slug: "layanan/poskesdes" },
-            { title: "Menu Pendamping Gizi", slug: "layanan/mpg" },
-            { title: "Bank Sampah", slug: "layanan/bank-sampah" },
-            { title: "Pos Keamanan Lingkungan", slug: "layanan/poskamling" },
-        ];
-
         const topNavMenuStructure = [
             { title: 'Profil Desa', path: '/profil', icon: 'Landmark', order: 0, children: initialPages.filter(p => p.slug.startsWith('profil/')) },
             { title: 'Pembangunan', path: '/pembangunan', icon: 'Construction', order: 1, children: [{title: 'RPJMDes', slug: 'pembangunan/rpjmdes'}, {title: 'RKPDes', slug: 'pembangunan/rkpdes'}] },
-            { title: 'Layanan Publik', path: '/layanan', icon: 'Briefcase', order: 2, children: layananChildren },
-            { title: 'Kelembagaan', path: '/kelembagaan', icon: 'Library', order: 3, children: [{title: 'PKK', slug: 'kelembagaan/pkk'}, {title: 'LKD', slug: 'kelembagaan/lkd'}, {title: 'Karang Taruna', slug: 'kelembagaan/karang-taruna'}] },
+            { title: 'Layanan Publik', path: '/layanan', icon: 'Briefcase', order: 2, children: [
+                ...initialPages.filter(p => p.slug.startsWith('layanan/')),
+                { title: "Pos Kesehatan Desa", slug: "layanan/poskesdes" },
+                { title: "Menu Pendamping Gizi", slug: "layanan/mpg" },
+                { title: "Bank Sampah", slug: "layanan/bank-sampah" },
+                { title: "Pos Keamanan Lingkungan", slug: "layanan/poskamling" },
+            ]},
+            { title: 'Kelembagaan', path: '/kelembagaan', icon: 'Library', order: 3, children: initialPages.filter(p => p.slug.startsWith('kelembagaan/')) },
             { title: 'Ekonomi', path: '/ekonomi', icon: 'TrendingUp', order: 4, children: [{title: 'BUMDes', slug: 'ekonomi/bumdes'}, {title: 'Koperasi', slug: 'ekonomi/koperasi'}, {title: 'UMKM', slug: 'ekonomi/umkm'}] },
-            { title: 'Dana Desa', path: '/dana-desa', icon: 'Wallet', order: 5, children: initialPages.filter(p => p.slug.startsWith('dana-desa/')) },
+            { title: 'Dana Desa', path: '/dana-desa', icon: 'Wallet', order: 5, children: [{title: 'Pendapatan', slug: 'dana-desa/pendapatan'}, {title: 'Belanja', slug: 'dana-desa/belanja'}] },
             { title: 'Pustaka', path: '/pustaka', icon: 'BookOpen', order: 6, children: [{title: 'Publikasi', slug: 'pustaka/publikasi'}, {title: 'Pustaka Desa', slug: 'pustaka/pustaka-desa'}] },
         ];
 
