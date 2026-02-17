@@ -10,7 +10,6 @@ const profileLinks = [
     { title: "Visi & Misi", href: "/profil/visi-misi", description: "Arah dan tujuan pembangunan desa ke depan." },
     { title: "Struktur Pemerintahan", href: "/profil/struktur-pemerintahan", description: "Susunan perangkat desa yang bertugas." },
     { title: "Struktur BPD", href: "/profil/struktur-badan", description: "Badan Permusyawaratan Desa sebagai mitra pemerintah." },
-    { title: "Perkembangan Desa", href: "/profil/perkembangan", description: "Indeks Desa Membangun (IDM) dan kemajuan desa." },
 ];
 
 export default function ProfilPage() {
