@@ -1,4 +1,3 @@
-
 'use server';
 import { db } from '@/firebase/config';
 import { 
@@ -244,15 +243,15 @@ export const seedDefaultMenus = async () => {
 
     try {
         const bottomNavMenuStructure = [
-            { title: 'Profil Desa', path: '/profil', icon: 'Landmark', order: 0, children: initialPages.filter(p => p.slug.startsWith('profil/')) },
-            { title: 'Pembangunan', path: '/pembangunan', icon: 'Construction', order: 1, children: [{title: 'RPJMDes', slug: 'pembangunan/rpjmdes'}, {title: 'RKPDes', slug: 'pembangunan/rkpdes'}] },
-            { title: 'Dana Desa', path: '/dana-desa', icon: 'Wallet', order: 2, children: [{title: 'Pendapatan', slug: 'dana-desa/pendapatan'}, {title: 'Belanja', slug: 'dana-desa/belanja'}] },
-            { title: 'Indeks', path: '/indeks', icon: 'BarChart3', order: 3, children: [
+            { title: 'Peta', path: '/tata-ruang', icon: 'Map', order: 0, children: [] },
+            { title: 'Profil Desa', path: '/profil', icon: 'Landmark', order: 1, children: initialPages.filter(p => p.slug.startsWith('profil/')) },
+            { title: 'Pembangunan', path: '/pembangunan', icon: 'Construction', order: 2, children: [{title: 'RPJMDes', slug: 'pembangunan/rpjmdes'}, {title: 'RKPDes', slug: 'pembangunan/rkpdes'}] },
+            { title: 'Dana Desa', path: '/dana-desa', icon: 'Wallet', order: 3, children: [{title: 'Pendapatan', slug: 'dana-desa/pendapatan'}, {title: 'Belanja', slug: 'dana-desa/belanja'}] },
+            { title: 'Indeks', path: '/indeks', icon: 'BarChart3', order: 4, children: [
                 {title: 'Ketahanan Sosial', slug: 'indeks/ketahanan-sosial'},
                 {title: 'Ketahanan Ekonomi', slug: 'indeks/ketahanan-ekonomi'},
                 {title: 'Ketahanan Lingkungan', slug: 'indeks/ketahanan-lingkungan'}
             ] },
-            { title: 'Peta', path: '/tata-ruang', icon: 'Map', order: 4, children: [] },
         ];
 
         const topNavMenuStructure = [
