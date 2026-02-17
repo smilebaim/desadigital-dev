@@ -242,39 +242,48 @@ export const seedDefaultMenus = async () => {
     const batch = writeBatch(db);
 
     try {
-        // --- BOTTOM NAV ---
-        const bottomNavRef = doc(menusCollection);
-        batch.set(bottomNavRef, { name: 'Navigasi Bawah', description: 'Menu utama di bagian bawah layar.', location: 'bottomnav', createdAt: serverTimestamp() });
-        const bottomNavItems = [
-            { title: 'Beranda', path: '/', icon: 'Home', order: 0, parentId: null },
-            { title: 'Peta', path: '/tata-ruang', icon: 'Map', order: 1, parentId: null },
-            { title: 'Info', path: '/info', icon: 'Newspaper', order: 2, parentId: null },
+        const bottomNavMenuStructure = [
+            { title: 'Beranda', path: '/', icon: 'Home', order: 0, children: [] },
+            { title: 'Profil Desa', path: '/profil', icon: 'Landmark', order: 1, children: initialPages.filter(p => p.slug.startsWith('profil/')) },
+            { title: 'Pembangunan', path: '/pembangunan', icon: 'Construction', order: 2, children: [{title: 'RPJMDes', slug: 'pembangunan/rpjmdes'}, {title: 'RKPDes', slug: 'pembangunan/rkpdes'}] },
+            { title: 'Dana Desa', path: '/dana-desa', icon: 'Wallet', order: 3, children: [{title: 'Pendapatan', slug: 'dana-desa/pendapatan'}, {title: 'Belanja', slug: 'dana-desa/belanja'}] },
+            { title: 'Peta', path: '/tata-ruang', icon: 'Map', order: 4, children: [] },
+            { title: 'Info', path: '/info', icon: 'Newspaper', order: 5, children: [] },
         ];
-        bottomNavItems.forEach(item => {
-            const itemRef = doc(collection(db, bottomNavRef.path, 'items'));
-            batch.set(itemRef, item);
-        });
 
-        // --- TOP NAV (for sub-menus) ---
-        const topNavRef = doc(menusCollection);
-        batch.set(topNavRef, { name: 'Menu Utama', description: 'Menu utama di dalam menu geser (sheet).', location: 'topnav', createdAt: serverTimestamp() });
-        
         const topNavMenuStructure = [
-            { title: 'Profil Desa', path: '/profil', icon: 'Landmark', order: 0, children: initialPages.filter(p => p.slug.startsWith('profil/')) },
-            { title: 'Pembangunan', path: '/pembangunan', icon: 'Construction', order: 1, children: [{title: 'RPJMDes', slug: 'pembangunan/rpjmdes'}, {title: 'RKPDes', slug: 'pembangunan/rkpdes'}] },
-            { title: 'Layanan Publik', path: '/layanan', icon: 'Briefcase', order: 2, children: [
+            { title: 'Layanan Publik', path: '/layanan', icon: 'Briefcase', order: 0, children: [
                 ...initialPages.filter(p => p.slug.startsWith('layanan/')),
                 { title: "Pos Kesehatan Desa", slug: "layanan/poskesdes" },
                 { title: "Menu Pendamping Gizi", slug: "layanan/mpg" },
                 { title: "Bank Sampah", slug: "layanan/bank-sampah" },
                 { title: "Pos Keamanan Lingkungan", slug: "layanan/poskamling" },
             ]},
-            { title: 'Kelembagaan', path: '/kelembagaan', icon: 'Library', order: 3, children: initialPages.filter(p => p.slug.startsWith('kelembagaan/')) },
-            { title: 'Ekonomi', path: '/ekonomi', icon: 'TrendingUp', order: 4, children: [{title: 'BUMDes', slug: 'ekonomi/bumdes'}, {title: 'Koperasi', slug: 'ekonomi/koperasi'}, {title: 'UMKM', slug: 'ekonomi/umkm'}] },
-            { title: 'Dana Desa', path: '/dana-desa', icon: 'Wallet', order: 5, children: [{title: 'Pendapatan', slug: 'dana-desa/pendapatan'}, {title: 'Belanja', slug: 'dana-desa/belanja'}] },
-            { title: 'Pustaka', path: '/pustaka', icon: 'BookOpen', order: 6, children: [{title: 'Publikasi', slug: 'pustaka/publikasi'}, {title: 'Pustaka Desa', slug: 'pustaka/pustaka-desa'}] },
+            { title: 'Kelembagaan', path: '/kelembagaan', icon: 'Library', order: 1, children: initialPages.filter(p => p.slug.startsWith('kelembagaan/')) },
+            { title: 'Ekonomi', path: '/ekonomi', icon: 'TrendingUp', order: 2, children: [{title: 'BUMDes', slug: 'ekonomi/bumdes'}, {title: 'Koperasi', slug: 'ekonomi/koperasi'}, {title: 'UMKM', slug: 'ekonomi/umkm'}] },
+            { title: 'Pustaka', path: '/pustaka', icon: 'BookOpen', order: 3, children: [{title: 'Publikasi', slug: 'pustaka/publikasi'}, {title: 'Pustaka Desa', slug: 'pustaka/pustaka-desa'}] },
         ];
 
+        // --- BOTTOM NAV ---
+        const bottomNavRef = doc(menusCollection);
+        batch.set(bottomNavRef, { name: 'Navigasi Bawah', description: 'Menu utama di bagian bawah layar.', location: 'bottomnav', createdAt: serverTimestamp() });
+
+        for (const parent of bottomNavMenuStructure) {
+            const parentItemRef = doc(collection(db, bottomNavRef.path, 'items'));
+            batch.set(parentItemRef, { title: parent.title, path: parent.path, icon: parent.icon, order: parent.order, parentId: null });
+            
+            if (parent.children.length > 0) {
+                parent.children.forEach((child, index) => {
+                    const childItemRef = doc(collection(db, bottomNavRef.path, 'items'));
+                    batch.set(childItemRef, { title: child.title, path: `/${child.slug}`, icon: 'FileText', order: index, parentId: parentItemRef.id });
+                });
+            }
+        }
+        
+        // --- TOP NAV (for sub-menus) ---
+        const topNavRef = doc(menusCollection);
+        batch.set(topNavRef, { name: 'Menu Utama', description: 'Menu utama di dalam menu geser (sheet).', location: 'topnav', createdAt: serverTimestamp() });
+        
         for (const parent of topNavMenuStructure) {
             const parentItemRef = doc(collection(db, topNavRef.path, 'items'));
             batch.set(parentItemRef, { title: parent.title, path: parent.path, icon: parent.icon, order: parent.order, parentId: null });
