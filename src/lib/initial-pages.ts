@@ -43,6 +43,100 @@ export const initialPages: InitialPage[] = [
 </ol>`
   },
   {
+    title: "Struktur Pemerintahan",
+    slug: "profil/struktur-pemerintahan",
+    content: `<h1>Struktur Pemerintahan Desa</h1>
+<p>Berikut adalah jajaran aparatur Pemerintah Desa Remau Bako Tuo periode 2021-2027 yang berdedikasi untuk melayani masyarakat dan memajukan desa.</p>
+<div style="text-align: center; margin: 2rem 0; padding: 1.5rem; background-color: #f9fafb; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);">
+    <img src="https://picsum.photos/seed/kades/200/200" alt="Kepala Desa" style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+    <h2 style="font-size: 1.5rem; font-weight: 700; margin-top: 1rem;">H. Abdullah</h2>
+    <p style="color: #15803d; font-weight: 600;">Kepala Desa</p>
+</div>
+<h2 style="text-align: center; font-size: 1.5rem; font-weight: 700; margin-top: 3rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">Perangkat Desa</h2>
+<p style="text-align: center; color: #6b7280; margin-bottom: 2rem; margin-top: -0.5rem;">Tim yang mendukung operasional pemerintahan desa.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; text-align: center;">
+    <div><img src="https://picsum.photos/seed/sekdes/200/200" alt="Sekretaris Desa" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Muhammad Saleh, S.Kom</h3><p style="font-size: 0.875rem; color: #6b7280;">Sekretaris Desa</p></div>
+    <div><img src="https://picsum.photos/seed/kaurkeu/200/200" alt="Kaur Keuangan" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Siti Aminah, A.Md</h3><p style="font-size: 0.875rem; color: #6b7280;">Kaur Keuangan</p></div>
+    <div><img src="https://picsum.photos/seed/kaurplan/200/200" alt="Kaur Perencanaan" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Ahmad Yani</h3><p style="font-size: 0.875rem; color: #6b7280;">Kaur Perencanaan</p></div>
+    <div><img src="https://picsum.photos/seed/kaurtu/200/200" alt="Kaur Tata Usaha & Umum" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Fatimah</h3><p style="font-size: 0.875rem; color: #6b7280;">Kaur Tata Usaha & Umum</p></div>
+    <div><img src="https://picsum.photos/seed/kasipem/200/200" alt="Kasi Pemerintahan" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">La Ode Idrus</h3><p style="font-size: 0.875rem; color: #6b7280;">Kasi Pemerintahan</p></div>
+    <div><img src="https://picsum.photos/seed/kasikesra/200/200" alt="Kasi Kesejahteraan" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Wa Ode Rahma</h3><p style="font-size: 0.875rem; color: #6b7280;">Kasi Kesejahteraan</p></div>
+    <div><img src="https://picsum.photos/seed/kasipel/200/200" alt="Kasi Pelayanan" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Suparman</h3><p style="font-size: 0.875rem; color: #6b7280;">Kasi Pelayanan</p></div>
+</div>
+<h2 style="text-align: center; font-size: 1.5rem; font-weight: 700; margin-top: 3rem; border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">Kepala Dusun</h2>
+<p style="text-align: center; color: #6b7280; margin-bottom: 2rem; margin-top: -0.5rem;">Perpanjangan tangan pemerintah desa di tingkat dusun.</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; text-align: center;">
+    <div><img src="https://picsum.photos/seed/kadus1/200/200" alt="Kepala Dusun I" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Sulaiman</h3><p style="font-size: 0.875rem; color: #6b7280;">Kepala Dusun I</p></div>
+    <div><img src="https://picsum.photos/seed/kadus2/200/200" alt="Kepala Dusun II" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Junaidi</h3><p style="font-size: 0.875rem; color: #6b7280;">Kepala Dusun II</p></div>
+    <div><img src="https://picsum.photos/seed/kadus3/200/200" alt="Kepala Dusun III" style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; border: 2px solid #e5e7eb;"><h3 style="font-weight: 600; margin-top: 0.5rem;">Rahmat</h3><p style="font-size: 0.875rem; color: #6b7280;">Kepala Dusun III</p></div>
+</div>`
+  },
+  {
+    title: "Badan Permusyawaratan Desa",
+    slug: "profil/struktur-badan",
+    content: `<h1>Badan Permusyawaratan Desa (BPD)</h1>
+<p>Struktur dan perangkat Badan Permusyawaratan Desa Remau Bakotuo.</p>
+<div style="margin: 2rem 0; padding: 1.5rem; background-color: #f9fafb; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
+    <h2>Ketua BPD Periode 2021-2026</h2>
+    <h3>H. La Ode Karim</h3>
+    <p>Pendidikan: S1 Hukum</p>
+    <ul style="list-style-type: none; padding-left: 0;">
+        <li><strong>Telepon:</strong> +62 812-3456-7891</li>
+        <li><strong>Email:</strong> bpd.remaubakotuo@gmail.com</li>
+        <li><strong>Alamat:</strong> Jl. Desa No. 2, Dusun II</li>
+    </ul>
+</div>
+<h2 style="border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-bottom: 1rem;">Anggota BPD</h2>
+<div style="margin-top: 1.5rem;">
+    <h3>Wa Ode Aminah - Wakil Ketua</h3>
+    <ul style="list-style-type: disc; padding-left: 1.5rem;">
+        <li>Membantu ketua dalam menjalankan tugas</li>
+        <li>Menggantikan ketua saat berhalangan</li>
+        <li>Mengkoordinasikan kegiatan komisi</li>
+        <li>Melakukan pengawasan kinerja</li>
+    </ul>
+</div>
+<div style="margin-top: 1.5rem;">
+    <h3>La Ode Safar - Sekretaris</h3>
+    <ul style="list-style-type: disc; padding-left: 1.5rem;">
+        <li>Mengelola administrasi BPD</li>
+        <li>Menyusun notulen rapat</li>
+        <li>Mengelola arsip BPD</li>
+        <li>Menyiapkan laporan kegiatan</li>
+    </ul>
+</div>
+<div style="margin-top: 1.5rem;">
+    <h3>La Ode Rusli - Anggota</h3>
+    <ul style="list-style-type: disc; padding-left: 1.5rem;">
+        <li>Melakukan pengawasan kinerja</li>
+        <li>Menampung aspirasi masyarakat</li>
+        <li>Menyusun peraturan desa</li>
+        <li>Melakukan evaluasi program</li>
+    </ul>
+</div>
+<div style="margin-top: 1.5rem;">
+    <h3>Wa Ode Hasnia - Anggota</h3>
+    <ul style="list-style-type: disc; padding-left: 1.5rem;">
+        <li>Melakukan pengawasan kinerja</li>
+        <li>Menampung aspirasi masyarakat</li>
+        <li>Menyusun peraturan desa</li>
+        <li>Melakukan evaluasi program</li>
+    </ul>
+</div>
+<h2 style="border-bottom: 1px solid #e5e7eb; padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1rem;">Fungsi BPD</h2>
+<p>Tugas dan wewenang Badan Permusyawaratan Desa</p>
+<ul style="list-style-type: disc; padding-left: 1.5rem;">
+    <li>Membahas dan menyepakati Rancangan Peraturan Desa</li>
+    <li>Menampung dan menyalurkan aspirasi masyarakat</li>
+    <li>Melakukan pengawasan kinerja Kepala Desa</li>
+    <li>Menyelenggarakan musyawarah desa</li>
+    <li>Membahas dan menyepakati Rancangan Anggaran Pendapatan dan Belanja Desa</li>
+    <li>Membahas dan menyepakati Rancangan Peraturan Desa tentang APBDes</li>
+    <li>Membahas dan menyepakati Rancangan Peraturan Desa tentang perubahan APBDes</li>
+    <li>Membahas dan menyepakati Rancangan Peraturan Desa tentang pertanggungjawaban pelaksanaan APBDes</li>
+</ul>`
+  },
+  {
     title: "Layanan Persuratan",
     slug: "layanan/persuratan",
     content: `<h1>Layanan Administrasi Persuratan</h1>
