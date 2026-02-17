@@ -259,18 +259,18 @@ export const seedDefaultMenus = async () => {
         const topNavRef = doc(menusCollection);
         batch.set(topNavRef, { name: 'Menu Utama', description: 'Menu utama di dalam menu geser (sheet).', location: 'topnav', createdAt: serverTimestamp() });
         const topNavMenuStructure = [
-            { title: 'Profil Desa', icon: 'Landmark', order: 0, children: initialPages.filter(p => p.slug.startsWith('profil/')) },
-            { title: 'Pembangunan', icon: 'Construction', order: 1, children: initialPages.filter(p => p.slug.startsWith('pembangunan/')) },
-            { title: 'Layanan Publik', icon: 'Briefcase', order: 2, children: initialPages.filter(p => p.slug.startsWith('layanan/')) },
-            { title: 'Kelembagaan', icon: 'Library', order: 3, children: initialPages.filter(p => p.slug.startsWith('kelembagaan/')) },
-            { title: 'Ekonomi', icon: 'TrendingUp', order: 4, children: initialPages.filter(p => p.slug.startsWith('ekonomi/')) },
-            { title: 'Dana Desa', icon: 'Wallet', order: 5, children: initialPages.filter(p => p.slug.startsWith('dana-desa/')) },
-            { title: 'Pustaka', icon: 'BookOpen', order: 6, children: initialPages.filter(p => p.slug.startsWith('pustaka/')) },
+            { title: 'Profil Desa', path: '/profil', icon: 'Landmark', order: 0, children: initialPages.filter(p => p.slug.startsWith('profil/')) },
+            { title: 'Pembangunan', path: '/pembangunan', icon: 'Construction', order: 1, children: [{title: 'RPJMDes', slug: 'pembangunan/rpjmdes'}, {title: 'RKPDes', slug: 'pembangunan/rkpdes'}] },
+            { title: 'Layanan Publik', path: '/layanan', icon: 'Briefcase', order: 2, children: initialPages.filter(p => p.slug.startsWith('layanan/')) },
+            { title: 'Kelembagaan', path: '/kelembagaan', icon: 'Library', order: 3, children: [{title: 'PKK', slug: 'kelembagaan/pkk'}, {title: 'LKD', slug: 'kelembagaan/lkd'}, {title: 'Karang Taruna', slug: 'kelembagaan/karang-taruna'}] },
+            { title: 'Ekonomi', path: '/ekonomi', icon: 'TrendingUp', order: 4, children: [{title: 'BUMDes', slug: 'ekonomi/bumdes'}, {title: 'Koperasi', slug: 'ekonomi/koperasi'}, {title: 'UMKM', slug: 'ekonomi/umkm'}] },
+            { title: 'Dana Desa', path: '/dana-desa', icon: 'Wallet', order: 5, children: initialPages.filter(p => p.slug.startsWith('dana-desa/')) },
+            { title: 'Pustaka', path: '/pustaka', icon: 'BookOpen', order: 6, children: [{title: 'Publikasi', slug: 'pustaka/publikasi'}, {title: 'Pustaka Desa', slug: 'pustaka/pustaka-desa'}] },
         ];
 
         for (const parent of topNavMenuStructure) {
             const parentItemRef = doc(collection(db, topNavRef.path, 'items'));
-            batch.set(parentItemRef, { title: parent.title, path: '#', icon: parent.icon, order: parent.order, parentId: null });
+            batch.set(parentItemRef, { title: parent.title, path: parent.path, icon: parent.icon, order: parent.order, parentId: null });
             
             parent.children.forEach((child, index) => {
                 const childItemRef = doc(collection(db, topNavRef.path, 'items'));
