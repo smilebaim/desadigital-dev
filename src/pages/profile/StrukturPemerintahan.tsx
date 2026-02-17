@@ -75,35 +75,36 @@ const StrukturPemerintahan = () => {
       <div className="space-y-8">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Struktur Pemerintahan Desa</h2>
-          <p className="text-muted-foreground">
-            Perangkat Desa Remau Bako Tuo Periode 2021-2027
+          <p className="text-muted-foreground mt-2 max-w-2xl">
+            Berikut adalah jajaran aparatur Pemerintah Desa Remau Bako Tuo periode 2021-2027 yang berdedikasi untuk melayani masyarakat dan memajukan desa.
           </p>
         </div>
 
-        <Card className="bg-muted/30">
-            <CardHeader className="text-center">
-                <div className="mx-auto bg-background rounded-full p-2 border inline-block">
-                    <Avatar className="h-24 w-24">
-                        <Image src={perangkatDesa[0].fotoUrl} alt={perangkatDesa[0].nama} width={96} height={96} data-ai-hint={perangkatDesa[0].imageHint} className="rounded-full" />
+        <Card className="bg-gradient-to-br from-background via-slate-50 to-muted/30 border-primary/10 shadow-lg">
+            <CardHeader className="text-center py-8">
+                <div className="mx-auto bg-background rounded-full p-1 border-2 border-primary/20 shadow-md inline-block">
+                    <Avatar className="h-28 w-28">
+                        <Image src={perangkatDesa[0].fotoUrl} alt={perangkatDesa[0].nama} width={112} height={112} data-ai-hint={perangkatDesa[0].imageHint} className="rounded-full" />
                     </Avatar>
                 </div>
-                <CardTitle className="mt-4">{perangkatDesa[0].nama}</CardTitle>
-                <CardDescription>{perangkatDesa[0].jabatan}</CardDescription>
+                <CardTitle className="mt-4 text-2xl">{perangkatDesa[0].nama}</CardTitle>
+                <CardDescription className="text-primary font-semibold">{perangkatDesa[0].jabatan}</CardDescription>
             </CardHeader>
         </Card>
         
-        <div className="text-center">
+        <div className="text-center pt-4">
             <h3 className="text-2xl font-bold tracking-tight">Perangkat Desa</h3>
+            <p className="text-muted-foreground mt-1">Tim yang mendukung operasional pemerintahan desa.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {perangkatDesa.slice(1).map((perangkat, index) => (
-            <Card key={index} className="text-center">
+            <Card key={index} className="text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5">
               <CardContent className="pt-6">
-                <Avatar className="h-20 w-20 mx-auto mb-4">
-                  <Image src={perangkat.fotoUrl} alt={perangkat.nama} width={80} height={80} data-ai-hint={perangkat.imageHint} className="rounded-full" />
+                <Avatar className="h-24 w-24 mx-auto mb-4 border-2 border-muted">
+                  <Image src={perangkat.fotoUrl} alt={perangkat.nama} width={96} height={96} data-ai-hint={perangkat.imageHint} className="rounded-full" />
                 </Avatar>
-                <h3 className="font-semibold">{perangkat.nama}</h3>
+                <h3 className="font-semibold text-lg">{perangkat.nama}</h3>
                 <p className="text-sm text-muted-foreground">{perangkat.jabatan}</p>
               </CardContent>
             </Card>
@@ -112,16 +113,17 @@ const StrukturPemerintahan = () => {
         
         <div className="text-center pt-8">
             <h3 className="text-2xl font-bold tracking-tight">Kepala Dusun</h3>
+            <p className="text-muted-foreground mt-1">Perpanjangan tangan pemerintah desa di tingkat dusun.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {kepalaDusun.map((kadus, index) => (
-                <Card key={index} className="text-center">
+                <Card key={index} className="text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5">
                 <CardContent className="pt-6">
-                    <Avatar className="h-20 w-20 mx-auto mb-4">
-                      <Image src={kadus.fotoUrl} alt={kadus.nama} width={80} height={80} data-ai-hint={kadus.imageHint} className="rounded-full" />
+                    <Avatar className="h-24 w-24 mx-auto mb-4 border-2 border-muted">
+                      <Image src={kadus.fotoUrl} alt={kadus.nama} width={96} height={96} data-ai-hint={kadus.imageHint} className="rounded-full" />
                     </Avatar>
-                    <h3 className="font-semibold">{kadus.nama}</h3>
+                    <h3 className="font-semibold text-lg">{kadus.nama}</h3>
                     <p className="text-sm text-muted-foreground">{kadus.jabatan}</p>
                 </CardContent>
                 </Card>
