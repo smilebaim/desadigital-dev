@@ -311,6 +311,36 @@
         "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }, "nomorSurat": { "type": "string" }, "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["pendudukId", "namaPemohon", "nikPemohon", "keterangan", "status"]
+    },
+    "SuratMasuk": {
+      "title": "Surat Masuk",
+      "type": "object",
+      "properties": {
+        "nomorSurat": { "type": "string" },
+        "tanggalSurat": { "type": "string", "format": "date" },
+        "tanggalDiterima": { "type": "string", "format": "date" },
+        "pengirim": { "type": "string" },
+        "perihal": { "type": "string" },
+        "fileUrl": { "type": "string", "format": "uri" },
+        "filePath": { "type": "string" },
+        "disposisi": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nomorSurat", "tanggalSurat", "tanggalDiterima", "pengirim", "perihal"]
+    },
+    "SuratKeluar": {
+      "title": "Surat Keluar",
+      "type": "object",
+      "properties": {
+        "nomorSurat": { "type": "string" },
+        "tanggalSurat": { "type": "string", "format": "date" },
+        "tujuan": { "type": "string" },
+        "perihal": { "type": "string" },
+        "fileUrl": { "type": "string", "format": "uri" },
+        "filePath": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["nomorSurat", "tanggalSurat", "tujuan", "perihal"]
     }
   },
   "auth": {
@@ -331,6 +361,8 @@
     "/surat_kematian/{suratId}": { "schema": { "$ref": "#/entities/SuratKematian" }, "description": "Menyimpan data surat keterangan kematian." },
     "/surat_pindah/{suratId}": { "schema": { "$ref": "#/entities/SuratPindah" }, "description": "Menyimpan data surat keterangan pindah." },
     "/surat_pengantar/{suratId}": { "schema": { "$ref": "#/entities/SuratPengantar" }, "description": "Menyimpan data surat pengantar." },
-    "/surat_keterangan/{suratId}": { "schema": { "$ref": "#/entities/SuratKeterangan" }, "description": "Menyimpan data surat keterangan lainnya." }
+    "/surat_keterangan/{suratId}": { "schema": { "$ref": "#/entities/SuratKeterangan" }, "description": "Menyimpan data surat keterangan lainnya." },
+    "/surat_masuk/{suratId}": { "schema": { "$ref": "#/entities/SuratMasuk" }, "description": "Menyimpan data arsip surat masuk." },
+    "/surat_keluar/{suratId}": { "schema": { "$ref": "#/entities/SuratKeluar" }, "description": "Menyimpan data arsip surat keluar." }
   }
 }
