@@ -6,8 +6,17 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
 import { getPostsStream } from "@/lib/posts-client-actions";
-import { getSuratUsahaStream } from "@/lib/surat-usaha-client-actions";
 import dynamic from 'next/dynamic';
+
+import { getSuratUsahaStream } from "@/lib/surat-usaha-client-actions";
+import { getSuratDomisiliStream } from "@/lib/surat-domisili-client-actions";
+import { getSuratKelahiranStream } from "@/lib/surat-kelahiran-client-actions";
+import { getSuratKematianStream } from "@/lib/surat-kematian-client-actions";
+import { getSuratNikahStream } from "@/lib/surat-nikah-client-actions";
+import { getSuratPindahStream } from "@/lib/surat-pindah-client-actions";
+import { getSuratPengantarStream } from "@/lib/surat-pengantar-client-actions";
+import { getSuratKeteranganStream } from "@/lib/surat-keterangan-client-actions";
+
 
 const VisitorChart = dynamic(() => import('@/components/dashboard/VisitorChart'), {
     ssr: false,
@@ -22,15 +31,36 @@ const DashboardHome = () => {
   useEffect(() => {
     const unsubPenduduk = getPendudukStream((data) => setResidentCount(data.length));
     const unsubPosts = getPostsStream((data) => setPostCount(data.length));
-    const unsubSurat = getSuratUsahaStream((data) => {
-      const pending = data.filter(s => s.status === 'Diproses').length;
-      setLetterCount(pending);
+
+    const letterStreams = [
+      getSuratUsahaStream,
+      getSuratDomisiliStream,
+      getSuratKelahiranStream,
+      getSuratKematianStream,
+      getSuratNikahStream,
+      getSuratPindahStream,
+      getSuratPengantarStream,
+      getSuratKeteranganStream,
+    ];
+
+    const pendingCounts = Array(letterStreams.length).fill(0);
+
+    const updateLetterCount = () => {
+      const totalPending = pendingCounts.reduce((acc, count) => acc + count, 0);
+      setLetterCount(totalPending);
+    };
+
+    const unsubscribers = letterStreams.map((stream, index) => {
+      return stream((data: any[]) => {
+        pendingCounts[index] = data.filter(s => s.status === 'Diproses').length;
+        updateLetterCount();
+      });
     });
 
     return () => {
       unsubPenduduk();
       unsubPosts();
-      unsubSurat();
+      unsubscribers.forEach(unsub => unsub());
     };
   }, []);
 
