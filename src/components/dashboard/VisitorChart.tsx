@@ -1,5 +1,5 @@
 'use client';
-
+import { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -11,21 +11,23 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { name: "Jan", visitors: 400, pageViews: 2400 },
-  { name: "Feb", visitors: 300, pageViews: 1398 },
-  { name: "Mar", visitors: 200, pageViews: 9800 },
-  { name: "Apr", visitors: 278, pageViews: 3908 },
-  { name: "Mei", visitors: 189, pageViews: 4800 },
-  { name: "Jun", visitors: 239, pageViews: 3800 },
-  { name: "Jul", visitors: 349, pageViews: 4300 },
-];
-
 export default function VisitorChart() {
+    const [chartData, setChartData] = useState<any[]>([]);
+
+    useEffect(() => {
+        const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul"];
+        const data = months.map(month => ({
+            name: month,
+            visitors: Math.floor(Math.random() * (500 - 100 + 1) + 100),
+            pageViews: Math.floor(Math.random() * (10000 - 1000 + 1) + 1000),
+        }));
+        setChartData(data);
+    }, []);
+
     return (
         <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data}>
+              <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -34,10 +36,11 @@ export default function VisitorChart() {
                 <Line
                   type="monotone"
                   dataKey="visitors"
+                  name="Pengunjung Unik"
                   stroke="#8884d8"
                   activeDot={{ r: 8 }}
                 />
-                <Line type="monotone" dataKey="pageViews" stroke="#82ca9d" />
+                <Line type="monotone" dataKey="pageViews" name="Total Kunjungan" stroke="#82ca9d" />
               </LineChart>
             </ResponsiveContainer>
         </div>

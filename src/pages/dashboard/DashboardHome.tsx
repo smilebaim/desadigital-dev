@@ -27,8 +27,15 @@ const DashboardHome = () => {
   const [residentCount, setResidentCount] = useState(0);
   const [postCount, setPostCount] = useState(0);
   const [letterCount, setLetterCount] = useState(0);
+  const [visitorCount, setVisitorCount] = useState(0);
+  const [visitorChange, setVisitorChange] = useState(0);
+
 
   useEffect(() => {
+    // Set visitor stats on client mount to avoid hydration errors
+    setVisitorCount(Math.floor(Math.random() * (2000 - 500 + 1) + 500));
+    setVisitorChange(Math.floor(Math.random() * (25 - -10 + 1) + -10));
+
     const unsubPenduduk = getPendudukStream((data) => setResidentCount(data.length));
     const unsubPosts = getPostsStream((data) => setPostCount(data.length));
 
@@ -125,9 +132,9 @@ const DashboardHome = () => {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,250</div>
-            <p className="text-xs text-muted-foreground">
-              +10% dari kemarin
+            <div className="text-2xl font-bold">{visitorCount > 0 ? visitorCount.toLocaleString('id-ID') : '...'}</div>
+             <p className={`text-xs ${visitorChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {visitorCount > 0 ? `${visitorChange >= 0 ? '+' : ''}${visitorChange}% dari kemarin` : 'Memuat...'}
             </p>
           </CardContent>
         </Card>
