@@ -485,5 +485,71 @@ export const initialPages: InitialPage[] = [
 <h3>Pemberdayaan Masyarakat Desa</h3>
 <p>Contoh Program: Pelatihan UMKM, pengembangan BUMDes, program ketahanan pangan.</p>
 [DIAGRAM_BELANJA_DESA]`
+  },
+  {
+    title: "Agenda Desa",
+    slug: "aktivitas/agenda",
+    content: `<h1>Agenda Desa</h1>
+<p>Jadwal kegiatan dan acara yang akan datang di Desa Remau Bako Tuo.</p>
+<br/>
+<div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 600;">Musyawarah Desa (Musdes) Rencana Pembangunan</h3>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">📅 Senin, 25 Juli 2024 | 🕒 09:00 - Selesai | 📍 Aula Kantor Desa</p>
+    <p style="margin-top: 1rem;">Pembahasan dan penetapan prioritas pembangunan desa untuk tahun anggaran berikutnya. Diharapkan kehadiran perwakilan dari setiap RT.</p>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 1rem;"><strong>Penyelenggara:</strong> Pemerintah Desa & BPD</p>
+</div>
+<div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 600;">Pelatihan Pembuatan Pupuk Kompos</h3>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">📅 Rabu, 27 Juli 2024 | 🕒 13:00 - 16:00 | 📍 Kelompok Tani Maju Jaya</p>
+    <p style="margin-top: 1rem;">Pelatihan praktis bagi para petani dan warga untuk mengelola sampah organik menjadi pupuk yang bernilai ekonomis.</p>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 1rem;"><strong>Penyelenggara:</strong> Dinas Pertanian & Karang Taruna</p>
+</div>
+<div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 600;">Posyandu Balita dan Lansia</h3>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">📅 Jumat, 29 Juli 2024 | 🕒 08:00 - 11:00 | 📍 Poskesdes Remau Bako Tuo</p>
+    <p style="margin-top: 1rem;">Pemeriksaan kesehatan rutin, imunisasi, dan pemberian vitamin untuk balita. Serta pemeriksaan tensi dan gula darah untuk lansia.</p>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 1rem;"><strong>Penyelenggara:</strong> Kader PKK & Bidan Desa</p>
+</div>
+<div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+    <h3 style="font-size: 1.25rem; font-weight: 600;">Kerja Bakti Membersihkan Saluran Irigasi</h3>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 0.5rem;">📅 Minggu, 31 Juli 2024 | 🕒 07:00 - 10:00 | 📍 Area Persawahan Desa</p>
+    <p style="margin-top: 1rem;">Gotong royong membersihkan saluran irigasi primer dan sekunder untuk persiapan musim tanam. Alat-alat diharapkan membawa dari rumah masing-masing.</p>
+    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 1rem;"><strong>Penyelenggara:</strong> Seluruh Warga Desa</p>
+</div>`
+  },
+  {
+    title: "Publikasi Desa",
+    slug: "pustaka/publikasi",
+    content: `<h1>Publikasi Desa</h1>
+<p>Dokumen, laporan, dan produk hukum resmi yang dipublikasikan oleh Pemerintah Desa.</p>
+<br/>
+<div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+    <p style="font-size: 0.875rem; font-weight: 600; color: hsl(var(--primary));">Laporan Keuangan</p>
+    <h3 style="font-size: 1.25rem; font-weight: 600; margin-top: 0.25rem;">Laporan Pertanggungjawaban (LPJ) APBDes 2023</h3>
+    <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; margin-bottom: 0.5rem;">Dipublikasikan pada: 15 Januari 2024</p>
+    <p style="font-size: 0.875rem; color: #6b7280;">Dokumen resmi LPJ Anggaran Pendapatan dan Belanja Desa tahun 2023 yang telah disahkan.</p>
+    <a href="#" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); text-decoration: none; border-radius: 0.375rem;">Unduh</a>
+</div>
+<div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+    <p style="font-size: 0.875rem; font-weight: 600; color: hsl(var(--primary));">Perencanaan</p>
+    <h3 style="font-size: 1.25rem; font-weight: 600; margin-top: 0.25rem;">Rencana Pembangunan Jangka Menengah Desa (RPJMDes) 2021-2026</h3>
+    <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; margin-bottom: 0.5rem;">Dipublikasikan pada: 10 Februari 2021</p>
+    <p style="font-size: 0.875rem; color: #6b7280;">Dokumen perencanaan strategis pembangunan desa untuk periode enam tahun.</p>
+    <a href="#" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); text-decoration: none; border-radius: 0.375rem;">Unduh</a>
+</div>
+<div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+    <p style="font-size: 0.875rem; font-weight: 600; color: hsl(var(--primary));">Profil Desa</p>
+    <h3 style="font-size: 1.25rem; font-weight: 600; margin-top: 0.25rem;">Profil Desa Remau Bako Tuo Tahun 2024</h3>
+    <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; margin-bottom: 0.5rem;">Dipublikasikan pada: 01 Maret 2024</p>
+    <p style="font-size: 0.875rem; color: #6b7280;">Buku profil desa yang berisi data demografi, geografis, dan potensi desa terbaru.</p>
+    <a href="#" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); text-decoration: none; border-radius: 0.375rem;">Unduh</a>
+</div>
+<div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
+    <p style="font-size: 0.875rem; font-weight: 600; color: hsl(var(--primary));">Produk Hukum</p>
+    <h3 style="font-size: 1.25rem; font-weight: 600; margin-top: 0.25rem;">Peraturan Desa (Perdes) No. 3 Tahun 2023 tentang Pengelolaan Sampah</h3>
+    <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; margin-bottom: 0.5rem;">Dipublikasikan pada: 20 September 2023</p>
+    <p style="font-size: 0.875rem; color: #6b7280;">Peraturan desa yang mengatur tentang mekanisme pengelolaan sampah di lingkungan desa.</p>
+    <a href="#" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); text-decoration: none; border-radius: 0.375rem;">Unduh</a>
+</div>`
   }
 ];
