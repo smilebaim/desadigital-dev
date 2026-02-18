@@ -36,6 +36,7 @@ const NewCustomPage = () => {
         resolver: zodResolver(pageSchema),
         defaultValues: { title: '', slug: '', content: '' }
     });
+    const [origin, setOrigin] = useState('');
 
     const titleValue = watch('title');
 
@@ -50,6 +51,10 @@ const NewCustomPage = () => {
     useEffect(() => {
         setValue('slug', generateSlug(titleValue));
     }, [titleValue, setValue]);
+
+    useEffect(() => {
+        setOrigin(window.location.origin);
+    }, []);
 
     const onSubmit = async (data: PageFormValues) => {
         const result = await addCustomPage(data);
@@ -97,7 +102,7 @@ const NewCustomPage = () => {
                                 <Input id="slug" {...field} placeholder="contoh/slug-url-halaman" />
                             )} />
                             {errors.slug && <p className="text-xs text-red-500">{errors.slug.message}</p>}
-                             <p className="text-xs text-muted-foreground">URL akan menjadi: {typeof window !== 'undefined' ? window.location.origin : ''}/{watch('slug')}</p>
+                             <p className="text-xs text-muted-foreground">URL akan menjadi: {origin}/{watch('slug')}</p>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="content">Isi Konten</Label>

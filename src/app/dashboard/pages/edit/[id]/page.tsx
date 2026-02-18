@@ -35,6 +35,7 @@ const EditCustomPage = () => {
     const pageId = params.id as string;
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
+    const [origin, setOrigin] = useState('');
 
     const { control, handleSubmit, setValue, watch, reset, getValues, formState: { errors, isSubmitting } } = useForm<PageFormValues>({
         resolver: zodResolver(pageSchema)
@@ -55,6 +56,10 @@ const EditCustomPage = () => {
         };
         fetchPage();
     }, [pageId, reset, router, toast]);
+
+    useEffect(() => {
+        setOrigin(window.location.origin);
+    }, []);
     
     const onSubmit = async (data: PageFormValues) => {
         const result = await updateCustomPage(pageId, data);
@@ -106,7 +111,7 @@ const EditCustomPage = () => {
                                 <Input id="slug" {...field} placeholder="contoh/slug-url-halaman" />
                             )} />
                             {errors.slug && <p className="text-xs text-red-500">{errors.slug.message}</p>}
-                             <p className="text-xs text-muted-foreground">URL akan menjadi: {typeof window !== 'undefined' ? window.location.origin : ''}/{watch('slug')}</p>
+                             <p className="text-xs text-muted-foreground">URL akan menjadi: {origin}/{watch('slug')}</p>
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="content">Isi Konten</Label>
