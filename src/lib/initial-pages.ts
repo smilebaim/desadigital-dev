@@ -551,5 +551,79 @@ export const initialPages: InitialPage[] = [
     <p style="font-size: 0.875rem; color: #6b7280;">Peraturan desa yang mengatur tentang mekanisme pengelolaan sampah di lingkungan desa.</p>
     <a href="#" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); text-decoration: none; border-radius: 0.375rem;">Unduh</a>
 </div>`
+  },
+  {
+    title: "Bank Sampah",
+    slug: "layanan/bank-sampah",
+    content: `<h1>Bank Sampah: Pengelolaan Sampah Berbasis Masyarakat</h1>
+<p>Bank Sampah adalah sistem pengelolaan sampah kering secara kolektif yang mendorong masyarakat untuk berperan aktif. Menerapkan prinsip 3R (Reduce, Reuse, Recycle) dan memberikan insentif kepada masyarakat yang menabung sampah.</p>
+<h2>Informasi Umum</h2>
+<ul><li><strong>Nama Organisasi:</strong> Bank Sampah Remaubakotuo</li><li><strong>Tahun Berdiri:</strong> 2018</li><li><strong>Jumlah Nasabah:</strong> 100 Orang</li><li><strong>Status:</strong> Aktif</li></ul>
+<h2>Program</h2>
+<h3>Pengumpulan</h3>
+<ul><li>Pemilahan Sampah</li><li>Pengumpulan Sampah</li><li>Penimbangan Sampah</li><li>Pencatatan Tabungan</li></ul>
+<h3>Pengolahan</h3>
+<ul><li>Daur Ulang Kertas</li><li>Daur Ulang Plastik</li><li>Daur Ulang Kaca</li><li>Kompos Organik</li></ul>
+<h2>Kinerja</h2>
+<h3>2023</h3><ul><li>Sampah Terkumpul: 25 Ton</li><li>Jumlah Nasabah: 100</li><li>Anggaran: Rp 35.000.000</li><li>Manfaat: Peningkatan Ekonomi</li></ul>
+<h2>Pengelolaan</h2>
+<ul><li><strong>Ketua Bank Sampah:</strong> Memimpin dan mengkoordinasikan seluruh kegiatan</li><li><strong>Sekretaris:</strong> Mengelola administrasi dan dokumentasi</li><li><strong>Bendahara:</strong> Mengelola keuangan</li></ul>`
+  },
+  {
+    title: "Pos Kesehatan Desa (Poskesdes)",
+    slug: "layanan/poskesdes",
+    content: `<h1>Pos Kesehatan Desa (Poskesdes)</h1>
+<p>Poskesdes adalah unit pelayanan kesehatan dasar yang berada di desa, dikelola oleh pemerintah desa dengan peran serta masyarakat.</p>
+<h2>Informasi Umum</h2>
+<ul><li><strong>Nama Fasilitas:</strong> Poskesdes Remaubakotuo</li><li><strong>Tahun Berdiri:</strong> 2015</li><li><strong>Jumlah Petugas:</strong> 5 Orang</li><li><strong>Status:</strong> Aktif</li></ul>
+<h2>Layanan</h2>
+<h3>Kesehatan Ibu dan Anak</h3>
+<ul><li>Pemeriksaan Kehamilan</li><li>Pemeriksaan Nifas</li><li>Pemeriksaan Bayi & Balita</li></ul>
+<h3>Kesehatan Umum</h3>
+<ul><li>Pemeriksaan Umum</li><li>Pemeriksaan Gigi</li><li>Pemeriksaan Telinga</li></ul>
+<h2>Kinerja 2023</h2>
+<ul><li>Total Kunjungan: 2000</li><li>Total Layanan: 2500</li><li>Anggaran: Rp 125.000.000</li></ul>
+<h2>Pengelolaan</h2>
+<ul><li><strong>Kepala Poskesdes:</strong> Memimpin dan mengkoordinasikan kegiatan</li><li><strong>Bidan Desa:</strong> Pelayanan kesehatan ibu dan anak</li><li><strong>Perawat:</strong> Pelayanan kesehatan umum</li></ul>`
+  },
+  {
+    title: "Menu Pendamping Gizi (MPG)",
+    slug: "layanan/mpg",
+    content: `<h1>Menu Pendamping Gizi (MPG)</h1>
+<p>Contoh menu sehat dan bergizi seimbang untuk balita, ibu hamil, dan menyusui.</p>
+<h2>Usia 6-8 Bulan</h2>
+<ul><li><strong>Bubur Susu:</strong> Tepung beras, ASI/susu formula.</li><li><strong>Puree Alpukat:</strong> Alpukat matang, ASI/susu formula.</li><li><strong>Puree Hati Ayam:</strong> Hati ayam, kaldu ayam.</li></ul>
+<h2>Usia 9-11 Bulan</h2>
+<ul><li><strong>Nasi Tim Saring:</strong> Beras, daging giling, wortel, buncis.</li><li><strong>Kentang Tumbuk Ikan:</strong> Kentang, ikan kembung, brokoli.</li><li><strong>Bubur Kacang Hijau:</strong> Kacang hijau, santan, gula merah.</li></ul>
+<h2>Usia 12-23 Bulan</h2>
+<ul><li><strong>Nasi Sop Ayam:</strong> Nasi, ayam suwir, aneka sayuran.</li><li><strong>Telur Dadar Sayur:</strong> Telur, bayam, tahu.</li><li><strong>Bola-bola Daging:</strong> Daging sapi giling, tepung roti, telur.</li></ul>
+<h2>Ibu Hamil & Menyusui</h2>
+<ul><li><strong>Sayur Bening Daun Katuk:</strong> Daun katuk, jagung, temu kunci.</li><li><strong>Ikan Bakar Bumbu Kuning:</strong> Ikan, bumbu kuning, kemangi.</li><li><strong>Susu Kedelai:</strong> Kacang kedelai, air.</li></ul>`
+  },
+  {
+    title: "Pos Keamanan Lingkungan (Poskamling)",
+    slug: "layanan/poskamling",
+    content: `<h1>Pos Keamanan Lingkungan (Poskamling)</h1>
+<p>Poskamling adalah sistem keamanan lingkungan yang dikelola oleh masyarakat secara swadaya untuk menjaga keamanan dan ketertiban.</p>
+<h2>Informasi Umum</h2>
+<ul><li><strong>Nama Organisasi:</strong> Poskamling Remaubakotuo</li><li><strong>Tahun Berdiri:</strong> 2010</li><li><strong>Jumlah Anggota:</strong> 30 Orang</li><li><strong>Status:</strong> Aktif</li></ul>
+<h2>Program</h2>
+<ul><li>Ronda Malam</li><li>Pengamanan Lingkungan</li><li>Penanganan Gangguan</li><li>Koordinasi dengan Aparat</li></ul>
+<h2>Pengelolaan</h2>
+<ul><li><strong>Ketua Poskamling:</strong> Memimpin dan mengkoordinasikan kegiatan</li><li><strong>Sekretaris:</strong> Mengelola administrasi</li><li><strong>Anggota:</strong> Melaksanakan tugas ronda dan pengamanan</li></ul>`
+  },
+  {
+    title: "Pendapatan Desa",
+    slug: "dana-desa/pendapatan",
+    content: `<h1>Transparansi Pendapatan Desa</h1>
+<p>Berikut adalah rincian sumber pendapatan Desa Remau Bako Tuo untuk tahun anggaran berjalan. Data ini diambil secara langsung dari sistem untuk memastikan transparansi.</p>
+[DIAGRAM_PENDAPATAN_DESA]`
+  },
+  {
+    title: "Belanja Desa",
+    slug: "dana-desa/belanja",
+    content: `<h1>Transparansi Belanja Desa</h1>
+<p>Berikut adalah rincian alokasi belanja Desa Remau Bako Tuo untuk tahun anggaran berjalan, dikelompokkan berdasarkan bidang utama pembangunan.</p>
+[DIAGRAM_BELANJA_DESA]`
   }
 ];
