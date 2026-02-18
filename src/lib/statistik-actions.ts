@@ -127,6 +127,19 @@ export const seedInitialStatistik = async () => {
                     { name: 'Permukiman', score: 0.8 },
                     { name: 'Keamanan', score: 0.65 },
                 ],
+                trend: [
+                    { year: 2021, score: 0.68 },
+                    { year: 2022, score: 0.70 },
+                    { year: 2023, score: 0.72 },
+                    { year: 2024, score: 0.75 },
+                ],
+                recommendations: [
+                    "Peningkatan program beasiswa bagi siswa berprestasi dan kurang mampu.",
+                    "Penyuluhan kesehatan preventif secara berkala di Posyandu.",
+                    "Mengaktifkan kembali kegiatan gotong royong dan siskamling.",
+                    "Program bedah rumah untuk keluarga tidak mampu.",
+                    "Peningkatan kerjasama antara warga dengan Babinsa/Bhabinkamtibmas."
+                ]
             }, null, 2)
         },
         {
@@ -143,6 +156,19 @@ export const seedInitialStatistik = async () => {
                     { name: 'Infrastruktur Ekonomi', score: 0.75 },
                     { name: 'Stabilitas Harga', score: 0.6 },
                 ],
+                trend: [
+                    { year: 2021, score: 0.65 },
+                    { year: 2022, score: 0.68 },
+                    { year: 2023, score: 0.70 },
+                    { year: 2024, score: 0.72 },
+                ],
+                recommendations: [
+                    "Pengembangan produk unggulan desa untuk meningkatkan diversifikasi ekonomi.",
+                    "Memfasilitasi akses UMKM ke lembaga keuangan formal dan program KUR.",
+                    "Pelatihan keterampilan digital dan manajemen keuangan untuk pelaku usaha.",
+                    "Perbaikan jalan produksi dan pasar desa untuk melancarkan distribusi.",
+                    "Membentuk koperasi desa untuk menjaga stabilitas harga komoditas."
+                ]
             }, null, 2)
         },
         {
@@ -159,6 +185,19 @@ export const seedInitialStatistik = async () => {
                     { name: 'Adaptasi Iklim', score: 0.65 },
                     { name: 'Edukasi Lingkungan', score: 0.7 },
                 ],
+                trend: [
+                    { year: 2021, score: 0.62 },
+                    { year: 2022, score: 0.65 },
+                    { year: 2023, score: 0.66 },
+                    { year: 2024, score: 0.68 },
+                ],
+                recommendations: [
+                    "Program reboisasi di lahan kritis sekitar desa.",
+                    "Peningkatan efisiensi bank sampah dan sosialisasi pemilahan sampah dari rumah.",
+                    "Pembangunan sumur resapan untuk konservasi air tanah.",
+                    "Kampanye hemat energi dan penggunaan sumber energi terbarukan.",
+                    "Pengawasan lebih ketat terhadap pencemaran sungai."
+                ]
             }, null, 2)
         }
     ];

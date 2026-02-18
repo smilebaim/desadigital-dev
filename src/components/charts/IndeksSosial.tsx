@@ -19,22 +19,7 @@ const IndeksSosial = ({ isPreview }: { isPreview?: boolean }) => {
         if (statData?.data) {
             try {
                 const parsed = JSON.parse(statData.data);
-                const defaultData = {
-                  trend: [
-                    { year: 2021, score: (parsed.score - 0.07) > 0 ? (parsed.score - 0.07) : 0.1 },
-                    { year: 2022, score: (parsed.score - 0.05) > 0 ? (parsed.score - 0.05) : 0.1 },
-                    { year: 2023, score: (parsed.score - 0.03) > 0 ? (parsed.score - 0.03) : 0.1 },
-                    { year: 2024, score: parsed.score },
-                  ],
-                  recommendations: [
-                    "Peningkatan program beasiswa bagi siswa berprestasi dan kurang mampu.",
-                    "Penyuluhan kesehatan preventif secara berkala di Posyandu.",
-                    "Mengaktifkan kembali kegiatan gotong royong dan siskamling.",
-                    "Program bedah rumah untuk keluarga tidak mampu.",
-                    "Peningkatan kerjasama antara warga dengan Babinsa/Bhabinkamtibmas."
-                  ]
-                };
-                setIksData({...defaultData, ...parsed});
+                setIksData(parsed);
             } catch {
                 setIksData(null);
             }
@@ -131,7 +116,7 @@ const IndeksSosial = ({ isPreview }: { isPreview?: boolean }) => {
           </CardHeader>
           <CardContent>
             <ul className="list-disc space-y-2 pl-5 text-sm">
-              {iksData.recommendations.map((rec: string, index: number) => (
+              {iksData.recommendations?.map((rec: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{rec}</li>
               ))}
             </ul>

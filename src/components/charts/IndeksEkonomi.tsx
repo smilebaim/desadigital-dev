@@ -18,24 +18,8 @@ const IndeksEkonomi = ({ isPreview }: { isPreview?: boolean }) => {
         const statData = await getStatistikByKey('indeks_ekonomi');
         if (statData?.data) {
             try {
-                // Add dummy trend and recommendations if they don't exist
                 const parsed = JSON.parse(statData.data);
-                const defaultData = {
-                  trend: [
-                    { year: 2021, score: (parsed.score - 0.07) > 0 ? (parsed.score - 0.07) : 0.1 },
-                    { year: 2022, score: (parsed.score - 0.04) > 0 ? (parsed.score - 0.04) : 0.1 },
-                    { year: 2023, score: (parsed.score - 0.02) > 0 ? (parsed.score - 0.02) : 0.1 },
-                    { year: 2024, score: parsed.score },
-                  ],
-                  recommendations: [
-                    "Pengembangan produk unggulan desa untuk meningkatkan diversifikasi ekonomi.",
-                    "Memfasilitasi akses UMKM ke lembaga keuangan formal dan program KUR.",
-                    "Pelatihan keterampilan digital dan manajemen keuangan untuk pelaku usaha.",
-                    "Perbaikan jalan produksi dan pasar desa untuk melancarkan distribusi.",
-                    "Membentuk koperasi desa untuk menjaga stabilitas harga komoditas."
-                  ]
-                };
-                setIkeData({...defaultData, ...parsed});
+                setIkeData(parsed);
             } catch {
                 setIkeData(null);
             }
@@ -131,7 +115,7 @@ const IndeksEkonomi = ({ isPreview }: { isPreview?: boolean }) => {
                 </CardHeader>
                 <CardContent>
                     <ul className="list-disc space-y-2 pl-5 text-sm">
-                    {ikeData.recommendations.map((rec: string, index: number) => (
+                    {ikeData.recommendations?.map((rec: string, index: number) => (
                         <li key={index} className="text-muted-foreground">{rec}</li>
                     ))}
                     </ul>

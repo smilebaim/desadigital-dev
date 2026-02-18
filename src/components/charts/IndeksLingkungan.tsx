@@ -19,22 +19,7 @@ const IndeksLingkungan = ({ isPreview }: { isPreview?: boolean }) => {
         if (statData?.data) {
             try {
                  const parsed = JSON.parse(statData.data);
-                 const defaultData = {
-                    trend: [
-                        { year: 2021, score: (parsed.score - 0.06) > 0 ? (parsed.score - 0.06) : 0.1 },
-                        { year: 2022, score: (parsed.score - 0.03) > 0 ? (parsed.score - 0.03) : 0.1 },
-                        { year: 2023, score: (parsed.score - 0.02) > 0 ? (parsed.score - 0.02) : 0.1 },
-                        { year: 2024, score: parsed.score },
-                    ],
-                    recommendations: [
-                        "Program reboisasi di lahan kritis sekitar desa.",
-                        "Peningkatan efisiensi bank sampah dan sosialisasi pemilahan sampah dari rumah.",
-                        "Pembangunan sumur resapan untuk konservasi air tanah.",
-                        "Kampanye hemat energi dan penggunaan sumber energi terbarukan.",
-                        "Pengawasan lebih ketat terhadap pencemaran sungai."
-                    ]
-                };
-                setIklData({...defaultData, ...parsed});
+                setIklData(parsed);
             } catch {
                 setIklData(null);
             }
@@ -131,7 +116,7 @@ const IndeksLingkungan = ({ isPreview }: { isPreview?: boolean }) => {
           </CardHeader>
           <CardContent>
             <ul className="list-disc space-y-2 pl-5 text-sm">
-              {iklData.recommendations.map((rec: string, index: number) => (
+              {iklData.recommendations?.map((rec: string, index: number) => (
                 <li key={index} className="text-muted-foreground">{rec}</li>
               ))}
             </ul>

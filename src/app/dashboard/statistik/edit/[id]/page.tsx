@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { getStatistikById, updateStatistik, type StatistikData } from '@/lib/statistik-actions';
 
@@ -110,6 +110,8 @@ const IdmForm = ({ initialData, onSave, isSubmitting }: { initialData: any, onSa
     const [score, setScore] = useState(initialData.score);
     const [status, setStatus] = useState(initialData.status);
     const [components, setComponents] = useState(initialData.components);
+    const [trend, setTrend] = useState(initialData.trend || []);
+    const [recommendations, setRecommendations] = useState(initialData.recommendations || []);
 
     const handleComponentScoreChange = (index: number, value: string) => {
         const newComponents = [...components];
@@ -119,29 +121,37 @@ const IdmForm = ({ initialData, onSave, isSubmitting }: { initialData: any, onSa
             setComponents(newComponents);
         }
     };
+    
+    const handleTrendChange = (index: number, field: 'year' | 'score', value: string) => {
+        const newTrend = [...trend];
+        newTrend[index] = {...newTrend[index], [field]: field === 'year' ? parseInt(value) : parseFloat(value)};
+        setTrend(newTrend);
+    }
+    
+    const handleRecommendationChange = (index: number, value: string) => {
+        const newRecs = [...recommendations];
+        newRecs[index] = value;
+        setRecommendations(newRecs);
+    }
+
+    const addTrendRow = () => setTrend([...trend, { year: new Date().getFullYear(), score: 0.0 }]);
+    const removeTrendRow = (index: number) => setTrend(trend.filter((_: any, i: number) => i !== index));
+    const addRecommendation = () => setRecommendations([...recommendations, '']);
+    const removeRecommendation = (index: number) => setRecommendations(recommendations.filter((_: any, i: number) => i !== index));
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Preserve other keys like 'trend' and 'recommendations'
-        const finalData = { ...initialData, score, status, components };
+        const finalData = { ...initialData, score, status, components, trend, recommendations };
         onSave(JSON.stringify(finalData, null, 2));
     };
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Skor dan Status */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                     <Label htmlFor="total-score">Skor Total (0-1)</Label>
-                    <Input
-                        id="total-score"
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        max="1"
-                        value={score}
-                        onChange={(e) => setScore(parseFloat(e.target.value))}
-                        disabled={isSubmitting}
-                    />
+                    <Input id="total-score" type="number" step="0.01" min="0" max="1" value={score} onChange={(e) => setScore(parseFloat(e.target.value))} disabled={isSubmitting}/>
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="status">Status</Label>
@@ -156,22 +166,42 @@ const IdmForm = ({ initialData, onSave, isSubmitting }: { initialData: any, onSa
                 </div>
             </div>
 
+            {/* Komponen Penilaian */}
             <div className="space-y-4 pt-4">
                 <h4 className="font-semibold text-muted-foreground border-b pb-2">Komponen Penilaian</h4>
                 {components.map((comp: any, index: number) => (
-                     <div key={comp.name} className="grid grid-cols-3 items-center gap-4">
-                        <Label htmlFor={`comp-${index}`} className="col-span-1">{comp.name}</Label>
-                        <Input
-                            id={`comp-${index}`}
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            max="1"
-                            value={comp.score}
-                            onChange={(e) => handleComponentScoreChange(index, e.target.value)}
-                            className="col-span-2"
-                            disabled={isSubmitting}
-                        />
+                     <div key={index} className="grid grid-cols-3 items-center gap-4">
+                        <Input defaultValue={comp.name} className="col-span-1 bg-muted" readOnly />
+                        <Input id={`comp-${index}`} type="number" step="0.01" min="0" max="1" value={comp.score} onChange={(e) => handleComponentScoreChange(index, e.target.value)} className="col-span-2" disabled={isSubmitting} />
+                    </div>
+                ))}
+            </div>
+
+            {/* Tren Skor */}
+            <div className="space-y-4 pt-4">
+                <div className="flex justify-between items-center border-b pb-2">
+                    <h4 className="font-semibold text-muted-foreground">Tren Skor Tahunan</h4>
+                    <Button type="button" size="sm" variant="outline" onClick={addTrendRow}><Plus className="h-4 w-4 mr-2" />Tambah Tahun</Button>
+                </div>
+                 {trend.map((item: any, index: number) => (
+                     <div key={index} className="flex items-center gap-2">
+                        <Input type="number" placeholder="Tahun" value={item.year} onChange={(e) => handleTrendChange(index, 'year', e.target.value)} disabled={isSubmitting} />
+                        <Input type="number" step="0.01" min="0" max="1" placeholder="Skor" value={item.score} onChange={(e) => handleTrendChange(index, 'score', e.target.value)} disabled={isSubmitting} />
+                        <Button type="button" size="icon" variant="ghost" onClick={() => removeTrendRow(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                    </div>
+                ))}
+            </div>
+
+             {/* Rekomendasi */}
+            <div className="space-y-4 pt-4">
+                <div className="flex justify-between items-center border-b pb-2">
+                    <h4 className="font-semibold text-muted-foreground">Teks Rekomendasi</h4>
+                     <Button type="button" size="sm" variant="outline" onClick={addRecommendation}><Plus className="h-4 w-4 mr-2" />Tambah Rekomendasi</Button>
+                </div>
+                 {recommendations.map((rec: string, index: number) => (
+                     <div key={index} className="flex items-center gap-2">
+                        <Textarea value={rec} onChange={(e) => handleRecommendationChange(index, e.target.value)} placeholder={`Rekomendasi #${index + 1}`} rows={2} disabled={isSubmitting} />
+                        <Button type="button" size="icon" variant="ghost" onClick={() => removeRecommendation(index)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </div>
                 ))}
             </div>
