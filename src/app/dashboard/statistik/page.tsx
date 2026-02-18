@@ -1,36 +1,22 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Lightbulb, Copy, Edit, Sparkles, MoreVertical, Plus, Trash2, Save } from 'lucide-react';
+import { Lightbulb, Copy, Edit, Sparkles, MoreVertical, Trash2 } from 'lucide-react';
 import { visualizationTemplates } from '@/lib/visualization-templates';
 import type { VisualizationTemplate } from '@/lib/visualization-templates';
 import { useToast } from "@/components/ui/use-toast";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { getStatistikStream } from "@/lib/statistik-client-actions";
-import { addStatistik, deleteStatistik, seedInitialStatistik, type StatistikData } from "@/lib/statistik-actions";
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { deleteStatistik, seedInitialStatistik, type StatistikData } from "@/lib/statistik-actions";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -118,26 +104,8 @@ const DataTab = () => {
   const [isSeeding, setIsSeeding] = useState(false);
   const { toast } = useToast();
 
-  const [isAddOpen, setIsAddOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [statToDelete, setStatToDelete] = useState<Statistik | null>(null);
-
-  const statSchema = z.object({
-      title: z.string().min(1, 'Judul wajib diisi'),
-      key: z.string().min(1, 'Kunci unik wajib diisi').regex(/^[a-z0-9_]+$/, 'Kunci hanya boleh berisi huruf kecil, angka, dan underscore'),
-      group: z.string().min(1, 'Grup wajib diisi'),
-      data: z.string().refine(val => {
-          try { JSON.parse(val); return true; }
-          catch { return false; }
-      }, { message: 'Format JSON tidak valid' })
-  });
-  
-  type StatFormValues = z.infer<typeof statSchema>;
-
-  const { control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<StatFormValues>({
-      resolver: zodResolver(statSchema),
-      defaultValues: { title: '', key: '', group: 'Lainnya', data: '{\n  "contoh_key": "contoh_value"\n}' }
-  });
 
   useEffect(() => {
     const unsubscribe = getStatistikStream((data) => {
@@ -157,17 +125,6 @@ const DataTab = () => {
     }
     setIsSeeding(false);
   }
-
-  const handleAddSubmit = async (values: StatFormValues) => {
-    const result = await addStatistik(values);
-    if (result.success) {
-      toast({ title: 'Data statistik berhasil ditambahkan.' });
-      setIsAddOpen(false);
-      reset();
-    } else {
-      toast({ title: 'Gagal menambahkan data.', description: result.error, variant: 'destructive' });
-    }
-  };
 
   const openDeleteDialog = (stat: Statistik) => {
       setStatToDelete(stat);
@@ -193,19 +150,13 @@ const DataTab = () => {
               <div>
                   <CardTitle>Daftar Data Statistik</CardTitle>
                   <CardDescription>
-                      Ubah, tambah, atau hapus data yang menjadi sumber untuk diagram.
+                      Ubah atau pulihkan data yang menjadi sumber untuk diagram.
                   </CardDescription>
               </div>
               <div className="flex gap-2">
-                  {stats.length === 0 && !loading && (
-                      <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
-                      <Sparkles className="h-4 w-4 mr-2" />
-                      {isSeeding ? 'Membuat...' : 'Buat Data Awal'}
-                      </Button>
-                  )}
-                   <Button size="sm" onClick={() => setIsAddOpen(true)}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Tambah Data Baru
+                  <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    {isSeeding ? 'Memproses...' : 'Buat/Pulihkan Data Awal'}
                   </Button>
               </div>
           </div>
@@ -255,7 +206,7 @@ const DataTab = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center">
-                      Belum ada data. Klik "Buat Data Statistik Awal" untuk memulai.
+                      Belum ada data. Klik "Buat/Pulihkan Data Awal" untuk memulai.
                   </TableCell>
                 </TableRow>
               )}
@@ -263,51 +214,6 @@ const DataTab = () => {
           </Table>
         </CardContent>
       </Card>
-      
-      {/* Add Dialog */}
-      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Tambah Data Statistik Baru</DialogTitle>
-            <DialogDescription>
-              Buat data baru untuk ditampilkan sebagai visualisasi. Kunci harus unik dan hanya berisi huruf kecil, angka, dan underscore.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleSubmit(handleAddSubmit)}>
-            <div className="grid gap-4 py-4">
-                <div className="space-y-2">
-                    <Label htmlFor="title">Judul Data</Label>
-                    <Controller name="title" control={control} render={({ field }) => <Input id="title" {...field} placeholder="Contoh: Jumlah Ternak Desa" />} />
-                    {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="key">Kunci Unik (Key)</Label>
-                        <Controller name="key" control={control} render={({ field }) => <Input id="key" {...field} placeholder="contoh_ternak_desa" />} />
-                        {errors.key && <p className="text-xs text-red-500">{errors.key.message}</p>}
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="group">Grup</Label>
-                        <Controller name="group" control={control} render={({ field }) => <Input id="group" {...field} placeholder="Contoh: Peternakan" />} />
-                        {errors.group && <p className="text-xs text-red-500">{errors.group.message}</p>}
-                    </div>
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="data">Data Awal (Format JSON)</Label>
-                    <Controller name="data" control={control} render={({ field }) => <Textarea id="data" {...field} rows={10} className="font-mono" />} />
-                    {errors.data && <p className="text-xs text-red-500">{errors.data.message}</p>}
-                </div>
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)}>Batal</Button>
-              <Button type="submit" disabled={isSubmitting}>
-                <Save className="h-4 w-4 mr-2" />
-                {isSubmitting ? 'Menyimpan...' : 'Simpan'}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
       
       {/* Delete Dialog */}
       <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>

@@ -109,10 +109,7 @@ export const updateStatistik = async (id: string, data: { data: string }) => {
 export const seedInitialStatistik = async () => {
     const statistikCollection = collection(db, 'statistik');
     const snapshot = await getDocs(statistikCollection);
-    
-    if (!snapshot.empty) {
-        return { success: true, message: 'Data statistik sudah ada.' };
-    }
+    const existingKeys = new Set(snapshot.docs.map(doc => doc.data().key));
 
     const initialData = [
         {
@@ -231,13 +228,23 @@ export const seedInitialStatistik = async () => {
     ];
 
     const batch = writeBatch(db);
-    try {
-        initialData.forEach(stat => {
+    let addedCount = 0;
+
+    initialData.forEach(stat => {
+        if (!existingKeys.has(stat.key)) {
             const docRef = doc(statistikCollection);
             batch.set(docRef, { ...stat, createdAt: serverTimestamp() });
-        });
+            addedCount++;
+        }
+    });
+
+    if (addedCount === 0) {
+        return { success: true, message: 'Semua data statistik awal sudah ada.' };
+    }
+
+    try {
         await batch.commit();
-        return { success: true, message: 'Data statistik awal berhasil dibuat.' };
+        return { success: true, message: `${addedCount} data statistik baru berhasil dibuat.` };
     } catch (error: any) {
         return { success: false, error: error.message };
     }
