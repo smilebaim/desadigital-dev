@@ -212,6 +212,29 @@
         "content"
       ]
     },
+    "Statistik": {
+      "title": "Statistik",
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Unique key to identify the statistic (e.g., 'pendapatan_desa')."
+        },
+        "title": {
+          "type": "string",
+          "description": "Display title for the statistic (e.g., 'Pendapatan Desa')."
+        },
+        "group": {
+          "type": "string",
+          "description": "Grouping for the statistic (e.g., 'Anggaran', 'IDM')."
+        },
+        "data": {
+          "type": "string",
+          "description": "JSON string representing the chart data."
+        }
+      },
+      "required": ["key", "title", "group", "data"]
+    },
     "SuratUsaha": {
       "title": "Surat Keterangan Usaha",
       "type": "object",
@@ -354,6 +377,7 @@
     "/workspaces/{workspaceId}": { "schema": { "$ref": "#/entities/Workspace" }, "description": "Menyimpan metadata untuk setiap workspace." },
     "/workspaces/{workspaceId}/items/{itemId}": { "schema": { "$ref": "#/entities/WorkspaceItem" }, "description": "Menyimpan item-item yang ada di dalam sebuah workspace." },
     "/custom_pages/{pageId}": { "schema": { "$ref": "#/entities/CustomPage" }, "description": "Stores content for user-created static pages." },
+    "/statistik/{statId}": { "schema": { "$ref": "#/entities/Statistik" }, "description": "Menyimpan data untuk komponen diagram statistik." },
     "/surat_usaha/{suratId}": { "schema": { "$ref": "#/entities/SuratUsaha" }, "description": "Menyimpan data surat keterangan usaha." },
     "/surat_domisili/{suratId}": { "schema": { "$ref": "#/entities/SuratDomisili" }, "description": "Menyimpan data surat keterangan domisili." },
     "/surat_kelahiran/{suratId}": { "schema": { "$ref": "#/entities/SuratKelahiran" }, "description": "Menyimpan data surat keterangan kelahiran." },

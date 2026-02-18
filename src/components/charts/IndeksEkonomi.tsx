@@ -3,36 +3,51 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import GaugeChart from "@/components/GaugeChart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { TrendingUp, BarChart as BarChartIcon, Briefcase, ShieldCheck } from "lucide-react";
-
-// Data IKE (Indeks Ketahanan Ekonomi)
-const ikeData = {
-  score: 0.72,
-  status: "Maju",
-  components: [
-    { name: 'Keragaman Ekonomi', score: 0.8, weight: 0.3 },
-    { name: 'Akses Permodalan', score: 0.65, weight: 0.25 },
-    { name: 'Keterampilan Kerja', score: 0.7, weight: 0.2 },
-    { name: 'Infrastruktur Ekonomi', score: 0.75, weight: 0.15 },
-    { name: 'Stabilitas Harga', score: 0.6, weight: 0.1 },
-  ],
-  trend: [
-    { year: 2021, score: 0.65 },
-    { year: 2022, score: 0.68 },
-    { year: 2023, score: 0.70 },
-    { year: 2024, score: 0.72 },
-  ],
-  recommendations: [
-    "Pengembangan produk unggulan desa untuk meningkatkan diversifikasi ekonomi.",
-    "Memfasilitasi akses UMKM ke lembaga keuangan formal dan program KUR.",
-    "Pelatihan keterampilan digital dan manajemen keuangan untuk pelaku usaha.",
-    "Perbaikan jalan produksi dan pasar desa untuk melancarkan distribusi.",
-    "Membentuk koperasi desa untuk menjaga stabilitas harga komoditas."
-  ]
-};
+import { getStatistikByKey } from '@/lib/statistik-actions';
+import { useState, useEffect } from 'react';
 
 const COLORS = ['#16a34a', '#4ade80', '#a3e635', '#facc15', '#fbbf24'];
 
 const IndeksEkonomi = ({ isPreview }: { isPreview?: boolean }) => {
+  const [ikeData, setIkeData] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+        setLoading(true);
+        const statData = await getStatistikByKey('indeks_ekonomi');
+        if (statData?.data) {
+            try {
+                // Add dummy trend and recommendations if they don't exist
+                const parsed = JSON.parse(statData.data);
+                const defaultData = {
+                  trend: [
+                    { year: 2021, score: (parsed.score - 0.07) > 0 ? (parsed.score - 0.07) : 0.1 },
+                    { year: 2022, score: (parsed.score - 0.04) > 0 ? (parsed.score - 0.04) : 0.1 },
+                    { year: 2023, score: (parsed.score - 0.02) > 0 ? (parsed.score - 0.02) : 0.1 },
+                    { year: 2024, score: parsed.score },
+                  ],
+                  recommendations: [
+                    "Pengembangan produk unggulan desa untuk meningkatkan diversifikasi ekonomi.",
+                    "Memfasilitasi akses UMKM ke lembaga keuangan formal dan program KUR.",
+                    "Pelatihan keterampilan digital dan manajemen keuangan untuk pelaku usaha.",
+                    "Perbaikan jalan produksi dan pasar desa untuk melancarkan distribusi.",
+                    "Membentuk koperasi desa untuk menjaga stabilitas harga komoditas."
+                  ]
+                };
+                setIkeData({...defaultData, ...parsed});
+            } catch {
+                setIkeData(null);
+            }
+        }
+        setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  if (loading) return <div className="p-4">Memuat data IKE...</div>;
+  if (!ikeData) return <div className="p-4">Data Indeks Ketahanan Ekonomi tidak dapat dimuat.</div>;
+
   return (
     <div className={`space-y-6 ${isPreview ? 'h-full w-full' : ''}`}>
         {!isPreview && (
@@ -72,7 +87,7 @@ const IndeksEkonomi = ({ isPreview }: { isPreview?: boolean }) => {
                             <YAxis dataKey="name" type="category" width={100} fontSize={10} />
                             <Tooltip formatter={(value: number) => value.toFixed(2)} />
                             <Bar dataKey="score" name="Skor" barSize={15}>
-                                {ikeData.components.map((entry, index) => (
+                                {ikeData.components.map((entry: any, index: number) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                 ))}
                             </Bar>
@@ -95,7 +110,7 @@ const IndeksEkonomi = ({ isPreview }: { isPreview?: boolean }) => {
                         <BarChart data={ikeData.trend}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="year" fontSize={12} />
-                            <YAxis domain={[0.5, 1]} fontSize={12}/>
+                            <YAxis domain={[0, 1]} fontSize={12}/>
                             <Tooltip />
                             <Legend wrapperStyle={{ fontSize: '10px' }} />
                             <Bar dataKey="score" fill="#16a34a" name="Skor IKE"/>
@@ -116,7 +131,7 @@ const IndeksEkonomi = ({ isPreview }: { isPreview?: boolean }) => {
                 </CardHeader>
                 <CardContent>
                     <ul className="list-disc space-y-2 pl-5 text-sm">
-                    {ikeData.recommendations.map((rec, index) => (
+                    {ikeData.recommendations.map((rec: string, index: number) => (
                         <li key={index} className="text-muted-foreground">{rec}</li>
                     ))}
                     </ul>

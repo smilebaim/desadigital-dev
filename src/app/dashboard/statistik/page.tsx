@@ -7,6 +7,7 @@ import { visualizationTemplates } from '@/lib/visualization-templates';
 import type { VisualizationTemplate } from '@/lib/visualization-templates';
 import { useToast } from "@/components/ui/use-toast";
 import React from "react";
+import Link from "next/link";
 
 const StatCard = ({ template }: { template: VisualizationTemplate }) => {
     const { toast } = useToast();
@@ -54,7 +55,7 @@ const StatistikPage = () => {
     return (
         <div className="space-y-8">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight">Perpustakaan Visualisasi Data</h2>
+                <h2 className="text-3xl font-bold tracking-tight">Pustaka Visualisasi Data</h2>
                 <p className="text-muted-foreground">
                     Gunakan template di bawah ini untuk menyisipkan diagram dan grafik ke dalam halaman kustom Anda.
                 </p>
@@ -69,13 +70,15 @@ const StatistikPage = () => {
                                  <StatCard key={template.placeholder} template={template} />
                             ))}
                              {groupName === "Lainnya" && (
-                                 <Card className="flex flex-col items-center justify-center text-center p-6 border-dashed">
-                                    <Lightbulb className="h-10 w-10 text-muted-foreground mb-4" />
-                                    <h3 className="text-lg font-semibold">Butuh Visualisasi Lain?</h3>
-                                    <p className="text-sm text-muted-foreground mt-2">
-                                        Jika diagram yang Anda butuhkan tidak ada di sini, Anda bisa meminta untuk dibuatkan visualisasi data baru yang lebih spesifik.
-                                    </p>
-                                </Card>
+                                <Link href="/dashboard/statistik/data" className="block">
+                                    <Card className="flex flex-col items-center justify-center text-center p-6 border-dashed h-full hover:border-primary hover:bg-muted transition-colors">
+                                        <Lightbulb className="h-10 w-10 text-muted-foreground mb-4" />
+                                        <h3 className="text-lg font-semibold">Kelola Data Statistik</h3>
+                                        <p className="text-sm text-muted-foreground mt-2">
+                                            Ubah data untuk diagram Anggaran dan Indeks Desa Membangun dari sini.
+                                        </p>
+                                    </Card>
+                                </Link>
                             )}
                         </div>
                     </div>
