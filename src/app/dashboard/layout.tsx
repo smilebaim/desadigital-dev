@@ -133,11 +133,7 @@ const DashboardLayout = ({
                         <ul className="space-y-1 pl-4">
                            <li><Link href="/dashboard/statistik" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                               <BarChart3 size={16} className="text-emerald-100" />
-                              <span>Pustaka Visualisasi</span>
-                           </Link></li>
-                           <li><Link href="/dashboard/statistik/data" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
-                              <BarChart3 size={16} className="text-emerald-100" />
-                              <span>Data Statistik</span>
+                              <span>Statistik & Visualisasi</span>
                            </Link></li>
                           <li><Link href="/dashboard/pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                             <ListTodo size={16} className="text-emerald-100" />
