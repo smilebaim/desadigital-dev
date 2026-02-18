@@ -5,9 +5,12 @@ import FadeIn from './animations/FadeIn';
 interface HeroProps {
   className?: string;
   heroUrl?: string;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroDescription?: string;
 }
 
-const Hero: React.FC<HeroProps> = ({ className, heroUrl }) => {
+const Hero: React.FC<HeroProps> = ({ className, heroUrl, heroTitle, heroSubtitle, heroDescription }) => {
   return (
     <section className={cn('relative min-h-screen flex items-center overflow-hidden', className)}>
       <div className="absolute inset-0 -z-10">
@@ -23,16 +26,16 @@ const Hero: React.FC<HeroProps> = ({ className, heroUrl }) => {
         <div className="max-w-3xl mx-auto text-center">
           <FadeIn delay={200}>
             <h1 className="text-lg sm:text-xl lg:text-2xl font-poppins font-medium tracking-tight text-white leading-tight mb-2">
-              SELAMAT DATANG DI LAMAN INFORMASI
+              {heroTitle || 'SELAMAT DATANG DI LAMAN INFORMASI'}
             </h1>
           </FadeIn>
           
           <FadeIn delay={200}>
             <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-poppins font-medium tracking-tight text-white leading-tight mb-4 sm:mb-6">
-              DESA REMAU BAKO TUO
+              {heroSubtitle || 'DESA REMAU BAKO TUO'}
             </h1>
             <p className="text-xs sm:text-sm md:text-base font-poppins text-white/90 mb-2 max-w-2xl mx-auto">
-              Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan
+              {heroDescription || 'Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan'}
             </p>
           </FadeIn>
         </div>

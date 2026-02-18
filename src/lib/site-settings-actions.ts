@@ -7,6 +7,9 @@ const settingsDocRef = doc(db, 'site_settings', 'main');
 export interface SiteSettings {
     logoUrl: string;
     heroUrl: string;
+    heroTitle?: string;
+    heroSubtitle?: string;
+    heroDescription?: string;
     updatedAt?: string | null;
 }
 
@@ -17,15 +20,21 @@ export const getSiteSettings = async (): Promise<SiteSettings | null> => {
         if (docSnap.exists()) {
             const data = docSnap.data();
             return {
-                logoUrl: data.logoUrl,
-                heroUrl: data.heroUrl,
+                logoUrl: data.logoUrl || "/logo-desa.png",
+                heroUrl: data.heroUrl || "/Background utama.png",
+                heroTitle: data.heroTitle || "SELAMAT DATANG DI LAMAN INFORMASI",
+                heroSubtitle: data.heroSubtitle || "DESA REMAU BAKO TUO",
+                heroDescription: data.heroDescription || "Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan",
                 updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null,
             };
         }
         // Return default settings if document doesn't exist
         return {
             logoUrl: "/logo-desa.png",
-            heroUrl: "/Background utama.png"
+            heroUrl: "/Background utama.png",
+            heroTitle: "SELAMAT DATANG DI LAMAN INFORMASI",
+            heroSubtitle: "DESA REMAU BAKO TUO",
+            heroDescription: "Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan",
         };
     } catch (error) {
         console.error("Error getting site settings: ", error);

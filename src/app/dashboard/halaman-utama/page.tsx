@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { toast } from "@/components/ui/use-toast";
@@ -11,6 +12,10 @@ import { getSiteSettings, updateSiteSettings } from "@/lib/site-settings-actions
 const HalamanUtamaPage = () => {
     const [logoUrl, setLogoUrl] = useState("/logo-desa.png");
     const [heroUrl, setHeroUrl] = useState("/Background utama.png");
+    const [heroTitle, setHeroTitle] = useState("");
+    const [heroSubtitle, setHeroSubtitle] = useState("");
+    const [heroDescription, setHeroDescription] = useState("");
+
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
@@ -21,6 +26,9 @@ const HalamanUtamaPage = () => {
             if (settings) {
                 setLogoUrl(settings.logoUrl || "/logo-desa.png");
                 setHeroUrl(settings.heroUrl || "/Background utama.png");
+                setHeroTitle(settings.heroTitle || "SELAMAT DATANG DI LAMAN INFORMASI");
+                setHeroSubtitle(settings.heroSubtitle || "DESA REMAU BAKO TUO");
+                setHeroDescription(settings.heroDescription || "Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan");
             }
             setIsLoading(false);
         };
@@ -30,7 +38,7 @@ const HalamanUtamaPage = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            const success = await updateSiteSettings({ logoUrl, heroUrl });
+            const success = await updateSiteSettings({ logoUrl, heroUrl, heroTitle, heroSubtitle, heroDescription });
             if (success) {
                 toast({ title: "Perubahan telah disimpan!" });
             } else {
@@ -50,12 +58,59 @@ const HalamanUtamaPage = () => {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-3xl font-bold tracking-tight">Kontrol Halaman Utama</h2>
-                <p className="text-muted-foreground">
-                    Atur gambar logo dan gambar utama (hero) yang tampil di halaman depan.
-                </p>
+            <div className="flex justify-between items-center">
+                <div>
+                    <h2 className="text-3xl font-bold tracking-tight">Kontrol Halaman Utama</h2>
+                    <p className="text-muted-foreground">
+                        Atur tampilan dan konten utama yang tampil di halaman depan.
+                    </p>
+                </div>
+                <Button onClick={handleSave} disabled={isSaving}>
+                    {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
+                </Button>
             </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Konten Teks Hero</CardTitle>
+                    <CardDescription>
+                        Ubah teks yang ditampilkan di atas gambar utama.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="hero-title">Judul Atas (Kecil)</Label>
+                        <Input 
+                            id="hero-title" 
+                            value={heroTitle} 
+                            onChange={(e) => setHeroTitle(e.target.value)}
+                            placeholder="Contoh: SELAMAT DATANG DI..."
+                            disabled={isSaving}
+                        />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="hero-subtitle">Judul Utama (Besar)</Label>
+                        <Input 
+                            id="hero-subtitle" 
+                            value={heroSubtitle} 
+                            onChange={(e) => setHeroSubtitle(e.target.value)}
+                            placeholder="Contoh: DESA REMAU BAKO TUO"
+                            disabled={isSaving}
+                        />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="hero-description">Deskripsi</Label>
+                        <Textarea 
+                            id="hero-description" 
+                            value={heroDescription} 
+                            onChange={(e) => setHeroDescription(e.target.value)}
+                            placeholder="Jelaskan secara singkat tentang desa atau situs web ini."
+                            rows={4}
+                            disabled={isSaving}
+                        />
+                    </div>
+                </CardContent>
+            </Card>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
@@ -128,12 +183,6 @@ const HalamanUtamaPage = () => {
                         </div>
                     </CardContent>
                 </Card>
-            </div>
-            
-            <div className="flex justify-end">
-                <Button onClick={handleSave} disabled={isSaving}>
-                    {isSaving ? "Menyimpan..." : "Simpan Perubahan"}
-                </Button>
             </div>
         </div>
     );
