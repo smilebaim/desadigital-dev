@@ -231,6 +231,45 @@
       },
       "required": ["pendudukId", "namaPemohon", "nikPemohon", "status"]
     },
+    "SuratKelahiran": {
+      "title": "Surat Keterangan Kelahiran",
+      "type": "object",
+      "properties": {
+        "pendudukId_ibu": { "type": "string" },
+        "namaIbu": { "type": "string" },
+        "nikIbu": { "type": "string" },
+        "pendudukId_ayah": { "type": "string" },
+        "namaAyah": { "type": "string" },
+        "nikAyah": { "type": "string" },
+        "namaBayi": { "type": "string" },
+        "jenisKelaminBayi": { "type": "string", "enum": ["Laki-laki", "Perempuan"] },
+        "tempatLahirBayi": { "type": "string" },
+        "tanggalLahirBayi": { "type": "string", "format": "date" },
+        "waktuLahirBayi": { "type": "string", "format": "time" },
+        "namaSaksi1": { "type": "string" },
+        "namaSaksi2": { "type": "string" },
+        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] },
+        "nomorSurat": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["pendudukId_ibu", "pendudukId_ayah", "namaBayi", "jenisKelaminBayi", "tempatLahirBayi", "tanggalLahirBayi", "status"]
+    },
+    "SuratNikah": {
+        "title": "Surat Pengantar Nikah",
+        "type": "object",
+        "properties": {
+            "pria_pendudukId": { "type": "string" },
+            "pria_nama": { "type": "string" },
+            "pria_nik": { "type": "string" },
+            "wanita_pendudukId": { "type": "string" },
+            "wanita_nama": { "type": "string" },
+            "wanita_nik": { "type": "string" },
+            "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] },
+            "nomorSurat": { "type": "string" },
+            "createdAt": { "type": "string", "format": "date-time" }
+        },
+        "required": ["pria_pendudukId", "wanita_pendudukId", "status"]
+    },
     "SuratKematian": {
       "title": "Surat Keterangan Kematian",
       "type": "object",
@@ -287,6 +326,8 @@
     "/custom_pages/{pageId}": { "schema": { "$ref": "#/entities/CustomPage" }, "description": "Stores content for user-created static pages." },
     "/surat_usaha/{suratId}": { "schema": { "$ref": "#/entities/SuratUsaha" }, "description": "Menyimpan data surat keterangan usaha." },
     "/surat_domisili/{suratId}": { "schema": { "$ref": "#/entities/SuratDomisili" }, "description": "Menyimpan data surat keterangan domisili." },
+    "/surat_kelahiran/{suratId}": { "schema": { "$ref": "#/entities/SuratKelahiran" }, "description": "Menyimpan data surat keterangan kelahiran." },
+    "/surat_nikah/{suratId}": { "schema": { "$ref": "#/entities/SuratNikah" }, "description": "Menyimpan data surat pengantar nikah." },
     "/surat_kematian/{suratId}": { "schema": { "$ref": "#/entities/SuratKematian" }, "description": "Menyimpan data surat keterangan kematian." },
     "/surat_pindah/{suratId}": { "schema": { "$ref": "#/entities/SuratPindah" }, "description": "Menyimpan data surat keterangan pindah." },
     "/surat_pengantar/{suratId}": { "schema": { "$ref": "#/entities/SuratPengantar" }, "description": "Menyimpan data surat pengantar." },
