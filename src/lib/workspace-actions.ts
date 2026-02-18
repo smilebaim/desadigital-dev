@@ -86,7 +86,13 @@ export const getWorkspace = async (workspaceId: string) => {
             
             const members = (await Promise.all(memberPromises)).filter(Boolean); // Filter out nulls
 
-            return { id: docSnap.id, ...workspaceData, owner, members };
+            return { 
+                id: docSnap.id, 
+                ...workspaceData, 
+                createdAt: workspaceData.createdAt ? workspaceData.createdAt.toDate().toISOString() : null,
+                owner, 
+                members 
+            };
         }
         return null;
     } catch (error) {

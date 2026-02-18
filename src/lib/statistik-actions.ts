@@ -33,6 +33,8 @@ export const getStatistikByKey = async (key: string): Promise<(StatistikData & {
             return {
                 id: docSnap.id,
                 ...data,
+                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
+                updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null,
             } as StatistikData & { id: string };
         }
         return null;
@@ -51,6 +53,8 @@ export const getStatistikById = async (id: string): Promise<(StatistikData & {id
             return {
                 id: docSnap.id,
                 ...data,
+                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : null,
+                updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null,
             } as StatistikData & { id: string };
         }
         return null;
