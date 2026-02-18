@@ -329,5 +329,161 @@ export const initialPages: InitialPage[] = [
 <p>Mengelola keuangan dan aset organisasi</p>
 <h3>Seksi-seksi</h3>
 <p>Melaksanakan program sesuai bidang masing-masing</p>`
+  },
+  {
+    title: "BUMDes",
+    slug: "ekonomi/bumdes",
+    content: `<h2>Informasi Umum</h2>
+<p>BUMDes adalah badan usaha yang seluruh atau sebagian besar modalnya dimiliki oleh desa melalui penyertaan secara langsung yang berasal dari kekayaan desa yang dipisahkan guna mengelola aset, jasa pelayanan, dan usaha lainnya untuk sebesar-besarnya kesejahteraan masyarakat desa.</p>
+<p><strong>Nama BUMDes:</strong> BUMDes Remaubakotuo</p>
+<p><strong>Berdiri:</strong> 2020</p>
+<p><strong>Bentuk Badan Hukum:</strong> Peraturan Desa</p>
+<p><strong>Modal Awal:</strong> Rp 500.000.000</p>
+<h2>Unit Usaha</h2>
+<h3>Jasa Keuangan</h3><ul><li>Simpan Pinjam</li><li>Pembayaran Pajak</li><li>Pembayaran Listrik</li><li>Pembayaran Air</li></ul>
+<h3>Jasa Umum</h3><ul><li>Air Minum</li><li>Listrik Desa</li><li>Internet Desa</li><li>Pengelolaan Pasar</li></ul>
+<h3>Perdagangan</h3><ul><li>Toko Desa</li><li>Warung Desa</li><li>Pasar Desa</li><li>Pengolahan Hasil Pertanian</li></ul>
+<h3>Pariwisata</h3><ul><li>Homestay</li><li>Wisata Alam</li><li>Wisata Budaya</li><li>Kuliner</li></ul>
+<h2>Kinerja</h2>
+<h3>2020</h3><p>Pendapatan: Rp 100.000.000<br>Laba: Rp 20.000.000<br>SHU: Rp 10.000.000</p>
+<h3>2021</h3><p>Pendapatan: Rp 150.000.000<br>Laba: Rp 30.000.000<br>SHU: Rp 15.000.000</p>
+<h3>2022</h3><p>Pendapatan: Rp 200.000.000<br>Laba: Rp 40.000.000<br>SHU: Rp 20.000.000</p>
+<h3>2023</h3><p>Pendapatan: Rp 250.000.000<br>Laba: Rp 50.000.000<br>SHU: Rp 25.000.000</p>
+<h2>Pengelolaan</h2>
+<h3>Direktur</h3><p>Memimpin dan mengelola BUMDes secara keseluruhan</p>
+<h3>Manager Unit</h3><p>Mengelola unit usaha sesuai bidangnya</p>
+<h3>Staff Operasional</h3><p>Melaksanakan operasional unit usaha</p>
+<h3>Staff Keuangan</h3><p>Mengelola keuangan dan pembukuan</p>`
+  },
+  {
+    title: "Koperasi",
+    slug: "ekonomi/koperasi",
+    content: `<h2>Informasi Umum</h2>
+<p>Koperasi adalah badan usaha yang beranggotakan orang-seorang atau badan hukum koperasi dengan melandaskan kegiatannya berdasarkan prinsip koperasi sekaligus sebagai gerakan ekonomi rakyat yang berdasarkan asas kekeluargaan.</p>
+<p><strong>Nama Koperasi:</strong> Koperasi Remaubakotuo</p>
+<p><strong>Berdiri:</strong> 2020</p>
+<p><strong>Bentuk Badan Hukum:</strong> Koperasi Serba Usaha</p>
+<p><strong>Modal Awal:</strong> Rp 100.000.000</p>
+<h2>Layanan</h2>
+<h3>Simpanan</h3><ul><li>Simpanan Pokok</li><li>Simpanan Wajib</li><li>Simpanan Sukarela</li><li>Deposito</li></ul>
+<h3>Pinjaman</h3><ul><li>Pinjaman Modal Kerja</li><li>Pinjaman Investasi</li><li>Pinjaman Konsumtif</li><li>Pinjaman Mikro</li></ul>
+<h3>Usaha</h3><ul><li>Toko Koperasi</li><li>Warung Koperasi</li><li>Pengolahan Hasil Pertanian</li><li>Jasa Keuangan</li></ul>
+<h3>Pendidikan</h3><ul><li>Pelatihan Koperasi</li><li>Pendampingan Usaha</li><li>Konsultasi Keuangan</li><li>Workshop Kewirausahaan</li></ul>
+<h2>Kinerja</h2>
+<h3>2020</h3><p>Modal: Rp 100.000.000<br>Aset: Rp 150.000.000<br>Volume Usaha: Rp 200.000.000<br>SHU: Rp 20.000.000</p>
+<h3>2021</h3><p>Modal: Rp 150.000.000<br>Aset: Rp 200.000.000<br>Volume Usaha: Rp 250.000.000<br>SHU: Rp 25.000.000</p>
+<h3>2022</h3><p>Modal: Rp 200.000.000<br>Aset: Rp 250.000.000<br>Volume Usaha: Rp 300.000.000<br>SHU: Rp 30.000.000</p>
+<h3>2023</h3><p>Modal: Rp 250.000.000<br>Aset: Rp 300.000.000<br>Volume Usaha: Rp 350.000.000<br>SHU: Rp 35.000.000</p>
+<h2>Pengelolaan</h2>
+<h3>Rapat Anggota</h3><p>Pemegang kekuasaan tertinggi dalam koperasi</p>
+<h3>Pengurus</h3><p>Mengelola koperasi dan usahanya</p>
+<h3>Pengawas</h3><p>Melakukan pengawasan terhadap pengelolaan koperasi</p>
+<h3>Manajer</h3><p>Mengelola operasional koperasi</p>`
+  },
+  {
+    title: "UMKM",
+    slug: "ekonomi/umkm",
+    content: `<h2>Informasi Umum</h2>
+<p>UMKM (Usaha Mikro, Kecil, dan Menengah) adalah usaha produktif yang dimiliki perorangan maupun badan usaha sesuai dengan kriteria yang ditetapkan oleh Undang-Undang. UMKM memiliki peran penting dalam perekonomian desa.</p>
+<p><strong>Total UMKM:</strong> 150 Unit</p>
+<p><strong>Usaha Mikro:</strong> 100 Unit</p>
+<p><strong>Usaha Kecil:</strong> 40 Unit</p>
+<p><strong>Usaha Menengah:</strong> 10 Unit</p>
+<h2>Sektor Usaha</h2>
+<h3>Pertanian</h3><ul><li>Budidaya Tanaman</li><li>Peternakan</li><li>Perikanan</li><li>Perkebunan</li></ul>
+<h3>Perdagangan</h3><ul><li>Warung Makan</li><li>Toko Kelontong</li><li>Pasar Tradisional</li><li>E-commerce</li></ul>
+<h3>Industri</h3><ul><li>Makanan & Minuman</li><li>Kerajinan</li><li>Konveksi</li><li>Pengolahan Hasil Pertanian</li></ul>
+<h3>Jasa</h3><ul><li>Warung Internet</li><li>Bengkel</li><li>Salon</li><li>Jasa Transportasi</li></ul>
+<h2>Kinerja</h2>
+<h3>2020</h3><p>Omzet: Rp 1.000.000.000<br>Tenaga Kerja: 300 Orang<br>Kontribusi: 15%</p>
+<h3>2021</h3><p>Omzet: Rp 1.200.000.000<br>Tenaga Kerja: 350 Orang<br>Kontribusi: 18%</p>
+<h3>2022</h3><p>Omzet: Rp 1.500.000.000<br>Tenaga Kerja: 400 Orang<br>Kontribusi: 20%</p>
+<h3>2023</h3><p>Omzet: Rp 1.800.000.000<br>Tenaga Kerja: 450 Orang<br>Kontribusi: 22%</p>
+<h2>Pengembangan</h2>
+<h3>Pelatihan</h3><p>Program peningkatan kapasitas pelaku UMKM</p>
+<h3>Pendampingan</h3><p>Pendampingan teknis dan manajemen usaha</p>
+<h3>Pembiayaan</h3><p>Akses modal usaha dan pembiayaan</p>
+<h3>Pemasaran</h3><p>Pengembangan pasar dan pemasaran produk</p>`
+  },
+    {
+    title: "Rencana Kerja Pemerintah Desa (RKPDes)",
+    slug: "pembangunan/rkpdes",
+    content: `<h1>Rencana Kerja Pemerintah Desa (RKPDes)</h1>
+<p>Rencana Kerja Pemerintah Desa (RKPDes) adalah penjabaran dari RPJMDes untuk jangka waktu satu tahun. Dokumen ini lebih operasional dan menjadi dasar penyusunan Anggaran Pendapatan dan Belanja Desa (APBDes) setiap tahunnya.</p>
+<p><strong>Tahun:</strong> 2024</p>
+<p><strong>Dasar Hukum:</strong> Peraturan Desa No. 5 Tahun 2023</p>
+<h2>Prioritas Pembangunan 2024</h2>
+<ul>
+    <li>Peningkatan Kualitas Infrastruktur Jalan dan Drainase</li>
+    <li>Pengembangan Kapasitas UMKM Lokal dan Ekonomi Kreatif</li>
+    <li>Peningkatan Kualitas Layanan Kesehatan Primer di Poskesdes</li>
+    <li>Program Digitalisasi Administrasi Desa dan Pelayanan Publik</li>
+    <li>Penguatan Ketahanan Pangan Melalui Kelompok Tani</li>
+</ul>
+<h2>Matriks Rencana Kegiatan</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Nama Kegiatan</th>
+            <th>Lokasi</th>
+            <th>Anggaran</th>
+            <th>Jadwal</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Pembangunan Jalan Usaha Tani</td>
+            <td>Dusun Tani Makmur</td>
+            <td>Rp 250.000.000</td>
+            <td>April - Juni 2024</td>
+        </tr>
+        <tr>
+            <td>Pelatihan Pemasaran Digital untuk UMKM</td>
+            <td>Aula Desa</td>
+            <td>Rp 50.000.000</td>
+            <td>Mei 2024</td>
+        </tr>
+        <tr>
+            <td>Pengadaan Alat Kesehatan Poskesdes</td>
+            <td>Poskesdes</td>
+            <td>Rp 75.000.000</td>
+            <td>Juli 2024</td>
+        </tr>
+        <tr>
+            <td>Normalisasi Saluran Drainase</td>
+            <td>Dusun Jaya & Dusun Makmur</td>
+            <td>Rp 150.000.000</td>
+            <td>Agustus - September 2024</td>
+        </tr>
+    </tbody>
+</table>`
+  },
+  {
+    title: "Rencana Pembangunan Jangka Menengah Desa (RPJMDes)",
+    slug: "pembangunan/rpjmdes",
+    content: `<h1>Rencana Pembangunan Jangka Menengah Desa (RPJMDes)</h1>
+<p>Rencana Pembangunan Jangka Menengah Desa (RPJMDes) adalah dokumen perencanaan strategis untuk periode enam tahunan yang menjadi acuan utama dalam pembangunan desa. Dokumen ini disusun secara partisipatif dengan melibatkan seluruh elemen masyarakat untuk menggali potensi, mengidentifikasi masalah, dan merumuskan program prioritas.</p>
+<p><strong>Periode:</strong> 2021-2026</p>
+<p><strong>Dasar Hukum:</strong> Peraturan Desa No. 1 Tahun 2021</p>
+<h2>Visi</h2>
+<p>"Terwujudnya Desa Remau Bako Tuo yang Maju, Mandiri, Sejahtera, dan Berbudaya Berlandaskan Iman dan Taqwa"</p>
+<h2>Misi</h2>
+<ol>
+    <li>Meningkatkan kualitas sumber daya manusia melalui program pendidikan dan kesehatan yang merata dan terjangkau.</li>
+    <li>Mengembangkan potensi ekonomi lokal berbasis pertanian, perikanan, dan pariwisata secara berkelanjutan.</li>
+    <li>Mewujudkan tata kelola pemerintahan desa yang transparan, akuntabel, profesional, dan partisipatif.</li>
+    <li>Meningkatkan kuantitas dan kualitas infrastruktur dasar yang mendukung aktivitas sosial dan ekonomi.</li>
+    <li>Melestarikan dan mengembangkan nilai-nilai budaya, adat istiadat, serta kearifan lokal.</li>
+</ol>
+<h2>Program Strategis Berdasarkan Bidang</h2>
+<h3>Penyelenggaraan Pemerintahan Desa</h3>
+<p>Contoh Program: Peningkatan kapasitas perangkat desa, digitalisasi layanan administrasi.</p>
+<h3>Pelaksanaan Pembangunan Desa</h3>
+<p>Contoh Program: Pembangunan jalan usaha tani, normalisasi drainase, pembangunan sarana air bersih.</p>
+<h3>Pembinaan Kemasyarakatan Desa</h3>
+<p>Contoh Program: Pembinaan Karang Taruna, PKK, dan lembaga adat.</p>
+<h3>Pemberdayaan Masyarakat Desa</h3>
+<p>Contoh Program: Pelatihan UMKM, pengembangan BUMDes, program ketahanan pangan.</p>
+[DIAGRAM_BELANJA_DESA]`
   }
 ];
