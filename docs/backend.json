@@ -364,6 +364,19 @@
         "createdAt": { "type": "string", "format": "date-time" }
       },
       "required": ["nomorSurat", "tanggalSurat", "tujuan", "perihal"]
+    },
+     "Kegiatan": {
+      "title": "Kegiatan Desa",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Judul kegiatan." },
+        "date": { "type": "string", "format": "date", "description": "Tanggal kegiatan." },
+        "time": { "type": "string", "format": "time", "description": "Waktu mulai kegiatan." },
+        "location": { "type": "string", "description": "Lokasi kegiatan." },
+        "description": { "type": "string", "description": "Deskripsi singkat kegiatan." },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "date", "time", "location"]
     }
   },
   "auth": {
@@ -387,6 +400,7 @@
     "/surat_pengantar/{suratId}": { "schema": { "$ref": "#/entities/SuratPengantar" }, "description": "Menyimpan data surat pengantar." },
     "/surat_keterangan/{suratId}": { "schema": { "$ref": "#/entities/SuratKeterangan" }, "description": "Menyimpan data surat keterangan lainnya." },
     "/surat_masuk/{suratId}": { "schema": { "$ref": "#/entities/SuratMasuk" }, "description": "Menyimpan data arsip surat masuk." },
-    "/surat_keluar/{suratId}": { "schema": { "$ref": "#/entities/SuratKeluar" }, "description": "Menyimpan data arsip surat keluar." }
+    "/surat_keluar/{suratId}": { "schema": { "$ref": "#/entities/SuratKeluar" }, "description": "Menyimpan data arsip surat keluar." },
+    "/kegiatan/{kegiatanId}": { "schema": { "$ref": "#/entities/Kegiatan" }, "description": "Menyimpan data semua agenda dan kegiatan desa." }
   }
 }

@@ -1,32 +1,35 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { Clock, MapPin } from "lucide-react";
 import Breadcrumb from "@/components/Breadcrumb";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import { getKegiatanStream, type KegiatanData } from '@/lib/kegiatan-client-actions';
 
-const kegiatanData: { [key: string]: { time: string; title: string; location: string }[] } = {
-  "2024-07-25": [
-    { time: "09:00", title: "Musyawarah Desa (Musdes)", location: "Aula Kantor Desa" }
-  ],
-  "2024-07-27": [
-    { time: "13:00", title: "Pelatihan Pembuatan Pupuk Kompos", location: "Kelompok Tani" }
-  ],
-  "2024-07-29": [
-    { time: "08:00", title: "Posyandu Balita dan Lansia", location: "Poskesdes" }
-  ],
-  "2024-07-31": [
-    { time: "07:00", title: "Kerja Bakti Irigasi", location: "Area Persawahan" }
-  ],
-};
+interface Kegiatan extends KegiatanData {
+  id: string;
+}
 
 const KalenderKegiatan = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [kegiatan, setKegiatan] = useState<Kegiatan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const unsub = getKegiatanStream((data) => {
+      setKegiatan(data as Kegiatan[]);
+      setLoading(false);
+    });
+    return () => unsub();
+  }, []);
   
   const selectedDateString = date ? format(date, "yyyy-MM-dd") : "";
-  const eventsForSelectedDay = kegiatanData[selectedDateString] || [];
+  const eventsForSelectedDay = kegiatan.filter(event => event.date === selectedDateString);
+
+  const eventDates = kegiatan.map(k => new Date(k.date));
 
   return (
     <div className="container mx-auto px-4 py-8 mt-16 mb-20">
@@ -54,6 +57,10 @@ const KalenderKegiatan = () => {
                     onSelect={setDate}
                     className="w-full"
                     locale={id}
+                    modifiers={{ events: eventDates }}
+                    modifiersClassNames={{
+                      events: 'bg-primary/20 rounded-full',
+                    }}
                   />
                 </CardContent>
               </Card>
@@ -66,10 +73,12 @@ const KalenderKegiatan = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {eventsForSelectedDay.length > 0 ? (
+                {loading ? (
+                    <p className="text-center text-muted-foreground py-8">Memuat kegiatan...</p>
+                ) : eventsForSelectedDay.length > 0 ? (
                   <ul className="space-y-4">
-                    {eventsForSelectedDay.map((event, index) => (
-                      <li key={index} className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
+                    {eventsForSelectedDay.map((event) => (
+                      <li key={event.id} className="flex items-start gap-4 p-4 bg-muted/50 rounded-lg">
                         <div className="flex-shrink-0">
                           <div className="flex items-center gap-1 text-sm text-primary font-semibold">
                             <Clock className="h-4 w-4" />
@@ -78,7 +87,8 @@ const KalenderKegiatan = () => {
                         </div>
                         <div>
                           <h4 className="font-semibold">{event.title}</h4>
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
+                           {event.description && <p className="text-sm text-muted-foreground mt-1">{event.description}</p>}
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2">
                             <MapPin className="h-3 w-3" />
                             <span>{event.location}</span>
                           </div>

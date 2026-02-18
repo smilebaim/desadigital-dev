@@ -33,7 +33,8 @@ import {
   BookUser,
   ArrowRightLeft,
   FileBadge,
-  Send
+  Send,
+  Calendar
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -114,6 +115,11 @@ const DashboardLayout = ({
                 <Link href="/dashboard/info" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                     <Newspaper size={18} className="text-emerald-100" />
                     <span>Info & Berita</span>
+                </Link>
+
+                 <Link href="/dashboard/kegiatan" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                    <Calendar size={18} className="text-emerald-100" />
+                    <span>Agenda Kegiatan</span>
                 </Link>
 
                 <Link href="/dashboard/map-control" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
