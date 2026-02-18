@@ -6,6 +6,7 @@ import {
     query, 
     orderBy
 } from 'firebase/firestore';
+import type { KegiatanData } from './kegiatan-actions';
 
 export const getKegiatanStream = (callback: (data: any[]) => void) => {
     const q = query(collection(db, "kegiatan"), orderBy("date", "desc"));
@@ -20,3 +21,5 @@ export const getKegiatanStream = (callback: (data: any[]) => void) => {
         callback([]);
     });
 };
+
+export type { KegiatanData };
