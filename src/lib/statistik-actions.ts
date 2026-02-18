@@ -23,6 +23,34 @@ export interface StatistikData {
     updatedAt?: any;
 }
 
+export const addStatistik = async (data: Omit<StatistikData, 'createdAt' | 'updatedAt'>) => {
+    try {
+        // Check for duplicate key
+        const q = query(collection(db, 'statistik'), where("key", "==", data.key));
+        const existing = await getDocs(q);
+        if (!existing.empty) {
+            return { success: false, error: 'Kunci (key) ini sudah digunakan. Harap gunakan kunci unik.' };
+        }
+
+        await addDoc(collection(db, 'statistik'), {
+            ...data,
+            createdAt: serverTimestamp()
+        });
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+export const deleteStatistik = async (id: string) => {
+    try {
+        await deleteDoc(doc(db, 'statistik', id));
+        return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
 export const getStatistikByKey = async (key: string): Promise<(StatistikData & {id: string}) | null> => {
     try {
         const q = query(collection(db, 'statistik'), where("key", "==", key));
