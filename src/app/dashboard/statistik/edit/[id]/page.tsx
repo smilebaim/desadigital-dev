@@ -234,7 +234,7 @@ const EditStatistikPage = () => {
                 setStatData(data);
             } else {
                 toast({ title: "Data statistik tidak ditemukan.", variant: 'destructive' });
-                router.push('/dashboard/statistik/data');
+                router.push('/dashboard/statistik');
             }
             setIsLoading(false);
         };
@@ -247,7 +247,7 @@ const EditStatistikPage = () => {
 
         if (result.success) {
             toast({ title: "Data statistik berhasil diperbarui." });
-            router.push('/dashboard/statistik/data');
+            router.push('/dashboard/statistik');
         } else {
             toast({ title: "Gagal memperbarui data.", description: result.error, variant: 'destructive' });
         }
@@ -288,7 +288,7 @@ const EditStatistikPage = () => {
                     <p className="text-muted-foreground">Ubah data untuk: {statData?.title}</p>
                 </div>
                 <Button variant="outline" asChild>
-                    <Link href="/dashboard/statistik/data"><ArrowLeft className="h-4 w-4 mr-2" />Kembali</Link>
+                    <Link href="/dashboard/statistik"><ArrowLeft className="h-4 w-4 mr-2" />Kembali</Link>
                 </Button>
             </div>
             <Card>

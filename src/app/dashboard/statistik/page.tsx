@@ -1,7 +1,6 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Edit, Sparkles, Copy, Info } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -60,8 +59,13 @@ const StatistikPage = () => {
         'indeks_sosial': '[INDEKS_KETAHANAN_SOSIAL]',
         'indeks_ekonomi': '[INDEKS_KETAHANAN_EKONOMI]',
         'indeks_lingkungan': '[INDEKS_KETAHANAN_LINGKUNGAN]',
+        'statistik_penduduk': '[STATISTIK_PENDUDUK_CHART]',
+        'statistik_pendidikan': '[STATISTIK_PENDIDIKAN_CHART]',
+        'statistik_pekerjaan': '[STATISTIK_PEKERJAAN_CHART]',
+        'statistik_pengunjung': '[STATISTIK_PENGUNJUNG_CHART]',
     };
-    return keyMap[key] || `[STAT_${key.toUpperCase()}]`;
+    const upperKey = key.toUpperCase();
+    return keyMap[key] || `[STAT_${upperKey}]`;
   };
 
   return (
@@ -163,7 +167,7 @@ const StatistikPage = () => {
           </CardHeader>
           <CardContent>
              <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground">
-                <li>Buka menu <Link href="/dashboard/pages" className="font-medium text-primary hover:underline">Kelola Halaman &gt; Daftar Halaman</Link>.</li>
+                <li>Buka menu <Link href="/dashboard/pages" className="font-medium text-primary hover:underline">Kelola Halaman</Link>.</li>
                 <li>Buat halaman baru atau edit halaman yang sudah ada.</li>
                 <li>Salin teks `Placeholder` dari tabel di atas (contoh: `[DIAGRAM_PENDAPATAN_DESA]`).</li>
                 <li>Tempelkan placeholder tersebut di dalam editor konten halaman di tempat Anda ingin diagram itu muncul.</li>
