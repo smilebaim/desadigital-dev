@@ -211,6 +211,67 @@
         "slug",
         "content"
       ]
+    },
+    "SuratUsaha": {
+      "title": "Surat Keterangan Usaha",
+      "type": "object",
+      "properties": {
+        "pendudukId": { "type": "string" }, "namaPemohon": { "type": "string" }, "nikPemohon": { "type": "string" },
+        "namaUsaha": { "type": "string" }, "jenisUsaha": { "type": "string" }, "alamatUsaha": { "type": "string" },
+        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }, "nomorSurat": { "type": "string" }, "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["pendudukId", "namaPemohon", "nikPemohon", "namaUsaha", "jenisUsaha", "alamatUsaha", "status"]
+    },
+    "SuratDomisili": {
+      "title": "Surat Keterangan Domisili",
+      "type": "object",
+      "properties": {
+        "pendudukId": { "type": "string" }, "namaPemohon": { "type": "string" }, "nikPemohon": { "type": "string" },
+        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }, "nomorSurat": { "type": "string" }, "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["pendudukId", "namaPemohon", "nikPemohon", "status"]
+    },
+    "SuratKematian": {
+      "title": "Surat Keterangan Kematian",
+      "type": "object",
+      "properties": {
+        "pendudukId": { "type": "string" }, "namaPemohon": { "type": "string" }, "nikPemohon": { "type": "string" },
+        "tanggalKematian": { "type": "string", "format": "date" },
+        "penyebabKematian": { "type": "string" },
+        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }, "nomorSurat": { "type": "string" }, "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["pendudukId", "namaPemohon", "nikPemohon", "tanggalKematian", "penyebabKematian", "status"]
+    },
+    "SuratPindah": {
+      "title": "Surat Keterangan Pindah",
+      "type": "object",
+      "properties": {
+        "pendudukId": { "type": "string" }, "namaPemohon": { "type": "string" }, "nikPemohon": { "type": "string" },
+        "alamatTujuan": { "type": "string" },
+        "alasanPindah": { "type": "string" },
+        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }, "nomorSurat": { "type": "string" }, "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["pendudukId", "namaPemohon", "nikPemohon", "alamatTujuan", "alasanPindah", "status"]
+    },
+    "SuratPengantar": {
+      "title": "Surat Pengantar",
+      "type": "object",
+      "properties": {
+        "pendudukId": { "type": "string" }, "namaPemohon": { "type": "string" }, "nikPemohon": { "type": "string" },
+        "keperluan": { "type": "string" },
+        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }, "nomorSurat": { "type": "string" }, "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["pendudukId", "namaPemohon", "nikPemohon", "keperluan", "status"]
+    },
+    "SuratKeterangan": {
+      "title": "Surat Keterangan Lainnya",
+      "type": "object",
+      "properties": {
+        "pendudukId": { "type": "string" }, "namaPemohon": { "type": "string" }, "nikPemohon": { "type": "string" },
+        "keterangan": { "type": "string" },
+        "status": { "type": "string", "enum": ["Diproses", "Selesai", "Ditolak"] }, "nomorSurat": { "type": "string" }, "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["pendudukId", "namaPemohon", "nikPemohon", "keterangan", "status"]
     }
   },
   "auth": {
@@ -219,35 +280,16 @@
     ]
   },
   "firestore": {
-    "/penduduk/{pendudukId}": {
-      "schema": {
-        "$ref": "#/entities/Penduduk"
-      },
-      "description": "Menyimpan informasi tentang setiap penduduk."
-    },
-    "/users/{userId}": {
-      "schema": {
-        "$ref": "#/entities/UserProfile"
-      },
-      "description": "Menyimpan profil publik pengguna aplikasi."
-    },
-    "/workspaces/{workspaceId}": {
-      "schema": {
-        "$ref": "#/entities/Workspace"
-      },
-      "description": "Menyimpan metadata untuk setiap workspace."
-    },
-    "/workspaces/{workspaceId}/items/{itemId}": {
-      "schema": {
-        "$ref": "#/entities/WorkspaceItem"
-      },
-      "description": "Menyimpan item-item yang ada di dalam sebuah workspace."
-    },
-    "/custom_pages/{pageId}": {
-      "schema": {
-        "$ref": "#/entities/CustomPage"
-      },
-      "description": "Stores content for user-created static pages."
-    }
+    "/penduduk/{pendudukId}": { "schema": { "$ref": "#/entities/Penduduk" }, "description": "Menyimpan informasi tentang setiap penduduk." },
+    "/users/{userId}": { "schema": { "$ref": "#/entities/UserProfile" }, "description": "Menyimpan profil publik pengguna aplikasi." },
+    "/workspaces/{workspaceId}": { "schema": { "$ref": "#/entities/Workspace" }, "description": "Menyimpan metadata untuk setiap workspace." },
+    "/workspaces/{workspaceId}/items/{itemId}": { "schema": { "$ref": "#/entities/WorkspaceItem" }, "description": "Menyimpan item-item yang ada di dalam sebuah workspace." },
+    "/custom_pages/{pageId}": { "schema": { "$ref": "#/entities/CustomPage" }, "description": "Stores content for user-created static pages." },
+    "/surat_usaha/{suratId}": { "schema": { "$ref": "#/entities/SuratUsaha" }, "description": "Menyimpan data surat keterangan usaha." },
+    "/surat_domisili/{suratId}": { "schema": { "$ref": "#/entities/SuratDomisili" }, "description": "Menyimpan data surat keterangan domisili." },
+    "/surat_kematian/{suratId}": { "schema": { "$ref": "#/entities/SuratKematian" }, "description": "Menyimpan data surat keterangan kematian." },
+    "/surat_pindah/{suratId}": { "schema": { "$ref": "#/entities/SuratPindah" }, "description": "Menyimpan data surat keterangan pindah." },
+    "/surat_pengantar/{suratId}": { "schema": { "$ref": "#/entities/SuratPengantar" }, "description": "Menyimpan data surat pengantar." },
+    "/surat_keterangan/{suratId}": { "schema": { "$ref": "#/entities/SuratKeterangan" }, "description": "Menyimpan data surat keterangan lainnya." }
   }
 }
