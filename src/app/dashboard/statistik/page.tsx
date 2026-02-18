@@ -2,11 +2,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit, Sparkles, Copy, Info } from "lucide-react";
+import { Edit, Sparkles, Copy, Info, Trash2, MoreVertical } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getStatistikStream } from "@/lib/statistik-client-actions";
-import { seedInitialStatistik, type StatistikData } from "@/lib/statistik-actions";
+import { seedInitialStatistik, deleteStatistik, type StatistikData } from "@/lib/statistik-actions";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Tooltip,
@@ -14,6 +14,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Statistik extends StatistikData {
   id: string;
@@ -23,6 +39,7 @@ const StatistikPage = () => {
   const [stats, setStats] = useState<Statistik[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
+  const [statToDelete, setStatToDelete] = useState<Statistik | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,6 +59,17 @@ const StatistikPage = () => {
       toast({ title: 'Gagal', description: result.error, variant: 'destructive' });
     }
     setIsSeeding(false);
+  }
+
+  const handleDelete = async () => {
+      if (!statToDelete) return;
+      const result = await deleteStatistik(statToDelete.id);
+      if (result.success) {
+          toast({ title: "Data statistik berhasil dihapus." });
+      } else {
+          toast({ title: "Gagal menghapus data.", variant: "destructive", description: result.error });
+      }
+      setStatToDelete(null);
   }
 
   const handleCopy = (placeholder: string) => {
@@ -69,6 +97,7 @@ const StatistikPage = () => {
   };
 
   return (
+    <>
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
@@ -77,12 +106,10 @@ const StatistikPage = () => {
             Kelola data untuk semua diagram dan grafik yang ditampilkan di situs publik.
           </p>
         </div>
-        {stats.length === 0 && !loading && (
-             <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
-              <Sparkles className="h-4 w-4 mr-2" />
-              {isSeeding ? 'Membuat...' : 'Buat Data Statistik Awal'}
-            </Button>
-        )}
+        <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
+          <Sparkles className="h-4 w-4 mr-2" />
+          {isSeeding ? 'Memulihkan...' : 'Pulihkan Data Bawaan'}
+        </Button>
       </div>
 
       <Card>
@@ -132,12 +159,25 @@ const StatistikPage = () => {
                                 </div>
                             </TableCell>
                             <TableCell className="text-right">
-                            <Button variant="outline" size="sm" asChild>
-                                <Link href={`/dashboard/statistik/edit/${stat.id}`}>
-                                    <Edit className="h-4 w-4 mr-2" />
-                                    Edit Data
-                                </Link>
-                            </Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem asChild>
+                                            <Link href={`/dashboard/statistik/edit/${stat.id}`}>
+                                                <Edit className="h-4 w-4 mr-2" />
+                                                Edit Data
+                                            </Link>
+                                        </DropdownMenuItem>
+                                         <DropdownMenuItem className="text-red-600" onClick={() => setStatToDelete(stat)}>
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            Hapus
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
                             </TableCell>
                         </TableRow>
                     )
@@ -145,7 +185,7 @@ const StatistikPage = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center">
-                      Belum ada data. Klik "Buat Data Statistik Awal" untuk memulai.
+                      Belum ada data. Klik "Pulihkan Data Bawaan" untuk memulai.
                   </TableCell>
                 </TableRow>
               )}
@@ -177,6 +217,22 @@ const StatistikPage = () => {
         </Card>
       )}
     </div>
+
+     <AlertDialog open={!!statToDelete} onOpenChange={(open) => !open && setStatToDelete(null)}>
+        <AlertDialogContent>
+        <AlertDialogHeader>
+            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+            <AlertDialogDescription>
+            Tindakan ini akan menghapus data &quot;{statToDelete?.title}&quot; secara permanen. Anda bisa memulihkannya lagi dengan tombol "Pulihkan Data Bawaan".
+            </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setStatToDelete(null)}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
+        </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 };
 
