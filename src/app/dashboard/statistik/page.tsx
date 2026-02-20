@@ -40,9 +40,12 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 interface Statistik extends StatistikData {
   id: string;
+  isAutomatic?: boolean;
+  source?: string;
 }
 
 const availableTemplates = [
@@ -52,6 +55,46 @@ const availableTemplates = [
     { key: 'indeks_ekonomi', title: 'Indeks Ketahanan Ekonomi (IKE)' },
     { key: 'indeks_lingkungan', title: 'Indeks Ketahanan Lingkungan (IKL)' }
 ];
+
+const automaticStats: Statistik[] = [
+  {
+    id: 'auto-penduduk',
+    key: 'statistik_penduduk',
+    title: 'Piramida Penduduk',
+    group: 'Demografi',
+    data: '',
+    isAutomatic: true,
+    source: 'Data Penduduk'
+  },
+  {
+    id: 'auto-pendidikan',
+    key: 'statistik_pendidikan',
+    title: 'Diagram Tingkat Pendidikan',
+    group: 'Demografi',
+    data: '',
+    isAutomatic: true,
+    source: 'Data Penduduk'
+  },
+  {
+    id: 'auto-pekerjaan',
+    key: 'statistik_pekerjaan',
+    title: 'Diagram Jenis Pekerjaan',
+    group: 'Demografi',
+    data: '',
+    isAutomatic: true,
+    source: 'Data Penduduk'
+  },
+  {
+    id: 'auto-pengunjung',
+    key: 'statistik_pengunjung',
+    title: 'Grafik Pengunjung Situs',
+    group: 'Lainnya',
+    data: '',
+    isAutomatic: true,
+    source: 'Data Dummy'
+  },
+];
+
 
 const StatistikPage = () => {
   const [stats, setStats] = useState<Statistik[]>([]);
@@ -132,9 +175,16 @@ const StatistikPage = () => {
         'statistik_pekerjaan': '[STATISTIK_PEKERJAAN_CHART]',
         'statistik_pengunjung': '[STATISTIK_PENGUNJUNG_CHART]',
     };
-    const upperKey = key.toUpperCase();
-    return keyMap[key] || `[STAT_${upperKey}]`;
+    return keyMap[key] || `[STAT_${key.toUpperCase()}]`;
   };
+  
+  const allStats: Statistik[] = [...stats, ...automaticStats].sort((a, b) => {
+    if (a.group < b.group) return -1;
+    if (a.group > b.group) return 1;
+    if (a.title < b.title) return -1;
+    if (a.title > b.title) return 1;
+    return 0;
+  });
 
   const existingKeys = new Set(stats.map(s => s.key));
   const templatesToAdd = availableTemplates.filter(t => !existingKeys.has(t.key));
@@ -152,7 +202,7 @@ const StatistikPage = () => {
         <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setIsAddDialogOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
-              Tambah Data
+              Tambah Data Manual
             </Button>
             <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
               <Sparkles className="h-4 w-4 mr-2" />
@@ -165,7 +215,7 @@ const StatistikPage = () => {
         <CardHeader>
           <CardTitle>Daftar Visualisasi Data</CardTitle>
           <CardDescription>
-            Pilih item di bawah untuk mengedit datanya. Salin placeholder untuk menampilkannya di halaman kustom.
+            Data "Manual" dapat diubah, sedangkan data "Otomatis" diperbarui dari sumber lain (misal: Data Penduduk).
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -173,6 +223,7 @@ const StatistikPage = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Judul Data</TableHead>
+                <TableHead>Jenis</TableHead>
                 <TableHead>Grup</TableHead>
                 <TableHead>Placeholder</TableHead>
                 <TableHead className="text-right">Aksi</TableHead>
@@ -181,14 +232,19 @@ const StatistikPage = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center">Memuat data...</TableCell>
+                  <TableCell colSpan={5} className="text-center">Memuat data...</TableCell>
                 </TableRow>
-              ) : stats.length > 0 ? (
-                stats.map((stat) => {
+              ) : allStats.length > 0 ? (
+                allStats.map((stat) => {
                     const placeholder = getPlaceholder(stat.key);
                     return (
                         <TableRow key={stat.id}>
                             <TableCell className="font-medium">{stat.title}</TableCell>
+                             <TableCell>
+                                <Badge variant={stat.isAutomatic ? "secondary" : "default"}>
+                                    {stat.isAutomatic ? 'Otomatis' : 'Manual'}
+                                </Badge>
+                            </TableCell>
                             <TableCell>{stat.group}</TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-2">
@@ -208,6 +264,22 @@ const StatistikPage = () => {
                                 </div>
                             </TableCell>
                             <TableCell className="text-right">
+                                {stat.isAutomatic ? (
+                                    <TooltipProvider>
+                                      <Tooltip>
+                                        <TooltipTrigger asChild>
+                                          <span tabIndex={0}>
+                                            <Button variant="ghost" size="icon" disabled>
+                                                <Info className="h-4 w-4 text-muted-foreground" />
+                                            </Button>
+                                          </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                          <p>Data dihasilkan otomatis dari {stat.source}</p>
+                                        </TooltipContent>
+                                      </Tooltip>
+                                    </TooltipProvider>
+                                ) : (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" size="icon">
@@ -227,13 +299,14 @@ const StatistikPage = () => {
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
+                                )}
                             </TableCell>
                         </TableRow>
                     )
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center">
+                  <TableCell colSpan={5} className="text-center">
                       Belum ada data. Klik "Pulihkan Data Bawaan" atau "Tambah Data".
                   </TableCell>
                 </TableRow>
@@ -285,7 +358,7 @@ const StatistikPage = () => {
     <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tambah Data Statistik Baru</DialogTitle>
+            <DialogTitle>Tambah Data Statistik Manual</DialogTitle>
             <DialogDescription>
               Pilih jenis data statistik yang ingin Anda tambahkan ke daftar.
             </DialogDescription>
@@ -304,7 +377,7 @@ const StatistikPage = () => {
                            <SelectItem key={template.key} value={template.key}>{template.title}</SelectItem>
                         ))
                     ) : (
-                        <SelectItem value="none" disabled>Semua data sudah ditambahkan.</SelectItem>
+                        <SelectItem value="none" disabled>Semua data manual sudah ditambahkan.</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
