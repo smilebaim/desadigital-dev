@@ -2,11 +2,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Edit, Sparkles, Copy, Info, Trash2, MoreVertical } from "lucide-react";
+import { Edit, Sparkles, Copy, Info, Trash2, MoreVertical, Plus, Save } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getStatistikStream } from "@/lib/statistik-client-actions";
-import { seedInitialStatistik, deleteStatistik, type StatistikData } from "@/lib/statistik-actions";
+import { seedInitialStatistik, deleteStatistik, addStatistikByKey, type StatistikData } from "@/lib/statistik-actions";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Tooltip,
@@ -30,10 +30,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface Statistik extends StatistikData {
   id: string;
 }
+
+const availableTemplates = [
+    { key: 'pendapatan_desa', title: 'Distribusi Pendapatan Desa' },
+    { key: 'belanja_desa', title: 'Distribusi Belanja Desa' },
+    { key: 'indeks_sosial', title: 'Indeks Ketahanan Sosial (IKS)' },
+    { key: 'indeks_ekonomi', title: 'Indeks Ketahanan Ekonomi (IKE)' },
+    { key: 'indeks_lingkungan', title: 'Indeks Ketahanan Lingkungan (IKL)' }
+];
 
 const StatistikPage = () => {
   const [stats, setStats] = useState<Statistik[]>([]);
@@ -41,6 +59,10 @@ const StatistikPage = () => {
   const [isSeeding, setIsSeeding] = useState(false);
   const [statToDelete, setStatToDelete] = useState<Statistik | null>(null);
   const { toast } = useToast();
+
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+  const [selectedKeyToAdd, setSelectedKeyToAdd] = useState('');
 
   useEffect(() => {
     const unsubscribe = getStatistikStream((data) => {
@@ -80,6 +102,24 @@ const StatistikPage = () => {
     });
   };
 
+  const handleAddData = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedKeyToAdd) {
+        toast({ title: "Silakan pilih jenis data untuk ditambahkan.", variant: 'destructive' });
+        return;
+    }
+    setIsAdding(true);
+    const result = await addStatistikByKey(selectedKeyToAdd);
+    if (result.success) {
+        toast({ title: "Data statistik berhasil ditambahkan." });
+        setIsAddDialogOpen(false);
+        setSelectedKeyToAdd('');
+    } else {
+        toast({ title: "Gagal menambahkan data.", description: result.error, variant: 'destructive' });
+    }
+    setIsAdding(false);
+  };
+
   const getPlaceholder = (key: string) => {
     const keyMap: { [key: string]: string } = {
         'pendapatan_desa': '[DIAGRAM_PENDAPATAN_DESA]',
@@ -96,6 +136,9 @@ const StatistikPage = () => {
     return keyMap[key] || `[STAT_${upperKey}]`;
   };
 
+  const existingKeys = new Set(stats.map(s => s.key));
+  const templatesToAdd = availableTemplates.filter(t => !existingKeys.has(t.key));
+
   return (
     <>
     <div className="space-y-6">
@@ -106,10 +149,16 @@ const StatistikPage = () => {
             Kelola data untuk semua diagram dan grafik yang ditampilkan di situs publik.
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
-          <Sparkles className="h-4 w-4 mr-2" />
-          {isSeeding ? 'Memulihkan...' : 'Pulihkan Data Bawaan'}
-        </Button>
+        <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setIsAddDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Data
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              {isSeeding ? 'Memulihkan...' : 'Pulihkan Data Bawaan'}
+            </Button>
+        </div>
       </div>
 
       <Card>
@@ -185,7 +234,7 @@ const StatistikPage = () => {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center">
-                      Belum ada data. Klik "Pulihkan Data Bawaan" untuk memulai.
+                      Belum ada data. Klik "Pulihkan Data Bawaan" atau "Tambah Data".
                   </TableCell>
                 </TableRow>
               )}
@@ -223,7 +272,7 @@ const StatistikPage = () => {
         <AlertDialogHeader>
             <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
             <AlertDialogDescription>
-            Tindakan ini akan menghapus data &quot;{statToDelete?.title}&quot; secara permanen. Anda bisa memulihkannya lagi dengan tombol "Pulihkan Data Bawaan".
+            Tindakan ini akan menghapus data &quot;{statToDelete?.title}&quot; secara permanen. Anda bisa memulihkannya lagi dengan tombol &quot;Pulihkan Data Bawaan&quot; atau menambahkannya kembali secara manual.
             </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -232,6 +281,47 @@ const StatistikPage = () => {
         </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
+
+    <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tambah Data Statistik Baru</DialogTitle>
+            <DialogDescription>
+              Pilih jenis data statistik yang ingin Anda tambahkan ke daftar.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddData}>
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="data-type">Jenis Data</Label>
+                <Select onValueChange={setSelectedKeyToAdd} value={selectedKeyToAdd}>
+                  <SelectTrigger id="data-type">
+                    <SelectValue placeholder="Pilih jenis data..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templatesToAdd.length > 0 ? (
+                        templatesToAdd.map(template => (
+                           <SelectItem key={template.key} value={template.key}>{template.title}</SelectItem>
+                        ))
+                    ) : (
+                        <SelectItem value="none" disabled>Semua data sudah ditambahkan.</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
+                Batal
+              </Button>
+              <Button type="submit" disabled={isAdding || templatesToAdd.length === 0}>
+                <Save className="h-4 w-4 mr-2" />
+                {isAdding ? 'Menyimpan...' : 'Simpan'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
