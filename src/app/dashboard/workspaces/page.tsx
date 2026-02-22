@@ -191,7 +191,7 @@ const WorkspacesPage = () => {
             <div>
             <h2 className="text-3xl font-bold tracking-tight">Workspaces</h2>
             <p className="text-muted-foreground">
-                Kelola ruang kerja kolaboratif Anda.
+                Buat dan kelola ruang kerja digital untuk berkolaborasi dalam proyek, panitia, atau kelompok kerja di desa Anda.
             </p>
             </div>
              <div className="flex gap-2">
@@ -375,3 +375,5 @@ const WorkspacesPage = () => {
 };
 
 export default WorkspacesPage;
+
+    
