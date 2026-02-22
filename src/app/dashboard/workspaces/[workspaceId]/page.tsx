@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
@@ -91,14 +92,13 @@ const WorkspaceDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Form states
-  const [newItemTitle, setNewItemTitle] = useState('');
-  const [newItemDesc, setNewItemDesc] = useState('');
-  const [newItemLabel, setNewItemLabel] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Edit state
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [itemToEdit, setItemToEdit] = useState<WorkspaceItem | null>(null);
+  // Item Dialog states
+  const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+  const [itemInDialog, setItemInDialog] = useState<WorkspaceItem | null>(null);
+
 
   // Member management states
   const [newMemberEmail, setNewMemberEmail] = useState('');
@@ -146,30 +146,13 @@ const WorkspaceDetailPage = () => {
   }, [workspaceId]);
   
   useEffect(() => {
-    if (isEditDialogOpen && itemToEdit) {
-      const currentItem = items.find(item => item.id === itemToEdit.id);
+    if (isItemDialogOpen && itemInDialog && dialogMode === 'edit') {
+      const currentItem = items.find(item => item.id === itemInDialog.id);
       if(currentItem) {
-        setItemToEdit(currentItem);
+        setItemInDialog(currentItem);
       }
     }
-  }, [items, isEditDialogOpen, itemToEdit]);
-
-  const handleAddItem = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newItemTitle.trim() || !workspaceId) return;
-
-    setIsSubmitting(true);
-    const success = await addItem(workspaceId, { title: newItemTitle, description: newItemDesc, label: newItemLabel });
-    if (success) {
-      setNewItemTitle('');
-      setNewItemDesc('');
-      setNewItemLabel('');
-      toast({ title: 'Item berhasil ditambahkan.' });
-    } else {
-      toast({ title: 'Gagal menambahkan item.', variant: 'destructive' });
-    }
-    setIsSubmitting(false);
-  };
+  }, [items, isItemDialogOpen, itemInDialog, dialogMode]);
 
   const handleToggleItem = async (itemId: string, completed: boolean) => {
     if (!workspaceId) return;
@@ -184,34 +167,76 @@ const WorkspaceDetailPage = () => {
     } else {
       toast({ title: 'Gagal menghapus item.', variant: 'destructive' });
     }
+    setItemToDelete(null);
+  };
+
+  const openAddDialog = () => {
+    setItemInDialog({
+      id: '', title: '', description: '', label: '',
+      completed: false, createdAt: null, attachments: []
+    });
+    setDialogMode('add');
+    setUploadingFile(null);
+    setUploadProgress(null);
+    setIsItemDialogOpen(true);
   };
   
   const openEditDialog = (item: WorkspaceItem) => {
-    setItemToEdit(JSON.parse(JSON.stringify(item))); // Deep copy to avoid direct state mutation
+    setItemInDialog(JSON.parse(JSON.stringify(item))); // Deep copy
+    setDialogMode('edit');
     setUploadingFile(null);
     setUploadProgress(null);
-    setIsEditDialogOpen(true);
+    setIsItemDialogOpen(true);
   };
 
-  const handleUpdateItem = async (e: React.FormEvent) => {
+  const handleSaveItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!workspaceId || !itemToEdit || !itemToEdit.title.trim()) return;
+    if (!workspaceId || !itemInDialog || !itemInDialog.title.trim()) return;
 
     setIsSubmitting(true);
-    const success = await updateItem(workspaceId, itemToEdit.id, {
-        title: itemToEdit.title,
-        description: itemToEdit.description,
-        label: itemToEdit.label,
-    });
 
-    if (success) {
-        toast({ title: 'Item berhasil diperbarui.' });
-        // Don't close dialog, user might want to upload files
-    } else {
-        toast({ title: 'Gagal memperbarui item.', variant: 'destructive' });
+    if (dialogMode === 'add') {
+        const result = await addItem(workspaceId, {
+            title: itemInDialog.title,
+            description: itemInDialog.description,
+            label: itemInDialog.label,
+        });
+
+        if (result.success && result.id) {
+            toast({ title: 'Item berhasil ditambahkan.' });
+            // Wait a moment for the new item to appear in the stream, then transition to edit mode
+            setTimeout(() => {
+                const newItemFromStream = items.find(i => i.id === result.id);
+                if (newItemFromStream) {
+                    setItemInDialog(newItemFromStream);
+                } else {
+                    // Fallback if stream is slow
+                    setItemInDialog(prev => prev ? {...prev, id: result.id!, attachments: []} : null);
+                }
+                setDialogMode('edit');
+                setIsSubmitting(false);
+            }, 500); // 500ms delay to allow Firestore stream to update
+            return; // Exit here to prevent setIsSubmitting(false) from running too early
+        } else {
+            toast({ title: 'Gagal menambahkan item.', description: result.error, variant: 'destructive' });
+        }
+    } else { // 'edit' mode
+        const success = await updateItem(workspaceId, itemInDialog.id, {
+            title: itemInDialog.title,
+            description: itemInDialog.description,
+            label: itemInDialog.label,
+        });
+        if (success) {
+            toast({ title: 'Item berhasil diperbarui.' });
+            // Don't close dialog if user is editing
+        } else {
+            toast({ title: 'Gagal memperbarui item.', variant: 'destructive' });
+        }
     }
+
     setIsSubmitting(false);
   };
+
 
   const handleInviteMember = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -243,14 +268,14 @@ const WorkspaceDetailPage = () => {
 
   const handleFileUpload = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    if (!uploadingFile || !itemToEdit || !storage) {
+    if (!uploadingFile || !itemInDialog || !storage) {
         toast({ title: 'File atau item tidak dipilih.', variant: 'destructive' });
         return;
     }
 
     setUploadProgress(0);
 
-    const storagePath = `workspaces/${workspaceId}/items/${itemToEdit.id}/${Date.now()}-${uploadingFile.name}`;
+    const storagePath = `workspaces/${workspaceId}/items/${itemInDialog.id}/${Date.now()}-${uploadingFile.name}`;
     const storageRef = ref(storage, storagePath);
     const uploadTask = uploadBytesResumable(storageRef, uploadingFile);
 
@@ -274,7 +299,7 @@ const WorkspaceDetailPage = () => {
                 path: storagePath,
             };
             
-            const result = await addAttachmentMetadata(workspaceId, itemToEdit.id, attachmentData);
+            const result = await addAttachmentMetadata(workspaceId, itemInDialog.id, attachmentData);
             
             if (result.success) {
                 toast({ title: 'Lampiran berhasil ditambahkan.' });
@@ -291,10 +316,10 @@ const WorkspaceDetailPage = () => {
 };
 
 const handleRemoveAttachment = async (attachment: Attachment) => {
-    if (!workspaceId || !itemToEdit) return;
+    if (!workspaceId || !itemInDialog) return;
 
     setIsDeletingAttachment(attachment.path);
-    const result = await removeAttachment(workspaceId, itemToEdit.id, attachment);
+    const result = await removeAttachment(workspaceId, itemInDialog.id, attachment);
 
     if (result.success) {
         toast({ title: "Lampiran berhasil dihapus." });
@@ -354,53 +379,19 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <Card>
-              <CardHeader>
-                <CardTitle>Daftar Item</CardTitle>
-                <CardDescription>
-                  Kelola tugas, catatan, atau item lain yang terkait dengan workspace ini.
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Daftar Item</CardTitle>
+                    <CardDescription>
+                      Kelola tugas, catatan, atau item lain yang terkait dengan workspace ini.
+                    </CardDescription>
+                </div>
+                <Button onClick={openAddDialog}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah Item
+                </Button>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleAddItem} className="space-y-4 mb-6 border-b pb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2 md:col-span-2">
-                          <Label htmlFor="item-title">Judul Item Baru</Label>
-                          <Input
-                            id="item-title"
-                            value={newItemTitle}
-                            onChange={(e) => setNewItemTitle(e.target.value)}
-                            placeholder="Apa yang perlu dilakukan?"
-                            disabled={isSubmitting}
-                          />
-                      </div>
-                      <div className="space-y-2">
-                          <Label htmlFor="item-label">Label (Opsional)</Label>
-                          <Input
-                            id="item-label"
-                            value={newItemLabel}
-                            onChange={(e) => setNewItemLabel(e.target.value)}
-                            placeholder="Contoh: Penting"
-                            disabled={isSubmitting}
-                          />
-                      </div>
-                  </div>
-                  <div className="space-y-2">
-                      <Label htmlFor="item-desc">Deskripsi (Opsional)</Label>
-                      <Textarea
-                        id="item-desc"
-                        value={newItemDesc}
-                        onChange={(e) => setNewItemDesc(e.target.value)}
-                        placeholder="Tambahkan detail lebih lanjut..."
-                        disabled={isSubmitting}
-                        rows={3}
-                      />
-                  </div>
-                  <Button type="submit" disabled={isSubmitting || !newItemTitle.trim()} className="w-full md:w-auto">
-                    <Plus className="h-4 w-4 mr-2" />
-                    {isSubmitting ? 'Menambahkan...' : 'Tambah Item'}
-                  </Button>
-                </form>
-
                 <div className="space-y-2">
                   {items.length > 0 ? (
                     <Accordion type="single" collapsible className="w-full space-y-2">
@@ -543,107 +534,111 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
         </div>
       </div>
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog open={isItemDialogOpen} onOpenChange={setIsItemDialogOpen}>
         <DialogContent className="sm:max-w-[625px]">
             <DialogHeader>
-                <DialogTitle>Edit Item</DialogTitle>
+                <DialogTitle>{dialogMode === 'add' ? 'Tambah Item Baru' : 'Edit Item'}</DialogTitle>
                 <DialogDescription>
-                    Perbarui detail item dan kelola lampiran.
+                    {dialogMode === 'add' ? 'Isi detail item baru. Setelah disimpan, Anda bisa menambahkan lampiran.' : 'Perbarui detail item dan kelola lampiran.'}
                 </DialogDescription>
             </DialogHeader>
-            {itemToEdit && (
+            {itemInDialog && (
                  <div className="max-h-[70vh] overflow-y-auto pr-4 -mr-6 space-y-6">
-                    {/* Form to update text fields */}
-                    <form id="edit-item-form" onSubmit={handleUpdateItem} className="space-y-4">
+                    <form id="item-dialog-form" onSubmit={handleSaveItem} className="space-y-4">
                         <div className="space-y-2">
-                            <Label htmlFor="edit-item-title">Judul</Label>
+                            <Label htmlFor="item-dialog-title">Judul</Label>
                             <Input
-                                id="edit-item-title"
-                                value={itemToEdit.title}
-                                onChange={(e) => setItemToEdit(prev => prev ? {...prev, title: e.target.value} : null)}
+                                id="item-dialog-title"
+                                value={itemInDialog.title}
+                                onChange={(e) => setItemInDialog(prev => prev ? {...prev, title: e.target.value} : null)}
                                 disabled={isSubmitting}
                             />
                         </div>
                          <div className="space-y-2">
-                            <Label htmlFor="edit-item-label">Label</Label>
+                            <Label htmlFor="item-dialog-label">Label</Label>
                             <Input
-                                id="edit-item-label"
-                                value={itemToEdit.label || ''}
-                                onChange={(e) => setItemToEdit(prev => prev ? {...prev, label: e.target.value} : null)}
+                                id="item-dialog-label"
+                                value={itemInDialog.label || ''}
+                                onChange={(e) => setItemInDialog(prev => prev ? {...prev, label: e.target.value} : null)}
                                 disabled={isSubmitting}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="edit-item-desc">Deskripsi</Label>
+                            <Label htmlFor="item-dialog-desc">Deskripsi</Label>
                             <Textarea
-                                id="edit-item-desc"
-                                value={itemToEdit.description}
-                                onChange={(e) => setItemToEdit(prev => prev ? {...prev, description: e.target.value} : null)}
+                                id="item-dialog-desc"
+                                value={itemInDialog.description}
+                                onChange={(e) => setItemInDialog(prev => prev ? {...prev, description: e.target.value} : null)}
                                 disabled={isSubmitting}
                                 rows={4}
                             />
                         </div>
                     </form>
 
-                     {/* Attachments Section */}
-                    <div className="space-y-2">
-                        <Label>Lampiran</Label>
-                        {(itemToEdit.attachments?.length || 0) > 0 ? (
-                            <ul className="mt-2 space-y-2">
-                                {itemToEdit.attachments?.map((att, index) => (
-                                    <li key={index} className="flex items-center justify-between text-sm p-2 rounded-md bg-muted">
-                                        <a href={att.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:underline truncate">
-                                            <FileIcon className="h-4 w-4 flex-shrink-0" />
-                                            <span className="truncate">{att.name}</span>
-                                        </a>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-6 w-6"
-                                            onClick={() => handleRemoveAttachment(att)}
-                                            disabled={isDeletingAttachment === att.path}
-                                        >
-                                            {isDeletingAttachment === att.path ? (
-                                                <Loader2 className="h-4 w-4 animate-spin" />
-                                            ) : (
-                                                <Trash2 className="h-4 w-4 text-red-500" />
-                                            )}
-                                        </Button>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-sm text-muted-foreground mt-2">Belum ada lampiran.</p>
-                        )}
-                    </div>
-
-                    {/* Upload Section */}
-                    <div className="space-y-2">
-                        <Label htmlFor="file-upload">Unggah Lampiran Baru</Label>
-                        <div className="flex gap-2">
-                            <Input id="file-upload" type="file" onChange={(e) => setUploadingFile(e.target.files ? e.target.files[0] : null)} disabled={uploadProgress !== null} />
-                            <Button onClick={handleFileUpload} disabled={!uploadingFile || uploadProgress !== null}>
-                                <Upload className="h-4 w-4 mr-2" />
-                                Unggah
-                            </Button>
-                        </div>
-                        {uploadProgress !== null && (
-                            <div className="mt-2">
-                                <Progress value={uploadProgress} />
-                                <p className="text-xs text-muted-foreground mt-1">{uploadProgress.toFixed(0)}% selesai</p>
+                     {dialogMode === 'edit' && (
+                        <>
+                            {/* Attachments Section */}
+                            <div className="space-y-2">
+                                <Label>Lampiran</Label>
+                                {(itemInDialog.attachments?.length || 0) > 0 ? (
+                                    <ul className="mt-2 space-y-2">
+                                        {itemInDialog.attachments?.map((att, index) => (
+                                            <li key={index} className="flex items-center justify-between text-sm p-2 rounded-md bg-muted">
+                                                <a href={att.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:underline truncate">
+                                                    <FileIcon className="h-4 w-4 flex-shrink-0" />
+                                                    <span className="truncate">{att.name}</span>
+                                                </a>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-6 w-6"
+                                                    onClick={() => handleRemoveAttachment(att)}
+                                                    disabled={isDeletingAttachment === att.path}
+                                                >
+                                                    {isDeletingAttachment === att.path ? (
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                                    )}
+                                                </Button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground mt-2">Belum ada lampiran.</p>
+                                )}
                             </div>
-                        )}
-                    </div>
+
+                            {/* Upload Section */}
+                            <div className="space-y-2">
+                                <Label htmlFor="file-upload">Unggah Lampiran Baru</Label>
+                                <div className="flex gap-2">
+                                    <Input id="file-upload" type="file" onChange={(e) => setUploadingFile(e.target.files ? e.target.files[0] : null)} disabled={uploadProgress !== null} />
+                                    <Button onClick={handleFileUpload} disabled={!uploadingFile || uploadProgress !== null}>
+                                        <Upload className="h-4 w-4 mr-2" />
+                                        Unggah
+                                    </Button>
+                                </div>
+                                {uploadProgress !== null && (
+                                    <div className="mt-2">
+                                        <Progress value={uploadProgress} />
+                                        <p className="text-xs text-muted-foreground mt-1">{uploadProgress.toFixed(0)}% selesai</p>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                     )}
                 </div>
             )}
             <DialogFooter className="pt-6">
-                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>Tutup</Button>
-                <Button type="submit" form="edit-item-form" disabled={isSubmitting}>
-                    {isSubmitting ? 'Menyimpan...' : 'Simpan Perubahan'}
+                <Button type="button" variant="outline" onClick={() => setIsItemDialogOpen(false)}>Tutup</Button>
+                <Button type="submit" form="item-dialog-form" disabled={isSubmitting}>
+                    {isSubmitting ? 'Menyimpan...' : (dialogMode === 'add' ? 'Simpan & Lanjutkan' : 'Simpan Perubahan')}
                 </Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>
+
        <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

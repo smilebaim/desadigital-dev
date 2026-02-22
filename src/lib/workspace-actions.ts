@@ -178,16 +178,16 @@ export const removeMemberFromWorkspace = async (workspaceId: string, memberId: s
 export const addItem = async (workspaceId: string, itemData: Omit<WorkspaceItemData, 'completed' | 'createdAt' | 'attachments'>) => {
     try {
         const itemsCollectionRef = collection(db, 'workspaces', workspaceId, 'items');
-        await addDoc(itemsCollectionRef, {
+        const docRef = await addDoc(itemsCollectionRef, {
             ...itemData,
             completed: false,
             createdAt: serverTimestamp(),
             attachments: []
         });
-        return true;
-    } catch (error) {
+        return { success: true, id: docRef.id };
+    } catch (error: any) {
         console.error("Error adding item: ", error);
-        return false;
+        return { success: false, error: error.message };
     }
 };
 
