@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
@@ -9,7 +8,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import Breadcrumb from '@/components/Breadcrumb';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Plus, Trash2, Edit, File as FileIcon, Upload, Loader2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Edit, File as FileIcon, Upload, Loader2, AlignLeft, Paperclip } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -31,8 +30,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 
 interface UserProfile {
@@ -94,6 +108,10 @@ const WorkspaceDetailPage = () => {
   const [uploadingFile, setUploadingFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [isDeletingAttachment, setIsDeletingAttachment] = useState<string | null>(null);
+
+  // Delete item state
+  const [itemToDelete, setItemToDelete] = useState<WorkspaceItem | null>(null);
+
 
   const workspaceId = Array.isArray(params.workspaceId) ? params.workspaceId[0] : params.workspaceId;
 
@@ -389,20 +407,39 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
                       {items.map(item => (
                         <AccordionItem value={item.id} key={item.id} className="border rounded-md bg-muted/50 data-[state=open]:bg-white">
                           <AccordionTrigger className="p-4 hover:no-underline">
-                            <div className="flex items-center gap-4 flex-grow">
-                              <Checkbox
-                                id={`item-${item.id}`}
-                                checked={item.completed}
-                                onCheckedChange={(checked) => handleToggleItem(item.id, !!checked)}
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              <label
-                                htmlFor={`item-${item.id}`}
-                                className={`flex-grow text-left text-sm ${item.completed ? 'line-through text-muted-foreground' : ''}`}
-                              >
-                                {item.title}
-                              </label>
-                              {item.label && <Badge variant="secondary">{item.label}</Badge>}
+                             <div className="flex items-center gap-4 flex-grow">
+                                <Checkbox
+                                  id={`item-${item.id}`}
+                                  checked={item.completed}
+                                  onCheckedChange={(checked) => handleToggleItem(item.id, !!checked)}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <label
+                                  htmlFor={`item-${item.id}`}
+                                  className={`flex-grow text-left text-sm ${item.completed ? 'line-through text-muted-foreground' : ''}`}
+                                >
+                                  {item.title}
+                                </label>
+                                <div className="flex items-center gap-3 text-muted-foreground ml-auto shrink-0">
+                                    {item.description && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild><AlignLeft className="h-4 w-4" /></TooltipTrigger>
+                                            <TooltipContent><p>Memiliki deskripsi</p></TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                    {item.attachments && item.attachments.length > 0 && (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="flex items-center gap-1">
+                                                    <Paperclip className="h-4 w-4" />
+                                                    <span className="text-xs">{item.attachments.length}</span>
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent><p>{item.attachments.length} lampiran</p></TooltipContent>
+                                        </Tooltip>
+                                    )}
+                                    {item.label && <Badge variant="secondary">{item.label}</Badge>}
+                                </div>
                             </div>
                           </AccordionTrigger>
                           <AccordionContent className="p-4 pt-0">
@@ -430,7 +467,7 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
                                         <Edit className="h-4 w-4 mr-2" />
                                         Edit
                                     </Button>
-                                    <Button variant="outline" size="sm" onClick={() => handleDeleteItem(item.id)}>
+                                    <Button variant="outline" size="sm" onClick={() => setItemToDelete(item)}>
                                       <Trash2 className="h-4 w-4 mr-2 text-red-500" />
                                       Hapus
                                     </Button>
@@ -607,6 +644,20 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
             </DialogFooter>
         </DialogContent>
       </Dialog>
+       <AlertDialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini akan menghapus item "{itemToDelete?.title}" secara permanen.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={() => itemToDelete && handleDeleteItem(itemToDelete.id)}>Hapus</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 };
