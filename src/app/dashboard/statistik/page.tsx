@@ -196,7 +196,7 @@ const StatistikPage = () => {
   });
 
   const existingKeys = new Set(stats.map(s => s.key));
-  const templatesToAdd = initialStatistikTemplates.filter(t => !existingKeys.has(t.key));
+  const templatesToAdd = Object.values(initialStatistikTemplates).filter(t => !existingKeys.has(t.key));
 
   return (
     <>
