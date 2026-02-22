@@ -6,7 +6,7 @@ import { Edit, Sparkles, Copy, Info, Trash2, MoreVertical, Plus, Save } from "lu
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getStatistikStream } from "@/lib/statistik-client-actions";
-import { seedInitialStatistik, deleteStatistik, addStatistikByKey, type StatistikData } from "@/lib/statistik-actions";
+import { seedInitialStatistik, deleteStatistik, addStatistik, type StatistikData, initialStatistikTemplates } from "@/lib/statistik-actions";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Tooltip,
@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 
 interface Statistik extends StatistikData {
@@ -47,14 +48,6 @@ interface Statistik extends StatistikData {
   isAutomatic?: boolean;
   source?: string;
 }
-
-const availableTemplates = [
-    { key: 'pendapatan_desa', title: 'Distribusi Pendapatan Desa' },
-    { key: 'belanja_desa', title: 'Distribusi Belanja Desa' },
-    { key: 'indeks_sosial', title: 'Indeks Ketahanan Sosial (IKS)' },
-    { key: 'indeks_ekonomi', title: 'Indeks Ketahanan Ekonomi (IKE)' },
-    { key: 'indeks_lingkungan', title: 'Indeks Ketahanan Lingkungan (IKL)' }
-];
 
 const automaticStats: Statistik[] = [
   {
@@ -105,7 +98,7 @@ const StatistikPage = () => {
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const [selectedKeyToAdd, setSelectedKeyToAdd] = useState('');
+  const [newStat, setNewStat] = useState<Omit<StatistikData, 'createdAt' | 'updatedAt'> | null>(null);
 
   useEffect(() => {
     const unsubscribe = getStatistikStream((data) => {
@@ -144,21 +137,37 @@ const StatistikPage = () => {
         description: `Placeholder "${placeholder}" telah disalin ke clipboard.`,
     });
   };
+  
+  const handleTemplateSelect = (key: string) => {
+    if (!key || key === 'none') {
+        setNewStat(null);
+        return;
+    }
+    const template = initialStatistikTemplates.find(t => t.key === key);
+    if (template) {
+        setNewStat({
+            key: template.key,
+            title: template.title,
+            group: template.group,
+            data: template.data
+        });
+    }
+  };
 
   const handleAddData = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedKeyToAdd) {
-        toast({ title: "Silakan pilih jenis data untuk ditambahkan.", variant: 'destructive' });
-        return;
+    if (!newStat || !newStat.title.trim() || !newStat.group.trim()) {
+      toast({ title: "Judul dan Grup tidak boleh kosong.", variant: "destructive" });
+      return;
     }
     setIsAdding(true);
-    const result = await addStatistikByKey(selectedKeyToAdd);
+    const result = await addStatistik(newStat);
     if (result.success) {
         toast({ title: "Data statistik berhasil ditambahkan." });
         setIsAddDialogOpen(false);
-        setSelectedKeyToAdd('');
+        setNewStat(null);
     } else {
-        toast({ title: "Gagal menambahkan data.", description: result.error, variant: 'destructive' });
+        toast({ title: "Gagal menambahkan data.", description: result.error, variant: "destructive" });
     }
     setIsAdding(false);
   };
@@ -187,7 +196,7 @@ const StatistikPage = () => {
   });
 
   const existingKeys = new Set(stats.map(s => s.key));
-  const templatesToAdd = availableTemplates.filter(t => !existingKeys.has(t.key));
+  const templatesToAdd = initialStatistikTemplates.filter(t => !existingKeys.has(t.key));
 
   return (
     <>
@@ -355,19 +364,22 @@ const StatistikPage = () => {
         </AlertDialogContent>
     </AlertDialog>
 
-    <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+    <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
+        if (!open) setNewStat(null);
+        setIsAddDialogOpen(open);
+    }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Tambah Data Statistik Manual</DialogTitle>
             <DialogDescription>
-              Pilih jenis data statistik yang ingin Anda tambahkan ke daftar.
+              Pilih jenis data statistik, sesuaikan detailnya, lalu simpan.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleAddData}>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <Label htmlFor="data-type">Jenis Data</Label>
-                <Select onValueChange={setSelectedKeyToAdd} value={selectedKeyToAdd}>
+                <Label htmlFor="data-type">Pilih Template Data</Label>
+                <Select onValueChange={handleTemplateSelect} value={newStat?.key || ''}>
                   <SelectTrigger id="data-type">
                     <SelectValue placeholder="Pilih jenis data..." />
                   </SelectTrigger>
@@ -382,12 +394,40 @@ const StatistikPage = () => {
                   </SelectContent>
                 </Select>
               </div>
+
+              {newStat && (
+                <>
+                    <div className="space-y-2">
+                        <Label htmlFor="stat-title">Judul Data</Label>
+                        <Input 
+                            id="stat-title" 
+                            value={newStat.title} 
+                            onChange={(e) => setNewStat(s => s ? {...s, title: e.target.value} : null)} 
+                            disabled={isAdding}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="stat-group">Grup</Label>
+                        <Input 
+                            id="stat-group" 
+                            value={newStat.group} 
+                            onChange={(e) => setNewStat(s => s ? {...s, group: e.target.value} : null)}
+                            disabled={isAdding}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Kunci (Key)</Label>
+                        <Input value={newStat.key} disabled />
+                        <p className="text-xs text-muted-foreground">Kunci ini tidak dapat diubah dan digunakan untuk identifikasi data.</p>
+                    </div>
+                </>
+              )}
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" disabled={isAdding || templatesToAdd.length === 0}>
+              <Button type="submit" disabled={isAdding || !newStat}>
                 <Save className="h-4 w-4 mr-2" />
                 {isAdding ? 'Menyimpan...' : 'Simpan'}
               </Button>

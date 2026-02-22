@@ -23,7 +23,7 @@ export interface StatistikData {
     updatedAt?: any;
 }
 
-const initialStatistikTemplates = [
+export const initialStatistikTemplates = [
     {
         key: 'pendapatan_desa',
         title: 'Distribusi Pendapatan Desa',
