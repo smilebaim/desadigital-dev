@@ -17,7 +17,8 @@ import {
   Edit, 
   Trash2, 
   Eye,
-  Download
+  Download,
+  Sparkles
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -39,7 +40,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { deletePost, type PostData } from "@/lib/posts-actions";
+import { deletePost, type PostData, seedDummyPosts } from "@/lib/posts-actions";
 import { getPostsStream } from "@/lib/posts-client-actions";
 import { useUser } from '@/firebase';
 import { useToast } from "@/components/ui/use-toast";
@@ -57,6 +58,7 @@ const BeritaDashboardPage = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const [isSeeding, setIsSeeding] = useState(false);
 
   useEffect(() => {
     if (user?.uid) {
@@ -83,6 +85,28 @@ const BeritaDashboardPage = () => {
     setPostToDelete(null);
   };
 
+  const handleSeedData = async () => {
+      if (!user) {
+          toast({ title: "Anda harus login untuk menambahkan data.", variant: "destructive" });
+          return;
+      }
+      setIsSeeding(true);
+      const result = await seedDummyPosts(user.uid, user.displayName || user.email || 'Admin');
+      if (result.success) {
+          toast({
+              title: "Data Dummy Berhasil Ditambahkan",
+              description: `${result.count} artikel dummy telah ditambahkan.`,
+          });
+      } else {
+          toast({
+              title: "Gagal Menambahkan Data Dummy",
+              description: result.error,
+              variant: "destructive",
+          });
+      }
+      setIsSeeding(false);
+  };
+
   const filteredPosts = posts.filter(post => 
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -93,12 +117,18 @@ const BeritaDashboardPage = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Kelola Info & Berita</h2>
+            <h2 className="text-3xl font-bold tracking-tight">Kelola Info &amp; Berita</h2>
             <p className="text-muted-foreground">
               Buat dan kelola semua pengumuman dan berita desa dari sini.
             </p>
           </div>
           <div className="flex gap-2">
+            {posts.length === 0 && !loading && (
+                <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    {isSeeding ? 'Menambahkan...' : 'Tambah Data Dummy'}
+                </Button>
+            )}
             <Button variant="outline" size="sm" disabled>
               <Download className="h-4 w-4 mr-2" />
               Export Data
@@ -210,7 +240,7 @@ const BeritaDashboardPage = () => {
                 ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center">Belum ada artikel.</TableCell>
+                    <TableCell colSpan={7} className="text-center">Belum ada artikel. Klik "Tambah Data Dummy" atau "Tambah Artikel Baru" untuk memulai.</TableCell>
                   </TableRow>
                 )}
               </TableBody>

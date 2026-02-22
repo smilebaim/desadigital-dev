@@ -1,4 +1,3 @@
-
 'use server';
 import { db } from '@/firebase/config';
 import { 
@@ -13,7 +12,9 @@ import {
     where,
     getDocs,
     orderBy,
-    increment
+    increment,
+    writeBatch,
+    limit
 } from 'firebase/firestore';
 
 // Interface for a single post
@@ -137,5 +138,59 @@ export const deletePost = async (postId: string) => {
     } catch (error) {
         console.error("Error deleting post: ", error);
         return { success: false };
+    }
+};
+
+export const seedDummyPosts = async (userId: string, author: string) => {
+    if (!userId || !author) {
+        return { success: false, error: "User ID dan nama author dibutuhkan." };
+    }
+
+    const postsCollection = collection(db, 'posts');
+    const q = query(postsCollection, limit(1));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return { success: false, error: 'Koleksi Info & Berita sudah berisi data. Data dummy tidak ditambahkan.' };
+    }
+
+    const dummyPosts: Omit<PostData, 'createdAt' | 'updatedAt' | 'views' | 'userId' | 'author'>[] = [
+        {
+            title: "Pembangunan Jalan Usaha Tani di Dusun Harapan",
+            content: "Pemerintah Desa Remau Bako Tuo telah menyelesaikan pembangunan jalan usaha tani sepanjang 500 meter di Dusun Harapan. Pembangunan ini diharapkan dapat mempermudah akses petani dalam mengangkut hasil panen dan meningkatkan perekonomian warga. Jalan yang sebelumnya berupa tanah kini telah diperkeras dengan beton, sehingga dapat dilalui kendaraan roda empat.",
+            category: 'Berita',
+            status: 'Published',
+        },
+        {
+            title: "Jadwal Posyandu Balita Bulan Mei 2024",
+            content: "Diberitahukan kepada seluruh warga yang memiliki balita, jadwal Posyandu untuk bulan Mei akan dilaksanakan pada:\n\nHari/Tanggal: Sabtu, 18 Mei 2024\nWaktu: 09:00 WIB - Selesai\nTempat: Balai Desa\n\nKegiatan meliputi penimbangan berat badan, pengukuran tinggi badan, dan pemberian vitamin A. Diharapkan para ibu dapat membawa balitanya sesuai jadwal. Atas perhatiannya, kami ucapkan terima kasih.",
+            category: 'Pengumuman',
+            status: 'Published',
+        },
+        {
+            title: "Pelatihan Pembuatan Kompos untuk Kelompok Tani",
+            content: "Dalam rangka mendukung pertanian berkelanjutan, akan diadakan pelatihan pembuatan kompos dari limbah organik. Pelatihan ini masih dalam tahap perencanaan dan akan diumumkan lebih lanjut. Warga yang berminat dapat mendaftarkan diri ke kantor desa.",
+            category: 'Berita',
+            status: 'Draft',
+        },
+    ];
+
+    const batch = writeBatch(db);
+    try {
+        dummyPosts.forEach(post => {
+            const docRef = doc(postsCollection);
+            batch.set(docRef, { 
+                ...post, 
+                userId,
+                author,
+                views: 0,
+                createdAt: serverTimestamp() 
+            });
+        });
+        await batch.commit();
+        return { success: true, count: dummyPosts.length };
+    } catch (error: any) {
+        console.error("Error seeding dummy posts:", error);
+        return { success: false, error: error.message };
     }
 };
