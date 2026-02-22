@@ -19,7 +19,8 @@ import {
   Edit, 
   Trash2, 
   Save,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Sparkles
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -50,7 +51,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { addKegiatan, updateKegiatan, deleteKegiatan, type KegiatanData } from "@/lib/kegiatan-actions";
+import { addKegiatan, updateKegiatan, deleteKegiatan, type KegiatanData, seedDummyKegiatan } from "@/lib/kegiatan-actions";
 import { getKegiatanStream } from "@/lib/kegiatan-client-actions";
 
 interface Kegiatan extends KegiatanData {
@@ -78,6 +79,7 @@ const KegiatanPage = () => {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedKegiatan, setSelectedKegiatan] = useState<Kegiatan | null>(null);
     const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+    const [isSeeding, setIsSeeding] = useState(false);
 
     const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm<FormValues>({
         resolver: zodResolver(kegiatanSchema),
@@ -134,6 +136,24 @@ const KegiatanPage = () => {
         setIsDeleteOpen(false);
     };
 
+    const handleSeedData = async () => {
+        setIsSeeding(true);
+        const result = await seedDummyKegiatan();
+        if (result.success) {
+            toast({
+                title: "Data Dummy Berhasil Ditambahkan",
+                description: `${result.count} kegiatan dummy telah ditambahkan.`,
+            });
+        } else {
+            toast({
+                title: "Gagal Menambahkan Data",
+                description: result.error,
+                variant: "destructive",
+            });
+        }
+        setIsSeeding(false);
+    };
+
     const filteredKegiatan = kegiatanList.filter(k => 
         k.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         k.location.toLowerCase().includes(searchQuery.toLowerCase())
@@ -154,10 +174,18 @@ const KegiatanPage = () => {
                                 </div>
                             </div>
                           </div>
-                          <Button size="sm" onClick={openAddForm}>
+                          <div className="flex gap-2">
+                            {kegiatanList.length === 0 && !loading && (
+                                <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
+                                    <Sparkles className="h-4 w-4 mr-2" />
+                                    {isSeeding ? 'Menambahkan...' : 'Tambah Data Dummy'}
+                                </Button>
+                            )}
+                            <Button size="sm" onClick={openAddForm}>
                                 <Plus className="h-4 w-4 mr-2" />
                                 Tambah Kegiatan
                             </Button>
+                          </div>
                         </div>
                     </CardHeader>
                     <CardContent>
@@ -200,7 +228,7 @@ const KegiatanPage = () => {
                                         </TableRow>
                                     ))
                                 ) : (
-                                    <TableRow><TableCell colSpan={4} className="text-center">Belum ada kegiatan yang ditambahkan.</TableCell></TableRow>
+                                    <TableRow><TableCell colSpan={4} className="text-center">Belum ada kegiatan. Klik "Tambah Data Dummy" atau "Tambah Kegiatan".</TableCell></TableRow>
                                 )}
                             </TableBody>
                         </Table>
