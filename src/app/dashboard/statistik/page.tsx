@@ -6,7 +6,8 @@ import { Edit, Sparkles, Copy, Info, Trash2, MoreVertical, Plus, Save } from "lu
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getStatistikStream } from "@/lib/statistik-client-actions";
-import { seedInitialStatistik, deleteStatistik, addStatistik, type StatistikData, initialStatistikTemplates } from "@/lib/statistik-actions";
+import { seedInitialStatistik, deleteStatistik, addStatistik, type StatistikData } from "@/lib/statistik-actions";
+import { initialStatistikTemplates } from "@/lib/statistik-templates";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Tooltip,
@@ -196,7 +197,7 @@ const StatistikPage = () => {
   });
 
   const existingKeys = new Set(stats.map(s => s.key));
-  const templatesToAdd = Object.values(initialStatistikTemplates).filter(t => !existingKeys.has(t.key));
+  const templatesToAdd = initialStatistikTemplates.filter(t => !existingKeys.has(t.key));
 
   return (
     <>
