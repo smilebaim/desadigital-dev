@@ -46,6 +46,7 @@ import { Progress } from '@/components/ui/progress';
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
@@ -103,11 +104,12 @@ const WorkspaceDetailPage = () => {
   // Member management states
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [isInviting, setIsInviting] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<UserProfile | null>(null);
   
   // Attachment states
   const [uploadingFile, setUploadingFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
-  const [isDeletingAttachment, setIsDeletingAttachment] = useState<string | null>(null);
+  const [attachmentToDelete, setAttachmentToDelete] = useState<Attachment | null>(null);
 
   // Delete item state
   const [itemToDelete, setItemToDelete] = useState<WorkspaceItem | null>(null);
@@ -159,9 +161,9 @@ const WorkspaceDetailPage = () => {
     await updateItem(workspaceId, itemId, { completed });
   };
 
-  const handleDeleteItem = async (itemId: string) => {
-    if (!workspaceId) return;
-    const success = await deleteItem(workspaceId, itemId);
+  const confirmDeleteItem = async () => {
+    if (!workspaceId || !itemToDelete) return;
+    const success = await deleteItem(workspaceId, itemToDelete.id);
     if (success) {
       toast({ title: 'Item berhasil dihapus.' });
     } else {
@@ -255,15 +257,16 @@ const WorkspaceDetailPage = () => {
     setIsInviting(false);
   };
 
-  const handleRemoveMember = async (memberId: string) => {
-      if (!workspaceId) return;
-      const result = await removeMemberFromWorkspace(workspaceId, memberId);
+  const confirmRemoveMember = async () => {
+      if (!workspaceId || !memberToRemove) return;
+      const result = await removeMemberFromWorkspace(workspaceId, memberToRemove.id);
       if (result.success) {
           toast({ title: 'Anggota berhasil dihapus.' });
           await fetchWorkspace(); // Refresh data
       } else {
           toast({ title: 'Gagal menghapus anggota.', variant: 'destructive' });
       }
+      setMemberToRemove(null);
   };
 
   const handleFileUpload = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -315,18 +318,17 @@ const WorkspaceDetailPage = () => {
     );
 };
 
-const handleRemoveAttachment = async (attachment: Attachment) => {
-    if (!workspaceId || !itemInDialog) return;
+const confirmRemoveAttachment = async () => {
+    if (!workspaceId || !itemInDialog || !attachmentToDelete) return;
 
-    setIsDeletingAttachment(attachment.path);
-    const result = await removeAttachment(workspaceId, itemInDialog.id, attachment);
+    const result = await removeAttachment(workspaceId, itemInDialog.id, attachmentToDelete);
 
     if (result.success) {
         toast({ title: "Lampiran berhasil dihapus." });
     } else {
         toast({ title: "Gagal menghapus lampiran.", description: result.error, variant: 'destructive' });
     }
-    setIsDeletingAttachment(null);
+    setAttachmentToDelete(null);
 };
 
 
@@ -355,7 +357,7 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
   }
 
   return (
-    <>
+    <TooltipProvider>
       <div className="space-y-6">
         <Breadcrumb items={[
             { title: "Dashboard", path: "/dashboard" },
@@ -500,33 +502,41 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
                       </form>
                     )}
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                                <Avatar><AvatarFallback>{workspace.owner?.displayName?.charAt(0) || 'O'}</AvatarFallback></Avatar>
-                                <div>
-                                    <p className="font-medium">{workspace.owner?.displayName}</p>
-                                    <p className="text-sm text-muted-foreground">{workspace.owner?.email}</p>
-                                </div>
-                            </div>
-                            <Badge variant="secondary">Pemilik</Badge>
-                        </div>
-                        
-                        {workspace.members && workspace.members.map(member => (
-                            <div key={member.id} className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h4 className="text-sm font-medium text-muted-foreground">Pemilik</h4>
+                            <div className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
                                 <div className="flex items-center gap-3">
-                                    <Avatar><AvatarFallback>{member.displayName?.charAt(0) || '?'}</AvatarFallback></Avatar>
+                                    <Avatar><AvatarFallback>{workspace.owner?.displayName?.charAt(0) || 'O'}</AvatarFallback></Avatar>
                                     <div>
-                                        <p className="font-medium">{member.displayName}</p>
-                                        <p className="text-sm text-muted-foreground">{member.email}</p>
+                                        <p className="font-medium text-sm">{workspace.owner?.displayName}</p>
+                                        <p className="text-xs text-muted-foreground">{workspace.owner?.email}</p>
                                     </div>
                                 </div>
-                                {user?.uid === workspace.ownerUid && member.id !== user.uid && (
-                                    <Button variant="ghost" size="icon" onClick={() => handleRemoveMember(member.id)}>
-                                        <Trash2 className="h-4 w-4 text-red-500" />
-                                    </Button>
-                                )}
+                                <Badge variant="secondary">Pemilik</Badge>
                             </div>
-                        ))}
+                        </div>
+                        
+                        {workspace.members && workspace.members.length > 0 && (
+                            <div className="space-y-1">
+                                 <h4 className="text-sm font-medium text-muted-foreground">Anggota</h4>
+                                {workspace.members.map(member => (
+                                    <div key={member.id} className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
+                                        <div className="flex items-center gap-3">
+                                            <Avatar><AvatarFallback>{member.displayName?.charAt(0) || '?'}</AvatarFallback></Avatar>
+                                            <div>
+                                                <p className="font-medium text-sm">{member.displayName}</p>
+                                                <p className="text-xs text-muted-foreground">{member.email}</p>
+                                            </div>
+                                        </div>
+                                        {user?.uid === workspace.ownerUid && member.id !== user.uid && (
+                                            <Button variant="ghost" size="icon" onClick={() => setMemberToRemove(member)}>
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>
@@ -592,14 +602,9 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
                                                     variant="ghost"
                                                     size="icon"
                                                     className="h-6 w-6"
-                                                    onClick={() => handleRemoveAttachment(att)}
-                                                    disabled={isDeletingAttachment === att.path}
+                                                    onClick={() => setAttachmentToDelete(att)}
                                                 >
-                                                    {isDeletingAttachment === att.path ? (
-                                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                                    ) : (
-                                                        <Trash2 className="h-4 w-4 text-red-500" />
-                                                    )}
+                                                    <Trash2 className="h-4 w-4 text-red-500" />
                                                 </Button>
                                             </li>
                                         ))}
@@ -649,11 +654,41 @@ const handleRemoveAttachment = async (attachment: Attachment) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={() => itemToDelete && handleDeleteItem(itemToDelete.id)}>Hapus</AlertDialogAction>
+            <AlertDialogAction onClick={confirmDeleteItem}>Hapus</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+
+      <AlertDialog open={!!memberToRemove} onOpenChange={(open) => !open && setMemberToRemove(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Hapus Anggota?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Apakah Anda yakin ingin menghapus {memberToRemove?.displayName} dari workspace ini? Mereka akan kehilangan akses ke semua item di dalamnya.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmRemoveMember}>Hapus Anggota</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      <AlertDialog open={!!attachmentToDelete} onOpenChange={(open) => !open && setAttachmentToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Hapus Lampiran?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Apakah Anda yakin ingin menghapus file "{attachmentToDelete?.name}"? Tindakan ini tidak dapat dibatalkan.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmRemoveAttachment}>Hapus</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </TooltipProvider>
   );
 };
 
