@@ -13,7 +13,8 @@ import {
     arrayUnion,
     arrayRemove,
     query,
-    where
+    where,
+    limit
 } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
 
@@ -245,6 +246,52 @@ export const removeAttachment = async (workspaceId: string, itemId: string, atta
         console.error("Error removing attachment:", error);
         // If deleting from storage fails, we might not want to remove from firestore.
         // For simplicity, we'll just report the error.
+        return { success: false, error: error.message };
+    }
+};
+
+// Seed dummy workspaces for a user
+export const seedDummyWorkspaces = async (userId: string) => {
+    if (!userId) {
+        return { success: false, error: "User ID tidak valid." };
+    }
+
+    const workspacesCollection = collection(db, 'workspaces');
+    const q = query(workspacesCollection, where("ownerUid", "==", userId), limit(1));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return { success: false, error: 'Anda sudah memiliki workspace. Tidak ada data dummy yang ditambahkan.' };
+    }
+
+    const dummyData: Omit<WorkspaceData, 'createdAt' | 'members'>[] = [
+        { 
+            name: "Proyek Pembangunan Jalan Desa", 
+            description: "Koordinasi dan pelacakan progres pembangunan jalan di Dusun Harapan.",
+            ownerUid: userId,
+        },
+        { 
+            name: "Kelompok Tani Sejahtera", 
+            description: "Perencanaan tanam, distribusi pupuk, dan jadwal panen bersama.",
+            ownerUid: userId,
+        },
+        {
+            name: "Panitia HUT RI ke-79",
+            description: "Semua persiapan untuk perayaan hari kemerdekaan Republik Indonesia.",
+            ownerUid: userId
+        }
+    ];
+
+    const batch = writeBatch(db);
+    try {
+        dummyData.forEach(ws => {
+            const docRef = doc(workspacesCollection);
+            batch.set(docRef, { ...ws, members: [], createdAt: serverTimestamp() });
+        });
+        await batch.commit();
+        return { success: true, count: dummyData.length };
+    } catch (error: any) {
+        console.error("Error seeding dummy workspaces:", error);
         return { success: false, error: error.message };
     }
 };

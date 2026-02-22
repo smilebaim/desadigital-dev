@@ -1,4 +1,3 @@
-
 'use client';
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
@@ -20,7 +19,8 @@ import {
   MoreVertical, 
   Edit, 
   Trash2,
-  Briefcase
+  Briefcase,
+  Sparkles
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -45,10 +45,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { useUser } from '@/firebase';
-import { addWorkspace, deleteWorkspace, updateWorkspace } from "@/lib/workspace-actions";
+import { addWorkspace, deleteWorkspace, updateWorkspace, seedDummyWorkspaces } from "@/lib/workspace-actions";
 import { getWorkspacesStream } from "@/lib/workspace-client-actions";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -63,10 +62,13 @@ const WorkspacesPage = () => {
   const { user } = useUser();
   const { toast } = useToast();
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [newWorkspaceName, setNewWorkspaceName] = useState("");
-  const [newWorkspaceDesc, setNewWorkspaceDesc] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // States for Add Dialog
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newWorkspaceName, setNewWorkspaceName] = useState("");
+  const [newWorkspaceDesc, setNewWorkspaceDesc] = useState("");
   
   // States for delete dialog
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -78,14 +80,19 @@ const WorkspacesPage = () => {
   const [editWorkspaceName, setEditWorkspaceName] = useState("");
   const [editWorkspaceDesc, setEditWorkspaceDesc] = useState("");
 
+  // State for seeding
+  const [isSeeding, setIsSeeding] = useState(false);
 
   useEffect(() => {
     if (user?.uid) {
+      setIsLoading(true);
       const unsubscribe = getWorkspacesStream(user.uid, (data) => {
         setWorkspaces(data as Workspace[]);
         setIsLoading(false);
       });
       return () => unsubscribe();
+    } else if (!user) {
+        setIsLoading(false);
     }
   }, [user]);
 
@@ -104,6 +111,7 @@ const WorkspacesPage = () => {
       toast({ title: "Workspace berhasil dibuat!" });
       setNewWorkspaceName("");
       setNewWorkspaceDesc("");
+      setIsAddDialogOpen(false);
     } else {
       toast({ title: "Gagal membuat workspace", variant: "destructive" });
     }
@@ -155,182 +163,214 @@ const WorkspacesPage = () => {
     setShowEditDialog(false);
     setWorkspaceToEdit(null);
   };
+  
+  const handleSeedData = async () => {
+    if (!user) return;
+    setIsSeeding(true);
+    const result = await seedDummyWorkspaces(user.uid);
+    if (result.success) {
+        toast({
+            title: "Data Dummy Berhasil Ditambahkan",
+            description: `${result.count} workspace dummy telah ditambahkan.`,
+        });
+    } else {
+        toast({
+            title: "Gagal Menambahkan Data Dummy",
+            description: result.error,
+            variant: "destructive",
+        });
+    }
+    setIsSeeding(false);
+  };
 
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">Workspaces</h2>
-          <p className="text-muted-foreground">
-            Kelola ruang kerja kolaboratif Anda.
-          </p>
+    <>
+        <div className="space-y-6">
+        <div className="flex justify-between items-center">
+            <div>
+            <h2 className="text-3xl font-bold tracking-tight">Workspaces</h2>
+            <p className="text-muted-foreground">
+                Kelola ruang kerja kolaboratif Anda.
+            </p>
+            </div>
+             <div className="flex gap-2">
+                {workspaces.length === 0 && !isLoading && (
+                    <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        {isSeeding ? 'Menambahkan...' : 'Tambah Data Dummy'}
+                    </Button>
+                )}
+                <Button size="sm" onClick={() => setIsAddDialogOpen(true)}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Buat Workspace Baru
+                </Button>
+             </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2">
-           <Card>
+        <Card>
             <CardHeader>
-              <CardTitle>Daftar Workspace</CardTitle>
+                <CardTitle>Daftar Workspace</CardTitle>
             </CardHeader>
             <CardContent>
-              <Table>
+            <Table>
                 <TableHeader>
-                  <TableRow>
+                <TableRow>
                     <TableHead>Nama Workspace</TableHead>
                     <TableHead>Deskripsi</TableHead>
                     <TableHead className="text-right">Aksi</TableHead>
-                  </TableRow>
+                </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {isLoading ? (
+                {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center">Memuat data...</TableCell>
+                    <TableCell colSpan={3} className="text-center">Memuat data...</TableCell>
                     </TableRow>
-                  ) : workspaces.length > 0 ? (
+                ) : workspaces.length > 0 ? (
                     workspaces.map((ws) => (
-                      <TableRow key={ws.id}>
+                    <TableRow key={ws.id}>
                         <TableCell className="font-medium">
-                          <Link href={`/dashboard/workspaces/${ws.id}`} className="hover:underline">
+                        <Link href={`/dashboard/workspaces/${ws.id}`} className="hover:underline">
                             {ws.name}
-                          </Link>
+                        </Link>
                         </TableCell>
                         <TableCell>{ws.description}</TableCell>
                         <TableCell className="text-right">
-                          <DropdownMenu>
+                        <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon">
                                 <MoreVertical className="h-4 w-4" />
-                              </Button>
+                            </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => openEditDialog(ws)}>
+                            <DropdownMenuItem onClick={() => openEditDialog(ws)}>
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit
-                              </DropdownMenuItem>
-                              <DropdownMenuItem 
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
                                 className="text-red-600"
                                 onClick={() => openDeleteDialog(ws.id)}
-                              >
+                            >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Hapus
-                              </DropdownMenuItem>
+                            </DropdownMenuItem>
                             </DropdownMenuContent>
-                          </DropdownMenu>
+                        </DropdownMenu>
                         </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={3} className="text-center">Belum ada workspace.</TableCell>
                     </TableRow>
-                  )}
+                    ))
+                ) : (
+                    <TableRow>
+                    <TableCell colSpan={3} className="text-center">Belum ada workspace. Klik "Tambah Data Dummy" atau "Buat Workspace Baru" untuk memulai.</TableCell>
+                    </TableRow>
+                )}
                 </TableBody>
-              </Table>
+            </Table>
             </CardContent>
-          </Card>
+        </Card>
         </div>
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Buat Workspace Baru</CardTitle>
-              <CardDescription>Mulai proyek baru dengan membuat workspace.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleAddWorkspace} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="ws-name">Nama Workspace</Label>
-                  <Input 
-                    id="ws-name" 
-                    placeholder="Contoh: Proyek Desa Digital"
-                    value={newWorkspaceName}
-                    onChange={(e) => setNewWorkspaceName(e.target.value)} 
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ws-desc">Deskripsi (Opsional)</Label>
-                  <Input 
-                    id="ws-desc" 
-                    placeholder="Deskripsi singkat tentang workspace ini"
-                    value={newWorkspaceDesc}
-                    onChange={(e) => setNewWorkspaceDesc(e.target.value)} 
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isSubmitting || !newWorkspaceName.trim()}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {isSubmitting ? "Menyimpan..." : "Buat Workspace"}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
       
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Ini akan menghapus workspace secara permanen.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteWorkspace}>Hapus</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        {/* Add Dialog */}
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogContent>
+                <DialogHeader>
+                <DialogTitle>Buat Workspace Baru</DialogTitle>
+                <DialogDescription>Mulai proyek baru dengan membuat workspace.</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddWorkspace} className="space-y-4">
+                    <div className="space-y-2">
+                    <Label htmlFor="ws-name">Nama Workspace</Label>
+                    <Input 
+                        id="ws-name" 
+                        placeholder="Contoh: Proyek Desa Digital"
+                        value={newWorkspaceName}
+                        onChange={(e) => setNewWorkspaceName(e.target.value)} 
+                        disabled={isSubmitting}
+                    />
+                    </div>
+                    <div className="space-y-2">
+                    <Label htmlFor="ws-desc">Deskripsi (Opsional)</Label>
+                    <Input 
+                        id="ws-desc" 
+                        placeholder="Deskripsi singkat tentang workspace ini"
+                        value={newWorkspaceDesc}
+                        onChange={(e) => setNewWorkspaceDesc(e.target.value)} 
+                        disabled={isSubmitting}
+                    />
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>Batal</Button>
+                        <Button type="submit" disabled={isSubmitting || !newWorkspaceName.trim()}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            {isSubmitting ? "Menyimpan..." : "Buat Workspace"}
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
 
-      {/* Edit Dialog */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Workspace</DialogTitle>
-              <DialogDescription>
-                Perbarui nama dan deskripsi untuk workspace &quot;{workspaceToEdit?.name}&quot;.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleEditWorkspace}>
-              <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="edit-ws-name" className="text-right">
-                      Nama
-                    </Label>
-                    <Input
-                      id="edit-ws-name"
-                      value={editWorkspaceName}
-                      onChange={(e) => setEditWorkspaceName(e.target.value)}
-                      className="col-span-3"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="edit-ws-desc" className="text-right">
-                      Deskripsi
-                    </Label>
-                    <Input
-                      id="edit-ws-desc"
-                      value={editWorkspaceDesc}
-                      onChange={(e) => setEditWorkspaceDesc(e.target.value)}
-                      className="col-span-3"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-              </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>Batal</Button>
-                <Button type="submit" disabled={isSubmitting || !editWorkspaceName.trim()}>
-                  {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-      </Dialog>
-    </div>
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                <AlertDialogDescription>
+                Tindakan ini tidak dapat dibatalkan. Ini akan menghapus workspace secara permanen.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteWorkspace}>Hapus</AlertDialogAction>
+            </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Edit Dialog */}
+        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+            <DialogContent>
+                <DialogHeader>
+                <DialogTitle>Edit Workspace</DialogTitle>
+                <DialogDescription>
+                    Perbarui nama dan deskripsi untuk workspace &quot;{workspaceToEdit?.name}&quot;.
+                </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleEditWorkspace}>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-ws-name" className="text-right">
+                        Nama
+                        </Label>
+                        <Input
+                        id="edit-ws-name"
+                        value={editWorkspaceName}
+                        onChange={(e) => setEditWorkspaceName(e.target.value)}
+                        className="col-span-3"
+                        disabled={isSubmitting}
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="edit-ws-desc" className="text-right">
+                        Deskripsi
+                        </Label>
+                        <Input
+                        id="edit-ws-desc"
+                        value={editWorkspaceDesc}
+                        onChange={(e) => setEditWorkspaceDesc(e.target.value)}
+                        className="col-span-3"
+                        disabled={isSubmitting}
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>Batal</Button>
+                    <Button type="submit" disabled={isSubmitting || !editWorkspaceName.trim()}>
+                    {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+                    </Button>
+                </DialogFooter>
+                </form>
+            </DialogContent>
+        </Dialog>
+    </>
   );
 };
 
