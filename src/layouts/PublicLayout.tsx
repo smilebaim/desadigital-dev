@@ -39,13 +39,35 @@ const PublicLayout = ({
   const topNavMenu = menus.find(m => m.location === 'topnav');
   const bottomNavMenu = menus.find(m => m.location === 'bottomnav');
   
-  const sidebarMenuIsActive = menus.some(m => {
+  // Generate virtual sidebar menus from navigation items that have children
+  const virtualSidebarMenus = menus.flatMap(menu => {
+    if (!menu.items || menu.location === 'sidebar') return [];
+    
+    const parentItems = menu.items.filter(item => !item.parentId);
+    return parentItems.map(parentItem => {
+      const children = menu.items!.filter(child => child.parentId === parentItem.id);
+      if (children.length === 0) return null;
+      
+      return {
+        id: `virtual-sidebar-${parentItem.id}`,
+        name: parentItem.title,
+        description: `Auto-generated sidebar for ${parentItem.title}`,
+        location: 'sidebar',
+        icon: parentItem.icon,
+        items: children
+      } as Menu;
+    }).filter(Boolean) as Menu[];
+  });
+
+  const allActiveMenus = [...menus, ...virtualSidebarMenus];
+
+  const sidebarMenuIsActive = allActiveMenus.some(m => {
     if (m.location !== 'sidebar' || !m.items || m.items.length === 0) {
       return false;
     }
     return m.items.some(item => {
-        const normalizedItemPath = item.path.startsWith('/') ? item.path.substring(1) : item.path;
-        const normalizedPathname = pathname.startsWith('/') ? pathname.substring(1) : pathname;
+        const normalizedItemPath = (item.path || '').startsWith('/') ? (item.path || '').substring(1) : (item.path || '');
+        const normalizedPathname = (pathname || '').startsWith('/') ? (pathname || '').substring(1) : (pathname || '');
 
         const itemRoot = normalizedItemPath.split('/')[0];
         const pathnameRoot = normalizedPathname.split('/')[0];
@@ -73,7 +95,7 @@ const PublicLayout = ({
       <main className={`flex-grow transition-all duration-300 ${needsSidebar ? 'md:pl-72 pl-12' : ''}`}>
         {children}
       </main>
-      <BottomNav menu={bottomNavMenu} allMenus={menus} loading={loading} />
+      <BottomNav menu={bottomNavMenu} allMenus={allActiveMenus} loading={loading} />
     </div>
   );
 };
