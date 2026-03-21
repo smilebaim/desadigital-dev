@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
-import type { LatLngTuple, LatLngBounds, Map as LeafletMap, Polygon } from 'leaflet';
+import type { LatLngTuple, LatLngBounds, Map as LeafletMap } from 'leaflet';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, MapPin } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetDescription, SheetTitle } from '@/components/ui/sheet';
@@ -339,7 +339,8 @@ export const MapComponent: React.FC = () => {
   const featureLayersRef = useRef<{[key: string]: L.Layer}>({});
 
   const [activeBaseLayer, setActiveBaseLayer] = useState<keyof typeof BASE_LAYERS>('satellite');
-  const [activeOverlays, setActiveOverlays] = useState<string[]>(['Batas Desa', 'Fasilitas Umum']);
+  const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
+  const initializedOverlays = useRef(false);
   
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [polygons, setPolygons] = useState<Polygon[]>([]);
@@ -348,6 +349,14 @@ export const MapComponent: React.FC = () => {
   const [layerPanelExpanded, setLayerPanelExpanded] = useState(false);
   const [infoPanelExpanded, setInfoPanelExpanded] = useState(false);
   const [selectedFeatureInfo, setSelectedFeatureInfo] = useState<LayerInfoProps['featureInfo']>(null);
+  
+  useEffect(() => {
+    if (categories.length > 0 && !initializedOverlays.current) {
+      const allLayers = categories.flatMap(c => c.layers);
+      setActiveOverlays(allLayers);
+      initializedOverlays.current = true;
+    }
+  }, [categories]);
   
   useEffect(() => {
     const unsubMarkers = getMarkersStream((data) => setMarkers(data as Marker[]));
@@ -368,13 +377,11 @@ export const MapComponent: React.FC = () => {
       center: DESA_CENTER,
       zoom: DEFAULT_ZOOM,
       zoomControl: false,
-      // Disable all default interactions
       dragging: false,
       scrollWheelZoom: false,
       doubleClickZoom: false,
       boxZoom: false,
       keyboard: false,
-      tap: false,
       touchZoom: false,
     });
     mapRef.current = map;
@@ -382,6 +389,13 @@ export const MapComponent: React.FC = () => {
     L.tileLayer(BASE_LAYERS[activeBaseLayer].url, {
       attribution: BASE_LAYERS[activeBaseLayer].attribution
     }).addTo(map);
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
   }, []);
 
   useEffect(() => {

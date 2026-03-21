@@ -464,7 +464,7 @@ const MapControlPage = () => {
             {/* Polygon Modals */}
              <Dialog open={isPolygonFormOpen} onOpenChange={setIsPolygonFormOpen}>
                 <DialogContent className="sm:max-w-[625px]">
-                    <DialogHeader><DialogTitle>{polygonFormMode === 'add' ? 'Tambah Poligon Baru' : 'Edit Poligon'}</DialogTitle><DialogDescription>Isi detail poligon. Salin-tempel (paste) array koordinat dari Google Earth atau alat GIS lainnya.</DialogDescription></DialogHeader>
+                    <DialogHeader><DialogTitle>{polygonFormMode === 'add' ? 'Tambah Poligon Baru' : 'Edit Poligon'}</DialogTitle><DialogDescription>Gunakan alat seperti <a href="http://geojson.io" target="_blank" className="text-blue-500 underline">geojson.io</a> untuk menggambar area, ambil koordinatnya, lalu tempel (paste) dalam format array `[latitude, longitude]`.</DialogDescription></DialogHeader>
                     <form onSubmit={handlePolygonFormSubmit}>
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-2 gap-4">
