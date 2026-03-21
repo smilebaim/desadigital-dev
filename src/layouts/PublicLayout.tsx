@@ -8,6 +8,7 @@ import type { Menu } from '@/lib/menu-data';
 import { getMenusWithItems } from '@/lib/menu-actions';
 import { getSiteSettings } from '@/lib/site-settings-actions';
 import type { SiteSettings } from '@/lib/site-settings-actions';
+import AiAssistant from '@/components/AiAssistant';
 
 const PublicLayout = ({
   children,
@@ -96,6 +97,7 @@ const PublicLayout = ({
         {children}
       </main>
       <BottomNav menu={bottomNavMenu} allMenus={allActiveMenus} loading={loading} />
+      <AiAssistant />
     </div>
   );
 };

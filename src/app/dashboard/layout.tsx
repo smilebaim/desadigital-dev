@@ -41,6 +41,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useUser, useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
+import { removeAuthCookie } from '@/lib/auth-cookies';
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
@@ -80,6 +81,7 @@ const DashboardLayout = ({
       title: "Logout",
       description: "Anda akan dialihkan ke halaman utama.",
     });
+    await removeAuthCookie();
     await signOut(auth);
     router.push('/');
   };

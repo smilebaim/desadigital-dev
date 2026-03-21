@@ -4,6 +4,9 @@ import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import '@/styles/map.css';
 import type { LatLngTuple, LatLngBounds, Map as LeafletMap } from 'leaflet';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import 'leaflet.markercluster';
 import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, MapPin } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetDescription, SheetTitle } from '@/components/ui/sheet';
@@ -426,6 +429,15 @@ export const MapComponent: React.FC = () => {
         layer.addTo(map);
     };
 
+    // Initialize marker cluster
+    // Use type assertion since markerClusterGroup is added to the L namespace via side-effects
+    const markersCluster = (L as any).markerClusterGroup({
+        chunkedLoading: true,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true
+    });
+
     // Draw active markers
     markers.forEach(marker => {
       if (activeOverlays.includes(marker.category)) {
@@ -440,9 +452,12 @@ export const MapComponent: React.FC = () => {
             });
             setInfoPanelExpanded(true);
           });
-        createAndAddLayer(`marker-${marker.id}`, leafletMarker);
+        markersCluster.addLayer(leafletMarker);
       }
     });
+
+    // Add cluster layer to map
+    createAndAddLayer('markers-cluster', markersCluster);
 
     // Draw active polygons
     polygons.forEach(polygon => {

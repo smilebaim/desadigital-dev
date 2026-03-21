@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth, useFirestore } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
+import { setAuthCookie } from '@/lib/auth-cookies';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -40,6 +41,8 @@ const LoginPage = () => {
         email: user.email,
         photoURL: user.photoURL || ''
       }, { merge: true });
+
+      await setAuthCookie(user.uid);
 
        toast({
         title: "Login Berhasil",
