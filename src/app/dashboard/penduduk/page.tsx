@@ -222,6 +222,63 @@ const PendudukPage = () => {
       setIsSeeding(false);
   };
 
+  const handleExportExcel = () => {
+    if (data.length === 0) {
+      toast({ title: "Tidak ada data", description: "Minimal perlu 1 data penduduk untuk bisa diekspor.", variant: "destructive" });
+      return;
+    }
+    import('xlsx').then(XLSX => {
+      const exportData = data.map(({ id, ...rest }) => rest);
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Data Penduduk");
+      XLSX.writeFile(wb, "Data_Penduduk_Desa.xlsx");
+      toast({ title: "Berhasil!", description: "Data penduduk diekspor ke format Excel (.xlsx)." });
+    }).catch(err => {
+      toast({ title: "Gagal memproses file Excel", description: err.message, variant: "destructive" });
+    });
+  };
+
+  const handleExportPDF = () => {
+    if (data.length === 0) {
+      toast({ title: "Tidak ada data", description: "Minimal perlu 1 data penduduk untuk bisa diekspor.", variant: "destructive" });
+      return;
+    }
+    Promise.all([import('jspdf'), import('jspdf-autotable')]).then(([jspdf, autotable]) => {
+      const jsPDF = jspdf.default;
+      const autoTable = autotable.default;
+      const doc = new jsPDF('landscape');
+      
+      doc.text("Data Kependudukan Desa Remau Bako Tuo", 14, 15);
+      
+      const head = [['Nama Lengkap', 'NIK', 'JK', 'Tempat/Tgl Lahir', 'Agama', 'Pendidikan', 'Pekerjaan', 'Status Kawin', 'Alamat']];
+      const body = data.map(item => [
+        item.nama,
+        item.nik,
+        item.jenisKelamin === 'Laki-laki' ? 'L' : 'P',
+        `${item.tempatLahir}, ${item.tanggalLahir}`,
+        item.agama,
+        item.pendidikan,
+        item.pekerjaan,
+        item.statusPerkawinan,
+        `RT ${item.rt}/RW ${item.rw}`
+      ]);
+
+      autoTable(doc, {
+        head,
+        body,
+        startY: 20,
+        styles: { fontSize: 8 },
+        headStyles: { fillColor: [5, 150, 105] }, // emerald-600 color
+      });
+
+      doc.save("Data_Penduduk_Desa.pdf");
+      toast({ title: "Berhasil!", description: "Data penduduk diekspor ke format PDF." });
+    }).catch(err => {
+      toast({ title: "Gagal memproses file PDF", description: err.message, variant: "destructive" });
+    });
+  };
+
   const filteredData = data.filter(item => 
     item.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
     item.nik.includes(searchQuery) ||
@@ -245,10 +302,24 @@ const PendudukPage = () => {
               <Sparkles className="h-4 w-4 mr-2" />
               {isSeeding ? 'Menambahkan...' : 'Tambah Data Dummy'}
             </Button>
-            <Button variant="outline" size="sm" disabled>
-              <Download className="h-4 w-4 mr-2" />
-              Export Data
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Data
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Pilih Format File</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleExportExcel} className="cursor-pointer">
+                  Export ke Excel (.xlsx)
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleExportPDF} className="cursor-pointer">
+                  Export ke PDF (.pdf)
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Button size="sm" onClick={openAddForm}>
               <Plus className="h-4 w-4 mr-2" />
               Tambah Penduduk

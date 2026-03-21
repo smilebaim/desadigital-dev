@@ -4,11 +4,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { askAssistant } from '@/lib/genkit-actions';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
+
+const QUICK_REPLIES = [
+  "Apa tata ruang desa?",
+  "Syarat buat surat keterangan",
+  "Kapan jam layanan kantor?",
+];
 
 const AiAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,17 +34,22 @@ const AiAssistant = () => {
     scrollToBottom();
   }, [messages, isOpen]);
 
-  const handleSend = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (e?: React.FormEvent | string) => {
+    if (typeof e !== 'string') e?.preventDefault();
+    
+    const userMessageInput = typeof e === 'string' ? e : input;
+    const userMessage = userMessageInput.trim();
+    
+    if (!userMessage || isLoading) return;
 
-    const userMessage = input.trim();
     setInput('');
+    const historyToSend = messages.slice(1); // Exclude initial greeting
+    
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
     try {
-      const result = await askAssistant(userMessage);
+      const result = await askAssistant(userMessage, historyToSend);
       
       if (result.success && result.text) {
         setMessages(prev => [...prev, { role: 'assistant', content: result.text! }]);
@@ -98,13 +110,21 @@ const AiAssistant = () => {
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div 
-                  className={`max-w-[85%] rounded-2xl p-3 text-sm shadow-sm ${
+                  className={`max-w-[85%] rounded-2xl p-3 text-sm shadow-sm overflow-hidden ${
                     msg.role === 'user' 
                       ? 'bg-emerald-600 text-white rounded-br-sm' 
                       : 'bg-white border border-gray-100 text-gray-800 rounded-bl-sm'
                   }`}
                 >
-                  {msg.content}
+                  {msg.role === 'user' ? (
+                    msg.content
+                  ) : (
+                    <div className="space-y-2 leading-relaxed [&>ul]:list-disc [&>ul]:ml-4 [&>ol]:list-decimal [&>ol]:ml-4 [&>h1]:text-lg [&>h1]:font-bold [&>h2]:text-base [&>h2]:font-bold [&>h3]:text-sm [&>h3]:font-bold">
+                      <ReactMarkdown>
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -120,8 +140,23 @@ const AiAssistant = () => {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* Quick Replies */}
+          {messages.length === 1 && (
+            <div className="px-4 pb-3 flex flex-wrap gap-2 bg-white pt-2 border-t border-gray-50">
+              {QUICK_REPLIES.map((reply, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSend(reply)}
+                  className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full px-3 py-1.5 hover:bg-emerald-100 transition-colors text-left"
+                >
+                  {reply}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* Input Area */}
-          <div className="p-3 bg-white border-t border-gray-100">
+          <div className="p-3 bg-white border-t border-gray-100 shadow-[0_-2px_10px_rgba(0,0,0,0.02)]">
             <form 
               onSubmit={handleSend}
               className="flex items-center gap-2 bg-gray-50 rounded-full p-1 border border-gray-200 focus-within:border-emerald-500 focus-within:ring-1 focus-within:ring-emerald-500 transition-all"

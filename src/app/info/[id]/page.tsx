@@ -1,8 +1,47 @@
 
+import type { Metadata, ResolvingMetadata } from 'next';
 import PublicLayout from "@/layouts/PublicLayout";
 import { getPost, incrementPostView } from "@/lib/posts-actions";
 import { notFound } from 'next/navigation';
 import { Badge } from "@/components/ui/badge";
+
+export async function generateMetadata(
+  { params }: { params: { id: string } },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const post = await getPost(params.id);
+
+  if (!post) {
+    return {
+      title: 'Halaman Tidak Ditemukan | Desa Remau Bako Tuo',
+    };
+  }
+
+  const previousImages = (await parent).openGraph?.images || [];
+  const description = post.content ? post.content.substring(0, 150) + '...' : 'Informasi terbaru dari Pemerintahan Desa.';
+
+  return {
+    title: `${post.title} | Info Desa`,
+    description: description,
+    openGraph: {
+      title: post.title,
+      description: description,
+      images: [
+        '/logo-desa.png',
+        ...previousImages,
+      ],
+      type: 'article',
+      publishedTime: post.createdAt || undefined,
+      authors: [post.author || 'Admin Desa'],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: description,
+      images: ['/logo-desa.png'],
+    },
+  };
+}
 
 export default async function PostDetailPage({ params }: { params: { id: string } }) {
     if (!params.id) {

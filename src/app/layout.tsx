@@ -11,6 +11,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Desa Remau Bako Tuo",
   description: "Sistem Informasi Desa Remau Bako Tuo",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

@@ -3,17 +3,33 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // --- Helper Functions ---
+    // Helper function
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // WARNING: These rules are extremely permissive and are for development convenience only.
-    // They allow ANY user (authenticated or not) to read AND write to your entire database.
-    // You MUST secure your data before deploying to production.
-    match /{document=**} {
+    // Public readable collections (auth required to write)
+    match /posts/{document=**} {
       allow read: if true;
-      allow write: if true;
+      allow write: if isSignedIn();
+    }
+    match /categories/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    match /settings/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    match /pages/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Protected collections (Data Penduduk, Users, Surat, etc)
+    // ONLY authenticated users can read and write
+    match /{document=**} {
+      allow read, write: if isSignedIn();
     }
   }
 }
