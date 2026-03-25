@@ -12,29 +12,31 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ className, heroUrl, heroTitle, heroSubtitle, heroDescription }) => {
   return (
-    <section className={cn('relative min-h-screen flex items-center overflow-hidden', className)}>
+    <section className={cn('relative h-[75vh] min-h-[600px] flex items-center overflow-hidden', className)}>
       <div className="absolute inset-0 -z-10">
         <img 
           src={heroUrl || "/Background utama.png"}
           alt="Desa Remau Bako Tuo" 
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="absolute inset-0 bg-black/20"></div>
+        {/* Bottom Fade Gradient */}
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent"></div>
       </div>
       
-      <div className="container mx-auto px-4 sm:px-6 md:px-10 py-16 sm:py-20 md:py-32 relative z-10 max-w-4xl">
+      <div className="container mx-auto px-4 sm:px-6 md:px-10 py-16 relative z-10 max-w-4xl">
         <div className="max-w-3xl mx-auto text-center">
           <FadeIn delay={200}>
-            <h1 className="text-lg sm:text-xl lg:text-2xl font-poppins font-medium tracking-tight text-white leading-tight mb-2">
+            <h1 className="text-sm sm:text-base lg:text-lg font-poppins font-semibold tracking-widest text-emerald-400 uppercase mb-3">
               {heroTitle || 'SELAMAT DATANG DI LAMAN INFORMASI'}
             </h1>
           </FadeIn>
           
-          <FadeIn delay={200}>
-            <h1 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-poppins font-medium tracking-tight text-white leading-tight mb-4 sm:mb-6">
+          <FadeIn delay={300}>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-poppins font-bold tracking-tight text-white leading-[1.1] mb-6">
               {heroSubtitle || 'DESA REMAU BAKO TUO'}
             </h1>
-            <p className="text-xs sm:text-sm md:text-base font-poppins text-white/90 mb-2 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-base md:text-lg font-poppins text-white/80 mb-2 max-w-2xl mx-auto leading-relaxed">
               {heroDescription || 'Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan'}
             </p>
           </FadeIn>

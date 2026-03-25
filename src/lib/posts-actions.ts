@@ -37,18 +37,25 @@ export const getPublishedPosts = async () => {
     try {
         const q = query(
             collection(db, "posts"),
-            where("status", "==", "Published"),
-            orderBy("createdAt", "desc")
+            where("status", "==", "Published")
         );
         const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => {
+        const posts = querySnapshot.docs.map(doc => {
             const data = doc.data();
             return {
                 id: doc.id,
                 ...data,
-                createdAt: data.createdAt ? data.createdAt.toDate().toISOString() : new Date().toISOString(),
-            } as PostData & { id: string };
+                createdAt: data.createdAt ? data.createdAt.toDate() : new Date(),
+            };
         });
+
+        // Sort in memory to avoid Firestore Index requirement
+        return posts
+            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+            .map(p => ({
+                ...p,
+                createdAt: p.createdAt.toISOString()
+            })) as (PostData & { id: string })[];
     } catch (error) {
         console.error("Error getting published posts:", error);
         return [];

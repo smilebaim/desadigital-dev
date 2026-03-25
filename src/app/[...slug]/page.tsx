@@ -12,6 +12,7 @@ import VisitorStatChart from "@/components/charts/VisitorStatChart";
 import PendapatanDesaChart from "@/components/charts/PendapatanDesaChart";
 import BelanjaDesaChart from "@/components/charts/BelanjaDesaChart";
 import React from "react";
+import SanitizedHtml from "@/components/SanitizedHtml";
 
 const CHART_PLACEHOLDERS = {
     '[STATISTIK_PENDUDUK_CHART]': <PopulationStatChart />,
@@ -71,10 +72,10 @@ export default async function CustomPage({ params }: { params: { slug: string[] 
                            return <React.Fragment key={index}>{ChartComponent}</React.Fragment>;
                        }
                        return (
-                           <div
-                                key={index}
-                                className="whitespace-pre-wrap text-foreground/90 leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: part.replace(/\n/g, '<br />') }}
+                           <SanitizedHtml
+                              key={index}
+                              className="whitespace-pre-wrap text-foreground/90 leading-relaxed"
+                              html={part.replace(/\n/g, '<br />')}
                            />
                        );
                     })}

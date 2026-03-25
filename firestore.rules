@@ -21,13 +21,58 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isSignedIn();
     }
+    match /site_settings/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    match /statistik/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
     match /pages/{document=**} {
       allow read: if true;
       allow write: if isSignedIn();
     }
 
-    // Protected collections (Data Penduduk, Users, Surat, etc)
+    // Public content needed for website navigation and custom pages
+    match /custom_pages/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    match /menus/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // Protected collections (Data Penduduk, Users, Statistik, dsb)
     // ONLY authenticated users can read and write
+    match /users/{userId} {
+      allow read, write: if isSignedIn();
+    }
+    match /penduduk/{document=**} {
+      allow read, write: if isSignedIn();
+    }
+    match /workspaces/{document=**} {
+      allow read, write: if isSignedIn();
+    }
+
+    // Surat Collections: Allow public CREATE, but restrict others to Admin
+    match /surat_usaha/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
+    match /surat_domisili/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
+    match /surat_kelahiran/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
+    match /surat_nikah/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
+    match /surat_kematian/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
+    match /surat_pindah/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
+    match /surat_pengantar/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
+    match /surat_keterangan/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
+    match /surat_masuk/{document=**} { allow read, write: if isSignedIn(); }
+    match /surat_keluar/{document=**} { allow read, write: if isSignedIn(); }
+
+    match /kegiatan/{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+    
     match /{document=**} {
       allow read, write: if isSignedIn();
     }

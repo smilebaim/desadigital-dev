@@ -112,5 +112,23 @@ export const initialStatistikTemplates = [
                 "Pengawasan lebih ketat terhadap pencemaran sungai."
             ]
         }, null, 2)
+    },
+    {
+        key: 'penduduk_desa',
+        title: 'Statistik Penduduk Desa',
+        group: 'Kependudukan',
+        data: JSON.stringify({
+            total: 1245,
+            laki: 630,
+            perempuan: 615,
+            kepalaKeluarga: 312,
+            perKelompokUsia: [
+                { name: "0-15th", value: 210 },
+                { name: "16-30th", value: 350 },
+                { name: "31-45th", value: 420 },
+                { name: "46-60th", value: 180 },
+                { name: "60th+", value: 85 }
+            ]
+        }, null, 2)
     }
 ];

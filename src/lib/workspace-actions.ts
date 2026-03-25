@@ -1,5 +1,3 @@
-
-'use server';
 import { db, storage } from '@/firebase/config';
 import { 
     collection, 

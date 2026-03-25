@@ -1,4 +1,3 @@
-'use server';
 import { db } from '@/firebase/config';
 import { 
     collection, 
@@ -8,6 +7,7 @@ import {
     doc,
     serverTimestamp
 } from 'firebase/firestore';
+import { generateTrackingCode } from './pdf-utils';
 
 export interface SuratPengantarData {
     pendudukId: string;
@@ -15,7 +15,8 @@ export interface SuratPengantarData {
     nikPemohon: string;
     keperluan: string;
     nomorSurat?: string;
-    status: 'Diproses' | 'Selesai' | 'Ditolak';
+    trackingCode?: string;
+    status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
     createdAt: any;
 }
 
@@ -23,6 +24,7 @@ export const addSuratPengantar = async (data: Omit<SuratPengantarData, 'createdA
     try {
         await addDoc(collection(db, 'surat_pengantar'), {
             ...data,
+            trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });
         return { success: true };

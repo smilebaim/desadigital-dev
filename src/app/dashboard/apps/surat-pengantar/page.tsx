@@ -57,6 +57,7 @@ import { getSuratPengantarStream } from "@/lib/surat-pengantar-client-actions";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
 import type { PendudukData } from "@/lib/penduduk-actions";
 import { Badge } from "@/components/ui/badge";
+import { generateSuratPDF } from "@/lib/pdf-utils";
 
 interface Surat extends SuratPengantarData {
   id: string;
@@ -239,7 +240,9 @@ const SuratPengantarPage = () => {
                                                             </>
                                                         )}
                                                         {surat.status === 'Selesai' && (
-                                                            <DropdownMenuItem><Printer className="h-4 w-4 mr-2" />Cetak</DropdownMenuItem>
+                                                            <DropdownMenuItem onClick={() => generateSuratPDF('Surat Pengantar', surat)}>
+                                                                <Printer className="h-4 w-4 mr-2" />Cetak
+                                                            </DropdownMenuItem>
                                                         )}
                                                         <DropdownMenuItem className="text-red-600" onClick={() => openDeleteDialog(surat)}><Trash2 className="h-4 w-4 mr-2" />Hapus</DropdownMenuItem>
                                                     </DropdownMenuContent>
