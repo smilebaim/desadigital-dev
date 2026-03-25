@@ -23,7 +23,8 @@ import {
   Send,
   Upload,
   Loader2,
-  Download
+  Download,
+  Printer
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -59,6 +60,7 @@ import { useStorage } from "@/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { addSuratKeluar, updateSuratKeluar, deleteSuratKeluar, type SuratKeluarData } from "@/lib/surat-keluar-actions";
 import { getSuratKeluarStream } from "@/lib/surat-keluar-client-actions";
+import { generateSuratPDF } from "@/lib/pdf-utils";
 
 interface Surat extends SuratKeluarData {
   id: string;
@@ -238,7 +240,8 @@ const SuratKeluarPage = () => {
                                                             </DropdownMenuItem>
                                                         )}
                                                         <DropdownMenuItem onClick={() => openEditForm(surat)}><Edit className="h-4 w-4 mr-2" />Edit</DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-red-600" onClick={() => openDeleteDialog(surat)}><Trash2 className="h-4 w-4 mr-2" />Hapus</DropdownMenuItem>
+<DropdownMenuItem onClick={() => generateSuratPDF('Surat Keluar', surat)}><Printer className="h-4 w-4 mr-2" />Cetak</DropdownMenuItem>
+<DropdownMenuItem className="text-red-600" onClick={() => openDeleteDialog(surat)}><Trash2 className="h-4 w-4 mr-2" />Hapus</DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </TableCell>

@@ -9,6 +9,7 @@ import {
     getDoc
 } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
+import { generateTrackingCode } from './pdf-utils';
 
 export interface SuratKeluarData {
     nomorSurat: string;
@@ -17,6 +18,7 @@ export interface SuratKeluarData {
     perihal: string;
     fileUrl?: string;
     filePath?: string;
+    trackingCode?: string;
     createdAt?: any;
 }
 
@@ -24,6 +26,7 @@ export const addSuratKeluar = async (data: Omit<SuratKeluarData, 'createdAt'>) =
     try {
         await addDoc(collection(db, 'surat_keluar'), {
             ...data,
+            trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });
         return { success: true };
