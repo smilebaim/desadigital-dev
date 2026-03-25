@@ -12,7 +12,7 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ className, heroUrl, heroTitle, heroSubtitle, heroDescription }) => {
   return (
-    <section className={cn('relative h-[75vh] min-h-[600px] flex items-center overflow-hidden', className)}>
+    <section className={cn('relative h-screen min-h-[600px] flex items-center overflow-hidden', className)}>
       <div className="absolute inset-0 -z-10">
         <img 
           src={heroUrl || "/Background utama.png"}
@@ -20,8 +20,6 @@ const Hero: React.FC<HeroProps> = ({ className, heroUrl, heroTitle, heroSubtitle
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/20"></div>
-        {/* Bottom Fade Gradient */}
-        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-background to-transparent"></div>
       </div>
       
       <div className="container mx-auto px-4 sm:px-6 md:px-10 py-16 relative z-10 max-w-4xl">

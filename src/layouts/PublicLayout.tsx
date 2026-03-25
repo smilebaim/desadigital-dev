@@ -9,7 +9,6 @@ import { getMenusWithItems } from '@/lib/menu-actions';
 import { getSiteSettings } from '@/lib/site-settings-actions';
 import type { SiteSettings } from '@/lib/site-settings-actions';
 import AiAssistant from '@/components/AiAssistant';
-import Footer from '@/components/Footer';
 
 const PublicLayout = ({
   children,
@@ -98,12 +97,6 @@ const PublicLayout = ({
         {children}
       </main>
       <BottomNav menu={bottomNavMenu} allMenus={allActiveMenus} loading={loading} />
-      <Footer 
-        siteName={siteSettings?.siteName} 
-        contactAddress={siteSettings?.contactAddress}
-        contactEmail={siteSettings?.contactEmail}
-        contactPhone={siteSettings?.contactPhone}
-      />
       <AiAssistant />
     </div>
   );
