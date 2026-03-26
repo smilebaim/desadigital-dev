@@ -6,10 +6,11 @@ import { notFound } from 'next/navigation';
 import { Badge } from "@/components/ui/badge";
 
 export async function generateMetadata(
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const post = await getPost(params.id);
+  const { id } = await params;
+  const post = await getPost(id);
 
   if (!post) {
     return {
@@ -43,19 +44,20 @@ export async function generateMetadata(
   };
 }
 
-export default async function PostDetailPage({ params }: { params: { id: string } }) {
-    if (!params.id) {
+export default async function PostDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
+    if (!id) {
         notFound();
     }
     
-    const post = await getPost(params.id);
+    const post = await getPost(id);
     
     if (!post || post.status !== 'Published') {
         notFound();
     }
 
     // Increment view count, fire and forget
-    incrementPostView(params.id);
+    incrementPostView(id);
 
     return (
         <PublicLayout>

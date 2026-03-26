@@ -31,23 +31,24 @@ const allPlaceholders = Object.keys(CHART_PLACEHOLDERS).map(p => p.replace(/\[/g
 const placeholderRegex = new RegExp(`(${allPlaceholders})`, 'g');
 
 
-export default async function CustomPage({ params }: { params: { slug: string[] } }) {
-    if (!params.slug || params.slug.length === 0) {
+export default async function CustomPage({ params }: { params: Promise<{ slug: string[] }> }) {
+    const { slug: slugArray } = await params;
+    if (!slugArray || slugArray.length === 0) {
         notFound();
     }
 
-    const slug = params.slug.join('/');
+    const slug = slugArray.join('/');
     const page = await getCustomPageBySlug(slug);
 
     if (!page) {
         notFound();
     }
 
-    const breadcrumbItems = params.slug.map((segment, index) => {
-        const path = `/${params.slug.slice(0, index + 1).join('/')}`;
+    const breadcrumbItems = slugArray.map((segment, index) => {
+        const path = `/${slugArray.slice(0, index + 1).join('/')}`;
         // Capitalize first letter
         const title = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ');
-        return { title, path: index === params.slug.length - 1 ? undefined : path };
+        return { title, path: index === slugArray.length - 1 ? undefined : path };
     });
 
     // Split content by any of the placeholders
