@@ -380,12 +380,12 @@ export const MapComponent: React.FC = () => {
       center: DESA_CENTER,
       zoom: DEFAULT_ZOOM,
       zoomControl: false,
-      dragging: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      boxZoom: false,
-      keyboard: false,
-      touchZoom: false,
+      dragging: true,
+      scrollWheelZoom: true,
+      doubleClickZoom: true,
+      boxZoom: true,
+      keyboard: true,
+      touchZoom: true,
     });
     mapRef.current = map;
 

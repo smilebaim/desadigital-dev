@@ -56,7 +56,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/components/ui/use-toast';
-import { addMarker, updateMarker, deleteMarker, type MapMarker, addPolygon, updatePolygon, deletePolygon, type MapPolygon, addLayerCategory, updateLayerCategory, deleteLayerCategory, seedDefaultCategories, type MapLayerCategory, seedDummyMarkers, deleteAllMarkers } from '@/lib/map-actions';
+import { addMarker, updateMarker, deleteMarker, type MapMarker, addPolygon, updatePolygon, deletePolygon, type MapPolygon, addLayerCategory, updateLayerCategory, deleteLayerCategory, seedDefaultCategories, type MapLayerCategory, seedDummyMarkers, deleteAllMarkers, seedDummyPolygons, deleteAllPolygons, deleteAllLayerCategories } from '@/lib/map-actions';
 import { getMarkersStream, getPolygonsStream, getLayerCategoriesStream } from '@/lib/map-client-actions';
 import { ADMINISTRATIVE_BOUNDARY_JSON } from '@/lib/map-data';
 
@@ -90,6 +90,7 @@ const MapControlPage = () => {
     // Polygon states
     const [isPolygonFormOpen, setIsPolygonFormOpen] = useState(false);
     const [isPolygonDeleteOpen, setIsPolygonDeleteOpen] = useState(false);
+    const [isPolygonDeleteAllOpen, setIsPolygonDeleteAllOpen] = useState(false);
     const [selectedPolygon, setSelectedPolygon] = useState<Polygon | null>(null);
     const [polygonFormMode, setPolygonFormMode] = useState<'add' | 'edit'>('add');
     const [polygonFormValues, setPolygonFormValues] = useState({ name: '', description: '', category: 'Area', coordinates: '' });
@@ -97,6 +98,7 @@ const MapControlPage = () => {
     // Category states
     const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
     const [isCategoryDeleteOpen, setIsCategoryDeleteOpen] = useState(false);
+    const [isCategoryDeleteAllOpen, setIsCategoryDeleteAllOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
     const [categoryFormMode, setCategoryFormMode] = useState<'add' | 'edit'>('add');
     const [categoryFormValues, setCategoryFormValues] = useState({ name: '', layers: '', order: 0 });
@@ -170,6 +172,39 @@ const MapControlPage = () => {
         }
         setIsSubmitting(false);
         setIsMarkerDeleteAllOpen(false);
+    };
+
+    const handleSeedPolygons = async () => {
+        const result = await seedDummyPolygons();
+        if (result.success) {
+            toast({ title: result.message });
+        } else {
+            toast({ title: 'Gagal menambahkan poligon dummy.', description: result.error, variant: 'destructive' });
+        }
+    };
+
+    const handleDeleteAllPolygons = async () => {
+        setIsSubmitting(true);
+        const result = await deleteAllPolygons();
+        if (result.success) {
+            toast({ title: 'Semua poligon berhasil dihapus.', description: `${result.count} data dihapus.` });
+        } else {
+            toast({ title: 'Gagal menghapus poligon.', description: result.error, variant: 'destructive' });
+        }
+        setIsSubmitting(false);
+        setIsPolygonDeleteAllOpen(false);
+    };
+
+    const handleDeleteAllCategories = async () => {
+        setIsSubmitting(true);
+        const result = await deleteAllLayerCategories();
+        if (result.success) {
+            toast({ title: 'Semua kategori berhasil dihapus.', description: `${result.count} data dihapus.` });
+        } else {
+            toast({ title: 'Gagal menghapus kategori.', description: result.error, variant: 'destructive' });
+        }
+        setIsSubmitting(false);
+        setIsCategoryDeleteAllOpen(false);
     };
 
     // --- Marker Handlers ---
@@ -407,12 +442,32 @@ const MapControlPage = () => {
                      <Card>
                         <CardHeader className="flex flex-row justify-between items-center">
                             <div>
-                                <CardTitle>Daftar Poligon Peta</CardTitle>
-                                <CardDescription>Total poligon: {polygons.length}</CardDescription>
+                                <CardTitle>Daftar Poligon Area</CardTitle>
+                                <CardDescription>Total area: {polygons.length}</CardDescription>
                             </div>
                             <div className="flex gap-2">
-                                <Button size="sm" variant="outline" onClick={handleSeedBoundary}><DownloadCloud className="h-4 w-4 mr-2" />Input Batas Desa</Button>
-                                <Button size="sm" onClick={openAddPolygonForm}><Plus className="h-4 w-4 mr-2" />Tambah Poligon</Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="sm">
+                                            <MoreVertical className="h-4 w-4 mr-2" />
+                                            Opsi
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={handleSeedPolygons} disabled={polygons.length > 0}>
+                                            <DownloadCloud className="h-4 w-4 mr-2" />
+                                            Input Poligon Dummy
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className="text-red-600" onClick={() => setIsPolygonDeleteAllOpen(true)} disabled={polygons.length === 0}>
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            Hapus Semua Poligon
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                <Button size="sm" onClick={openAddPolygonForm}>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Tambah Area
+                                </Button>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -449,8 +504,28 @@ const MapControlPage = () => {
                                 <CardDescription>Kelompokkan berbagai lapisan untuk kontrol di peta. Total kategori: {categories.length}</CardDescription>
                             </div>
                             <div className="flex gap-2">
-                                <Button size="sm" variant="outline" onClick={handleSeedCategories}><DownloadCloud className="h-4 w-4 mr-2" />Input Kategori Default</Button>
-                                <Button size="sm" onClick={openAddCategoryForm}><Plus className="h-4 w-4 mr-2" />Tambah Kategori</Button>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="sm">
+                                            <MoreVertical className="h-4 w-4 mr-2" />
+                                            Opsi
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={handleSeedCategories} disabled={categories.length > 0}>
+                                            <DownloadCloud className="h-4 w-4 mr-2" />
+                                            Input Kategori Default
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className="text-red-600" onClick={() => setIsCategoryDeleteAllOpen(true)} disabled={categories.length === 0}>
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            Hapus Semua Kategori
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                <Button size="sm" onClick={openAddCategoryForm}>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Tambah Kategori
+                                </Button>
                             </div>
                         </CardHeader>
                         <CardContent>
@@ -549,6 +624,21 @@ const MapControlPage = () => {
                 </AlertDialogContent>
             </AlertDialog>
 
+            <AlertDialog open={isPolygonDeleteAllOpen} onOpenChange={setIsPolygonDeleteAllOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus Semua Poligon?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tindakan ini akan menghapus semua poligon area secara permanen. Tindakan ini tidak dapat dibatalkan.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAllPolygons} className="bg-red-600 hover:bg-red-700">Ya, Hapus Semua</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
             {/* Category Modals */}
             <Dialog open={isCategoryFormOpen} onOpenChange={setIsCategoryFormOpen}>
                 <DialogContent>
@@ -567,6 +657,21 @@ const MapControlPage = () => {
                 <AlertDialogContent>
                     <AlertDialogHeader><AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle><AlertDialogDescription>Tindakan ini akan menghapus kategori &quot;{selectedCategory?.name}&quot; secara permanen.</AlertDialogDescription></AlertDialogHeader>
                     <AlertDialogFooter><AlertDialogCancel>Batal</AlertDialogCancel><AlertDialogAction onClick={handleDeleteCategory}>Hapus</AlertDialogAction></AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={isCategoryDeleteAllOpen} onOpenChange={setIsCategoryDeleteAllOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus Semua Kategori?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tindakan ini akan menghapus semua kategori layer secara permanen. Tindakan ini tidak dapat dibatalkan.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAllCategories} className="bg-red-600 hover:bg-red-700">Ya, Hapus Semua</AlertDialogAction>
+                    </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
         </div>
