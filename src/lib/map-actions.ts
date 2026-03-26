@@ -45,6 +45,58 @@ export const deleteMarker = async (id: string) => {
     }
 };
 
+// Seed dummy markers
+export const seedDummyMarkers = async () => {
+    const markersCollection = collection(db, 'map_markers');
+    const snapshot = await getDocs(markersCollection);
+    
+    if (!snapshot.empty) {
+        return { success: true, message: 'Data penanda sudah ada.' };
+    }
+
+    const batch = writeBatch(db);
+    const dummyMarkers: MapMarker[] = [
+        { name: 'Kantor Desa Remau Bako Tuo', description: 'Pusat pemerintahan dan pelayanan administrasi desa.', latitude: -1.222418, longitude: 104.383073, category: 'Fasilitas Umum' },
+        { name: 'SD Negeri 01 Remau Bako Tuo', description: 'Sekolah Dasar Negeri utama di desa.', latitude: -1.223500, longitude: 104.384000, category: 'Pendidikan' },
+        { name: 'Puskesmas Pembantu', description: 'Layanan kesehatan primer untuk warga desa.', latitude: -1.221500, longitude: 104.382000, category: 'Kesehatan' },
+        { name: 'Masjid Jami Al-Ikhlas', description: 'Masjid utama desa.', latitude: -1.224000, longitude: 104.385000, category: 'Ibadah' },
+        { name: 'Pasar Tradisional Desa', description: 'Pusat kegiatan ekonomi warga.', latitude: -1.220500, longitude: 104.381000, category: 'Umum' },
+    ];
+
+    dummyMarkers.forEach(marker => {
+        const docRef = doc(markersCollection);
+        batch.set(docRef, marker);
+    });
+
+    try {
+        await batch.commit();
+        return { success: true, message: 'Penanda dummy berhasil ditambahkan.' };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+export const deleteAllMarkers = async () => {
+    try {
+        const markersCollection = collection(db, 'map_markers');
+        const snapshot = await getDocs(markersCollection);
+        
+        if (snapshot.empty) {
+            return { success: true, message: 'Tidak ada data untuk dihapus.' };
+        }
+
+        const batch = writeBatch(db);
+        snapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+        return { success: true, count: snapshot.size };
+    } catch (error: any) {
+        console.error("Error deleting all markers:", error);
+        return { success: false, error: error.message };
+    }
+};
+
 
 // --- Polygon Types and Actions ---
 export interface MapPolygon {

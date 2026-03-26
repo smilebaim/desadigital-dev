@@ -56,7 +56,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from '@/components/ui/use-toast';
-import { addMarker, updateMarker, deleteMarker, type MapMarker, addPolygon, updatePolygon, deletePolygon, type MapPolygon, addLayerCategory, updateLayerCategory, deleteLayerCategory, seedDefaultCategories, type MapLayerCategory } from '@/lib/map-actions';
+import { addMarker, updateMarker, deleteMarker, type MapMarker, addPolygon, updatePolygon, deletePolygon, type MapPolygon, addLayerCategory, updateLayerCategory, deleteLayerCategory, seedDefaultCategories, type MapLayerCategory, seedDummyMarkers, deleteAllMarkers } from '@/lib/map-actions';
 import { getMarkersStream, getPolygonsStream, getLayerCategoriesStream } from '@/lib/map-client-actions';
 import { ADMINISTRATIVE_BOUNDARY_JSON } from '@/lib/map-data';
 
@@ -82,6 +82,7 @@ const MapControlPage = () => {
     // Marker states
     const [isMarkerFormOpen, setIsMarkerFormOpen] = useState(false);
     const [isMarkerDeleteOpen, setIsMarkerDeleteOpen] = useState(false);
+    const [isMarkerDeleteAllOpen, setIsMarkerDeleteAllOpen] = useState(false);
     const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
     const [markerFormMode, setMarkerFormMode] = useState<'add' | 'edit'>('add');
     const [markerFormValues, setMarkerFormValues] = useState({ name: '', description: '', latitude: '', longitude: '', category: 'Umum' });
@@ -148,6 +149,27 @@ const MapControlPage = () => {
         } else {
             toast({ title: 'Gagal menambahkan kategori default.', description: result.error, variant: 'destructive' });
         }
+    };
+
+    const handleSeedMarkers = async () => {
+        const result = await seedDummyMarkers();
+        if (result.success) {
+            toast({ title: result.message });
+        } else {
+            toast({ title: 'Gagal menambahkan penanda dummy.', description: result.error, variant: 'destructive' });
+        }
+    };
+
+    const handleDeleteAllMarkers = async () => {
+        setIsSubmitting(true);
+        const result = await deleteAllMarkers();
+        if (result.success) {
+            toast({ title: 'Semua penanda berhasil dihapus.', description: `${result.count} data dihapus.` });
+        } else {
+            toast({ title: 'Gagal menghapus penanda.', description: result.error, variant: 'destructive' });
+        }
+        setIsSubmitting(false);
+        setIsMarkerDeleteAllOpen(false);
     };
 
     // --- Marker Handlers ---
@@ -329,7 +351,30 @@ const MapControlPage = () => {
                                 <CardTitle>Daftar Penanda Peta</CardTitle>
                                 <CardDescription>Total penanda: {markers.length}</CardDescription>
                             </div>
-                            <Button size="sm" onClick={openAddMarkerForm}><Plus className="h-4 w-4 mr-2" />Tambah Penanda</Button>
+                            <div className="flex gap-2">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="sm">
+                                            <MoreVertical className="h-4 w-4 mr-2" />
+                                            Opsi
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={handleSeedMarkers} disabled={markers.length > 0}>
+                                            <DownloadCloud className="h-4 w-4 mr-2" />
+                                            Input Penanda Dummy
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className="text-red-600" onClick={() => setIsMarkerDeleteAllOpen(true)} disabled={markers.length === 0}>
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            Hapus Semua Penanda
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                <Button size="sm" onClick={openAddMarkerForm}>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Tambah Penanda
+                                </Button>
+                            </div>
                         </CardHeader>
                         <CardContent>
                             <Table>
@@ -458,6 +503,21 @@ const MapControlPage = () => {
                 <AlertDialogContent>
                     <AlertDialogHeader><AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle><AlertDialogDescription>Tindakan ini akan menghapus penanda &quot;{selectedMarker?.name}&quot; secara permanen.</AlertDialogDescription></AlertDialogHeader>
                     <AlertDialogFooter><AlertDialogCancel>Batal</AlertDialogCancel><AlertDialogAction onClick={handleDeleteMarker}>Hapus</AlertDialogAction></AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={isMarkerDeleteAllOpen} onOpenChange={setIsMarkerDeleteAllOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus Semua Penanda?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Tindakan ini akan menghapus semua penanda peta secara permanen. Tindakan ini tidak dapat dibatalkan.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAllMarkers} className="bg-red-600 hover:bg-red-700">Ya, Hapus Semua</AlertDialogAction>
+                    </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
 
