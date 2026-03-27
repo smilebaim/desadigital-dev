@@ -157,3 +157,17 @@ export const seedInitialStatistik = async () => {
         return { success: false, error: error.message };
     }
 };
+
+export const deleteAllStatistik = async () => {
+    try {
+        const snapshot = await getDocs(collection(db, 'statistik'));
+        if (snapshot.empty) return { success: true, message: 'Tidak ada data untuk dihapus.' };
+
+        const batch = writeBatch(db);
+        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        return { success: true, count: snapshot.size };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};

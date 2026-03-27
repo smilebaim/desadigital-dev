@@ -116,9 +116,9 @@ const KegiatanPage = () => {
     const onSubmit = async (values: FormValues) => {
         let result;
         if (formMode === 'add') {
-            result = await addKegiatan(values);
+            result = await addKegiatan({ ...values, description: values.description || "" });
         } else if (selectedKegiatan) {
-            result = await updateKegiatan(selectedKegiatan.id, values);
+            result = await updateKegiatan(selectedKegiatan.id, { ...values, description: values.description || "" });
         }
 
         if (result?.success) {

@@ -219,7 +219,7 @@ const IdmForm = ({ initialData, onSave, isSubmitting }: { initialData: any, onSa
 const EditStatistikPage = () => {
     const router = useRouter();
     const params = useParams();
-    const statId = params.id as string;
+    const statId = params?.id as string;
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);

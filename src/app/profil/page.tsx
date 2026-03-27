@@ -1,41 +1,41 @@
-
 import PublicLayout from "@/layouts/PublicLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { getLandingPage } from "@/lib/landing-pages-actions";
+import DynamicIcon from "@/components/DynamicIcon";
 
-const profileLinks = [
-    { title: "Profil Desa", href: "/profil/profil-desa", description: "Gambaran umum, geografis, dan demografi desa." },
-    { title: "Sejarah Desa", href: "/profil/sejarah-desa", description: "Jejak langkah dan asal-usul berdirinya desa." },
-    { title: "Visi & Misi", href: "/profil/visi-misi", description: "Arah dan tujuan pembangunan desa ke depan." },
-    { title: "Struktur Pemerintahan", href: "/profil/struktur-pemerintahan", description: "Susunan perangkat desa yang bertugas." },
-    { title: "Struktur BPD", href: "/profil/struktur-badan", description: "Badan Permusyawaratan Desa sebagai mitra pemerintah." },
-];
+export default async function ProfilPage() {
+  const pageData = await getLandingPage('profil');
 
-export default function ProfilPage() {
   return (
     <PublicLayout>
       <div className="container mx-auto px-4 py-8 mt-24 mb-20">
         <div className="space-y-6">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight">Profil Desa</h2>
+                <h2 className="text-3xl font-bold tracking-tight">{pageData.title}</h2>
                 <p className="text-muted-foreground">
-                    Kenali lebih dalam tentang Desa Remau Bako Tuo.
+                    {pageData.subtitle}
                 </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {profileLinks.map(link => (
+                {pageData.links.map(link => (
                     <Link key={link.href} href={link.href} className="block group">
                         <Card className="h-full transition-all group-hover:shadow-md group-hover:-translate-y-1">
                             <CardHeader>
-                                <CardTitle className="flex justify-between items-center">
-                                    {link.title}
+                                <CardTitle className="flex justify-between items-start">
+                                    <div className="flex items-center gap-3">
+                                        {link.icon && <DynamicIcon name={link.icon} className="h-6 w-6 text-primary" />}
+                                        {link.title}
+                                    </div>
                                     <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                                 </CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <p className="text-sm text-muted-foreground">{link.description}</p>
-                            </CardContent>
+                            {link.description && (
+                                <CardContent>
+                                    <p className="text-sm text-muted-foreground">{link.description}</p>
+                                </CardContent>
+                            )}
                         </Card>
                     </Link>
                 ))}

@@ -6,7 +6,7 @@ import { Edit, Sparkles, Copy, Info, Trash2, MoreVertical, Plus, Save } from "lu
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { getStatistikStream } from "@/lib/statistik-client-actions";
-import { seedInitialStatistik, deleteStatistik, addStatistik, type StatistikData } from "@/lib/statistik-actions";
+import { seedInitialStatistik, deleteStatistik, addStatistik, type StatistikData, deleteAllStatistik } from "@/lib/statistik-actions";
 import { initialStatistikTemplates } from "@/lib/statistik-templates";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -95,6 +95,8 @@ const StatistikPage = () => {
   const [loading, setLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
   const [statToDelete, setStatToDelete] = useState<Statistik | null>(null);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
   const { toast } = useToast();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -129,6 +131,18 @@ const StatistikPage = () => {
           toast({ title: "Gagal menghapus data.", variant: "destructive", description: result.error });
       }
       setStatToDelete(null);
+  }
+
+  const handleDeleteAll = async () => {
+    setIsDeletingAll(true);
+    const result = await deleteAllStatistik();
+    if (result.success) {
+      toast({ title: "Semua data statistik manual berhasil dihapus.", description: `${result.count} data dihapus.` });
+    } else {
+      toast({ title: "Gagal menghapus data.", variant: "destructive", description: result.error });
+    }
+    setIsDeletingAll(false);
+    setIsDeleteAllOpen(false);
   }
 
   const handleCopy = (placeholder: string) => {
@@ -210,13 +224,27 @@ const StatistikPage = () => {
           </p>
         </div>
         <div className="flex gap-2">
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                        <MoreVertical className="h-4 w-4 mr-2" />
+                        Opsi
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleSeedData} disabled={isSeeding}>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        {isSeeding ? 'Memulihkan...' : 'Pulihkan Data Bawaan'}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-600" onClick={() => setIsDeleteAllOpen(true)} disabled={isDeletingAll || stats.length === 0}>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        {isDeletingAll ? 'Menghapus...' : 'Hapus Semua Data'}
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
             <Button variant="outline" size="sm" onClick={() => setIsAddDialogOpen(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Tambah Data Manual
-            </Button>
-            <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
-              <Sparkles className="h-4 w-4 mr-2" />
-              {isSeeding ? 'Memulihkan...' : 'Pulihkan Data Bawaan'}
             </Button>
         </div>
       </div>
@@ -361,6 +389,21 @@ const StatistikPage = () => {
         <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setStatToDelete(null)}>Batal</AlertDialogCancel>
             <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
+        </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+
+    <AlertDialog open={isDeleteAllOpen} onOpenChange={setIsDeleteAllOpen}>
+        <AlertDialogContent>
+        <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Semua Data Statistik?</AlertDialogTitle>
+            <AlertDialogDescription>
+            Tindakan ini akan menghapus semua {stats.length} data statistik manual secara permanen. Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteAllOpen(false)}>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteAll} className="bg-red-600 hover:bg-red-700">Ya, Hapus Semua</AlertDialogAction>
         </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

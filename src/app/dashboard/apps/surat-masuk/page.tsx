@@ -23,7 +23,8 @@ import {
   Mail,
   Upload,
   Loader2,
-  Download
+  Download,
+  Sparkles
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -57,7 +58,7 @@ import * as z from "zod";
 
 import { useStorage } from "@/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { addSuratMasuk, updateSuratMasuk, deleteSuratMasuk, type SuratMasukData } from "@/lib/surat-masuk-actions";
+import { addSuratMasuk, updateSuratMasuk, deleteSuratMasuk, type SuratMasukData, seedDummySuratMasuk, deleteAllSuratMasuk } from "@/lib/surat-masuk-actions";
 import { getSuratMasukStream } from "@/lib/surat-masuk-client-actions";
 
 interface Surat extends SuratMasukData {
@@ -87,6 +88,9 @@ const SuratMasukPage = () => {
     const [isDeleteOpen, setIsDeleteOpen] = useState(false);
     const [selectedSurat, setSelectedSurat] = useState<Surat | null>(null);
     const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
+    const [isSeeding, setIsSeeding] = useState(false);
+    const [isDeletingAll, setIsDeletingAll] = useState(false);
+    const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
     
     const [file, setFile] = useState<File | null>(null);
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
@@ -180,6 +184,29 @@ const SuratMasukPage = () => {
         setIsDeleteOpen(false);
     };
 
+    const handleSeedData = async () => {
+        setIsSeeding(true);
+        const result = await seedDummySuratMasuk();
+        if (result.success) {
+            toast({ title: "Berhasil!", description: `${result.count} data dummy ditambahkan.` });
+        } else {
+            toast({ title: "Gagal", description: result.error, variant: 'destructive' });
+        }
+        setIsSeeding(false);
+    };
+
+    const handleDeleteAll = async () => {
+        setIsDeletingAll(true);
+        const result = await deleteAllSuratMasuk();
+        if (result.success) {
+            toast({ title: "Berhasil!", description: `Semua data arsip berhasil dihapus.` });
+        } else {
+            toast({ title: "Gagal", description: result.error, variant: 'destructive' });
+        }
+        setIsDeletingAll(false);
+        setIsDeleteAllOpen(false);
+    };
+
     const filteredSurat = suratList.filter(s => 
         s.perihal.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.nomorSurat.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -205,10 +232,30 @@ const SuratMasukPage = () => {
                                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                                 <Input placeholder="Cari nomor, perihal, atau pengirim..." className="pl-8" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                             </div>
-                            <Button size="sm" onClick={openAddForm}>
-                                <Plus className="h-4 w-4 mr-2" />
-                                Arsipkan Surat
-                            </Button>
+                            <div className="flex gap-2">
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" size="sm">
+                                            <MoreVertical className="h-4 w-4 mr-2" />
+                                            Opsi
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={handleSeedData} disabled={isSeeding || suratList.length > 0}>
+                                            <Sparkles className="h-4 w-4 mr-2" />
+                                            {isSeeding ? 'Menambahkan...' : 'Input Data Dummy'}
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem className="text-red-600" onClick={() => setIsDeleteAllOpen(true)} disabled={isDeletingAll || suratList.length === 0}>
+                                            <Trash2 className="h-4 w-4 mr-2" />
+                                            {isDeletingAll ? 'Menghapus...' : 'Hapus Semua Data'}
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                                <Button size="sm" onClick={openAddForm}>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Arsipkan Surat
+                                </Button>
+                            </div>
                         </div>
                         <Table>
                             <TableHeader>
@@ -322,6 +369,19 @@ const SuratMasukPage = () => {
                     <AlertDialogFooter>
                         <AlertDialogCancel>Batal</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDelete}>Hapus</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={isDeleteAllOpen} onOpenChange={setIsDeleteAllOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Hapus Semua Arsip Surat Masuk?</AlertDialogTitle>
+                        <AlertDialogDescription>Tindakan ini akan menghapus semua {suratList.length} data arsip secara permanen. Tindakan ini tidak dapat dibatalkan.</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteAll} className="bg-red-600 hover:bg-red-700">Ya, Hapus Semua</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

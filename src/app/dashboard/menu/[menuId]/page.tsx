@@ -54,7 +54,7 @@ import { CustomPageData } from "@/lib/static-pages-actions";
 const MenuItemsPage = () => {
   const params = useParams();
   const { toast } = useToast();
-  const menuId = params.menuId as string;
+  const menuId = params?.menuId as string;
   
   const [menuDetails, setMenuDetails] = useState<Menu | null>(null);
   const [loading, setLoading] = useState(true);
@@ -427,7 +427,7 @@ const MenuItemsPage = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {iconList.map(iconName => {
-                        const IconComponent = Icons[iconName];
+                        const IconComponent = Icons[iconName] as React.ElementType;
                         return (
                             <SelectItem key={iconName} value={iconName}>
                                 <div className="flex items-center gap-2">

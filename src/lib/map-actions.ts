@@ -6,8 +6,11 @@ import {
     deleteDoc, 
     doc,
     getDocs,
+    query,
+    orderBy,
     writeBatch
 } from 'firebase/firestore';
+import { ADMINISTRATIVE_BOUNDARY_JSON } from './map-data';
 
 // --- Marker Types and Actions ---
 export interface MapMarker {
@@ -144,6 +147,12 @@ export const seedDummyPolygons = async () => {
 
     const batch = writeBatch(db);
     const dummyPolygons: MapPolygon[] = [
+        {
+            name: 'Batas Administrasi Desa',
+            description: 'Batas wilayah administratif Desa Remau Bako Tuo.',
+            category: 'Batas Desa',
+            coordinates: ADMINISTRATIVE_BOUNDARY_JSON
+        },
         { 
             name: 'Hutan Desa', 
             description: 'Area konservasi hutan desa.', 

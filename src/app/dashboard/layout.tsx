@@ -33,7 +33,8 @@ import {
   ArrowRightLeft,
   FileBadge,
   Send,
-  Calendar
+  Calendar,
+  Folders
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
@@ -150,6 +151,10 @@ const DashboardLayout = ({
                           <li><Link href="/dashboard/halaman-utama" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                             <LayoutGrid size={16} className="text-emerald-100" />
                             <span>Halaman Utama</span>
+                          </Link></li>
+                          <li><Link href="/dashboard/landing-pages" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
+                            <Folders size={16} className="text-emerald-100" />
+                            <span>Halaman Kategori</span>
                           </Link></li>
                           <li><Link href="/dashboard/menu" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-emerald-800 transition-colors text-emerald-100">
                               <ListTodo size={16} className="text-emerald-100" />

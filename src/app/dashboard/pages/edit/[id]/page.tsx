@@ -32,7 +32,7 @@ type PageFormValues = z.infer<typeof pageSchema>;
 const EditCustomPage = () => {
     const router = useRouter();
     const params = useParams();
-    const pageId = params.id as string;
+    const pageId = params?.id as string;
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
     const [origin, setOrigin] = useState('');

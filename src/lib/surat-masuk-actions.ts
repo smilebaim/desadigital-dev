@@ -6,7 +6,9 @@ import {
     deleteDoc, 
     doc,
     serverTimestamp,
-    getDoc
+    getDoc,
+    getDocs,
+    writeBatch
 } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
 
@@ -57,6 +59,57 @@ export const deleteSuratMasuk = async (id: string) => {
         }
         await deleteDoc(suratDocRef);
         return { success: true };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+export const seedDummySuratMasuk = async () => {
+    try {
+        const snapshot = await getDocs(collection(db, 'surat_masuk'));
+        if (!snapshot.empty) return { success: false, error: 'Data sudah ada.' };
+
+        const batch = writeBatch(db);
+        const dummyData: Omit<SuratMasukData, 'createdAt'>[] = [
+            {
+                nomorSurat: '001/ADM/2024',
+                tanggalSurat: '2024-05-01',
+                tanggalDiterima: '2024-05-02',
+                pengirim: 'Kecamatan Remau',
+                perihal: 'Undangan Rapat Koordinasi Bulanan',
+                disposisi: 'Kasi Pemerintahan'
+            },
+            {
+                nomorSurat: '400/123/PMD/2024',
+                tanggalSurat: '2024-05-10',
+                tanggalDiterima: '2024-05-12',
+                pengirim: 'Dinas PMD Kabupaten',
+                perihal: 'Penyaluran Dana Desa Tahap I',
+                disposisi: 'Bendahara Desa'
+            }
+        ];
+
+        dummyData.forEach(item => {
+            const docRef = doc(collection(db, 'surat_masuk'));
+            batch.set(docRef, { ...item, createdAt: serverTimestamp() });
+        });
+
+        await batch.commit();
+        return { success: true, count: dummyData.length };
+    } catch (error: any) {
+        return { success: false, error: error.message };
+    }
+};
+
+export const deleteAllSuratMasuk = async () => {
+    try {
+        const snapshot = await getDocs(collection(db, 'surat_masuk'));
+        if (snapshot.empty) return { success: true, count: 0 };
+
+        const batch = writeBatch(db);
+        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+        return { success: true, count: snapshot.size };
     } catch (error: any) {
         return { success: false, error: error.message };
     }

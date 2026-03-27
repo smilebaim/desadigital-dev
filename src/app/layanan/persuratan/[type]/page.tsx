@@ -82,7 +82,7 @@ export default function LetterRequestPage() {
     const params = useParams();
     const router = useRouter();
     const { toast } = useToast();
-    const type = params.type as string;
+    const type = params?.type as string;
     const config = letterConfigs[type];
 
     const [formData, setFormData] = useState<Record<string, string>>({});
