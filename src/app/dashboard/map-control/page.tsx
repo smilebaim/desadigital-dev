@@ -45,6 +45,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { visualizationTemplates } from "@/lib/visualization-templates";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -85,7 +87,7 @@ const MapControlPage = () => {
     const [isMarkerDeleteAllOpen, setIsMarkerDeleteAllOpen] = useState(false);
     const [selectedMarker, setSelectedMarker] = useState<Marker | null>(null);
     const [markerFormMode, setMarkerFormMode] = useState<'add' | 'edit'>('add');
-    const [markerFormValues, setMarkerFormValues] = useState({ name: '', description: '', latitude: '', longitude: '', category: 'Umum' });
+    const [markerFormValues, setMarkerFormValues] = useState({ name: '', description: '', latitude: '', longitude: '', category: 'Umum', color: '#ef4444', shape: 'circle' });
     
     // Polygon states
     const [isPolygonFormOpen, setIsPolygonFormOpen] = useState(false);
@@ -93,7 +95,7 @@ const MapControlPage = () => {
     const [isPolygonDeleteAllOpen, setIsPolygonDeleteAllOpen] = useState(false);
     const [selectedPolygon, setSelectedPolygon] = useState<Polygon | null>(null);
     const [polygonFormMode, setPolygonFormMode] = useState<'add' | 'edit'>('add');
-    const [polygonFormValues, setPolygonFormValues] = useState({ name: '', description: '', category: 'Area', coordinates: '' });
+    const [polygonFormValues, setPolygonFormValues] = useState({ name: '', description: '', category: 'Area', coordinates: '', color: '#3b82f6' });
 
     // Category states
     const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
@@ -211,7 +213,7 @@ const MapControlPage = () => {
     const openAddMarkerForm = () => {
         setMarkerFormMode('add');
         setSelectedMarker(null);
-        setMarkerFormValues({ name: '', description: '', latitude: '', longitude: '', category: 'Umum' });
+        setMarkerFormValues({ name: '', description: '', latitude: '', longitude: '', category: 'Umum', color: '#ef4444', shape: 'circle' });
         setIsMarkerFormOpen(true);
     };
 
@@ -224,6 +226,8 @@ const MapControlPage = () => {
             latitude: marker.latitude.toString(),
             longitude: marker.longitude.toString(),
             category: marker.category || 'Umum',
+            color: marker.color || '#ef4444',
+            shape: marker.shape || 'circle'
         });
         setIsMarkerFormOpen(true);
     };
@@ -242,7 +246,7 @@ const MapControlPage = () => {
             toast({ title: 'Koordinat tidak valid.', variant: 'destructive' });
             setIsSubmitting(false); return;
         }
-        const markerData: MapMarker = { name: markerFormValues.name, description: markerFormValues.description, latitude: lat, longitude: lng, category: markerFormValues.category };
+        const markerData: MapMarker = { name: markerFormValues.name, description: markerFormValues.description, latitude: lat, longitude: lng, category: markerFormValues.category, color: markerFormValues.color, shape: markerFormValues.shape };
         let result;
         if (markerFormMode === 'add') result = await addMarker(markerData);
         else if (selectedMarker) result = await updateMarker(selectedMarker.id, markerData);
@@ -263,56 +267,88 @@ const MapControlPage = () => {
     };
 
     // --- Polygon Handlers ---
-    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const geojson = JSON.parse(e.target?.result as string);
-                let extractedCoords: number[][] = [];
+        setIsSubmitting(true);
+        toast({ title: 'Memproses file...' });
+
+        try {
+            let geojson: any = null;
+            const fileName = file.name.toLowerCase();
+
+            if (fileName.endsWith('.kmz')) {
+                const JSZip = (await import('jszip')).default;
+                const { kml } = await import('@tmcw/togeojson');
+                const zip = new JSZip();
+                const contents = await zip.loadAsync(file);
                 
-                let geometry = geojson.geometry;
-                if (geojson.type === 'FeatureCollection' && geojson.features.length > 0) {
-                    geometry = geojson.features[0].geometry;
-                } else if (geojson.type === 'Feature') {
-                    geometry = geojson.geometry;
-                }
+                const kmlFile = Object.values(contents.files).find((f: any) => f.name.toLowerCase().endsWith('.kml'));
+                if (!kmlFile) throw new Error("File KMZ tidak mengandung .kml valid.");
                 
-                if (geometry && (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon')) {
-                    // GeoJSON coordinates are [lng, lat]
-                    const polygonRing = geometry.type === 'Polygon' ? geometry.coordinates[0] : geometry.coordinates[0][0];
-                    // Convert [lng, lat] to [lat, lng] for Leaflet
-                    extractedCoords = polygonRing.map((coord: number[]) => [coord[1], coord[0]]);
-                    
-                    setPolygonFormValues({
-                        ...polygonFormValues,
-                        coordinates: JSON.stringify(extractedCoords, null, 2)
-                    });
-                    
-                    toast({ title: 'Berhasil mengimpor dan mengekstrak GeoJSON.' });
-                } else {
-                    toast({ title: 'File tidak memiliki format Poligon GeoJSON yang valid.', variant: 'destructive' });
-                }
-            } catch (error) {
-                toast({ title: 'Gagal memparsing file.', description: 'Pastikan file memiliki format GeoJSON yang valid.', variant: 'destructive' });
+                const kmlText = await kmlFile.async("text");
+                const kmlDom = new DOMParser().parseFromString(kmlText, 'text/xml');
+                geojson = kml(kmlDom);
+
+            } else if (fileName.endsWith('.kml')) {
+                const { kml } = await import('@tmcw/togeojson');
+                const text = await file.text();
+                const kmlDom = new DOMParser().parseFromString(text, 'text/xml');
+                geojson = kml(kmlDom);
+
+            } else { // geojson
+                const text = await file.text();
+                geojson = JSON.parse(text);
             }
-        };
-        reader.readAsText(file);
+
+            let extractedCoords: number[][] = [];
+            
+            let geometry = geojson.geometry;
+            if (geojson.type === 'FeatureCollection' && geojson.features.length > 0) {
+                const polygonFeature = geojson.features.find((f: any) => f.geometry && (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon'));
+                if (polygonFeature) {
+                    geometry = polygonFeature.geometry;
+                } else {
+                    throw new Error('Tidak ditemukan fitur Poligon di dalam GeoJSON/KML.');
+                }
+            } else if (geojson.type === 'Feature') {
+                geometry = geojson.geometry;
+            }
+            
+            if (geometry && (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon')) {
+                const polygonRing = geometry.type === 'Polygon' ? geometry.coordinates[0] : geometry.coordinates[0][0];
+                extractedCoords = polygonRing.map((coord: number[]) => [coord[1], coord[0]]);
+                
+                setPolygonFormValues({
+                    ...polygonFormValues,
+                    coordinates: JSON.stringify(extractedCoords, null, 2)
+                });
+                
+                toast({ title: 'Berhasil mengimpor dan mengekstrak geometri.' });
+            } else {
+                throw new Error('Format Poligon tidak ditemukan.');
+            }
+        } catch (error: any) {
+            console.error("Upload error:", error);
+            toast({ title: 'Gagal memparsing file.', description: error.message || 'Pastikan file memiliki format yang valid.', variant: 'destructive' });
+        } finally {
+            setIsSubmitting(false);
+            event.target.value = '';
+        }
     };
 
     const openAddPolygonForm = () => {
         setPolygonFormMode('add');
         setSelectedPolygon(null);
-        setPolygonFormValues({ name: '', description: '', category: 'Area', coordinates: '[]' });
+        setPolygonFormValues({ name: '', description: '', category: 'Area', coordinates: '[]', color: '#3b82f6' });
         setIsPolygonFormOpen(true);
     };
 
     const openEditPolygonForm = (polygon: Polygon) => {
         setPolygonFormMode('edit');
         setSelectedPolygon(polygon);
-        setPolygonFormValues({ name: polygon.name, description: polygon.description, category: polygon.category, coordinates: polygon.coordinates });
+        setPolygonFormValues({ name: polygon.name, description: polygon.description, category: polygon.category, coordinates: polygon.coordinates, color: polygon.color || '#3b82f6' });
         setIsPolygonFormOpen(true);
     };
 
@@ -602,8 +638,41 @@ const MapControlPage = () => {
                     <form onSubmit={handleMarkerFormSubmit}>
                         <div className="grid gap-4 py-4">
                             <div className="space-y-2"><Label htmlFor="name">Nama Penanda</Label><Input id="name" value={markerFormValues.name} onChange={(e) => setMarkerFormValues({...markerFormValues, name: e.target.value})} placeholder="Contoh: Kantor Desa" disabled={isSubmitting} /></div>
-                            <div className="space-y-2"><Label htmlFor="category">Kategori</Label><Input id="category" value={markerFormValues.category} onChange={(e) => setMarkerFormValues({...markerFormValues, category: e.target.value})} placeholder="Contoh: Fasilitas Umum" disabled={isSubmitting} /></div>
-                            <div className="space-y-2"><Label htmlFor="description">Deskripsi</Label><Textarea id="description" value={markerFormValues.description} onChange={(e) => setMarkerFormValues({...markerFormValues, description: e.target.value})} placeholder="Deskripsi singkat mengenai lokasi" disabled={isSubmitting} /></div>
+                            <div className="grid grid-cols-[1fr_auto_auto] gap-4">
+                                <div className="space-y-2"><Label htmlFor="category">Kategori</Label><Input id="category" value={markerFormValues.category} onChange={(e) => setMarkerFormValues({...markerFormValues, category: e.target.value})} placeholder="Contoh: Fasilitas Umum" disabled={isSubmitting} /></div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="shape">Bentuk Titik</Label>
+                                    <Select value={markerFormValues.shape} onValueChange={(val) => setMarkerFormValues({ ...markerFormValues, shape: val })}>
+                                        <SelectTrigger id="shape" className="w-[120px] h-10">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="circle">Lingkaran</SelectItem>
+                                            <SelectItem value="square">Persegi</SelectItem>
+                                            <SelectItem value="triangle">Segitiga</SelectItem>
+                                            <SelectItem value="diamond">Ketupat</SelectItem>
+                                            <SelectItem value="pin">Pin</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2"><Label htmlFor="color">Warna Titik</Label><Input id="color" type="color" value={markerFormValues.color} onChange={(e) => setMarkerFormValues({...markerFormValues, color: e.target.value})} disabled={isSubmitting} className="h-10 cursor-pointer w-16 p-1" /></div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <Label htmlFor="description">Deskripsi</Label>
+                                    <Select onValueChange={(val) => setMarkerFormValues(prev => ({...prev, description: prev.description ? `${prev.description}\n\n${val}` : val}))}>
+                                        <SelectTrigger className="w-[180px] h-8 text-xs font-normal">
+                                            <SelectValue placeholder="Sisipkan Grafik..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {visualizationTemplates.map(t => (
+                                                <SelectItem key={t.placeholder} value={t.placeholder}>{t.title}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Textarea id="description" value={markerFormValues.description} onChange={(e) => setMarkerFormValues({...markerFormValues, description: e.target.value})} placeholder="Deskripsi singkat mengenai lokasi" disabled={isSubmitting} />
+                            </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2"><Label htmlFor="latitude">Latitude</Label><Input id="latitude" value={markerFormValues.latitude} onChange={(e) => setMarkerFormValues({...markerFormValues, latitude: e.target.value})} placeholder="-1.222418" disabled={isSubmitting} /></div>
                                 <div className="space-y-2"><Label htmlFor="longitude">Longitude</Label><Input id="longitude" value={markerFormValues.longitude} onChange={(e) => setMarkerFormValues({...markerFormValues, longitude: e.target.value})} placeholder="104.383073" disabled={isSubmitting} /></div>
@@ -641,16 +710,32 @@ const MapControlPage = () => {
                     <DialogHeader><DialogTitle>{polygonFormMode === 'add' ? 'Tambah Poligon Baru' : 'Edit Poligon'}</DialogTitle><DialogDescription>Gunakan alat seperti <a href="http://geojson.io" target="_blank" className="text-blue-500 underline">geojson.io</a> untuk menggambar area, ambil koordinatnya, lalu tempel (paste) dalam format array `[latitude, longitude]`.</DialogDescription></DialogHeader>
                     <form onSubmit={handlePolygonFormSubmit}>
                         <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-[1fr_1fr_auto] gap-4">
                                 <div className="space-y-2"><Label htmlFor="polygon-name">Nama Poligon</Label><Input id="polygon-name" value={polygonFormValues.name} onChange={(e) => setPolygonFormValues({...polygonFormValues, name: e.target.value})} placeholder="Contoh: Zona Tambak" disabled={isSubmitting} /></div>
                                 <div className="space-y-2"><Label htmlFor="polygon-category">Kategori</Label><Input id="polygon-category" value={polygonFormValues.category} onChange={(e) => setPolygonFormValues({...polygonFormValues, category: e.target.value})} placeholder="Contoh: Bidang Tanah" disabled={isSubmitting} /></div>
+                                <div className="space-y-2"><Label htmlFor="polygon-color">Warna</Label><Input id="polygon-color" type="color" value={polygonFormValues.color} onChange={(e) => setPolygonFormValues({...polygonFormValues, color: e.target.value})} disabled={isSubmitting} className="h-10 cursor-pointer w-20 p-1" /></div>
                             </div>
-                            <div className="space-y-2"><Label htmlFor="polygon-description">Deskripsi</Label><Textarea id="polygon-description" value={polygonFormValues.description} onChange={(e) => setPolygonFormValues({...polygonFormValues, description: e.target.value})} placeholder="Deskripsi singkat area" disabled={isSubmitting} /></div>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <Label htmlFor="polygon-description">Deskripsi</Label>
+                                    <Select onValueChange={(val) => setPolygonFormValues(prev => ({...prev, description: prev.description ? `${prev.description}\n\n${val}` : val}))}>
+                                        <SelectTrigger className="w-[180px] h-8 text-xs font-normal">
+                                            <SelectValue placeholder="Sisipkan Grafik..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {visualizationTemplates.map(t => (
+                                                <SelectItem key={t.placeholder} value={t.placeholder}>{t.title}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Textarea id="polygon-description" value={polygonFormValues.description} onChange={(e) => setPolygonFormValues({...polygonFormValues, description: e.target.value})} placeholder="Deskripsi singkat area" disabled={isSubmitting} />
+                            </div>
                             <div className="space-y-4">
-                                <Label>Import dari File GeoJSON / KML</Label>
+                                <Label>Import dari File GeoJSON / KML / KMZ</Label>
                                 <div className="flex flex-col gap-2">
-                                  <Input type="file" accept=".geojson,.json" onChange={handleFileUpload} disabled={isSubmitting} className="cursor-pointer" />
-                                  <p className="text-xs text-muted-foreground">Pilih file berformat .geojson untuk mengisi titik koordinat secara otomatis menggunakan ekstraksi geometri poligon pertama.</p>
+                                  <Input type="file" accept=".geojson,.json,.kml,.kmz" onChange={handleFileUpload} disabled={isSubmitting} className="cursor-pointer" />
+                                  <p className="text-xs text-muted-foreground">Pilih file berformat .geojson, .kml, atau .kmz untuk mengisi titik koordinat secara otomatis menggunakan ekstraksi geometri poligon pertama yang ditemukan.</p>
                                 </div>
                             </div>
                             <div className="space-y-2">

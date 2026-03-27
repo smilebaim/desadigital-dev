@@ -19,6 +19,8 @@ export interface MapMarker {
     latitude: number;
     longitude: number;
     category: string;
+    color?: string;
+    shape?: string;
 }
 
 export const addMarker = async (data: MapMarker) => {
@@ -108,6 +110,7 @@ export interface MapPolygon {
     description: string;
     category: string;
     coordinates: string; // JSON string of LatLngTuple[]
+    color?: string;
 }
 
 export const addPolygon = async (data: MapPolygon) => {

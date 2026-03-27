@@ -11,6 +11,7 @@ import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { visualizationTemplates } from '@/lib/visualization-templates';
 
 import { getMarkersStream, getPolygonsStream, getLayerCategoriesStream } from '@/lib/map-client-actions';
 import type { MapMarker, MapPolygon, MapLayerCategory } from '@/lib/map-actions';
@@ -38,6 +39,17 @@ const DESA_BOUNDS: LatLngBounds = L.latLngBounds(
   [-1.2124187831143103, 104.39307336564955]
 );
 
+const CATEGORY_COLORS: Record<string, string> = {
+  'Batas Desa': '#3b82f6', // blue
+  'Batas Dusun': '#60a5fa', // light blue
+  'Sawah': '#22c55e', // green
+  'Perkebunan': '#16a34a', // dark green
+  'Pemukiman': '#f97316', // orange
+  'Jalan': '#475569', // slate
+  'Irigasi': '#06b6d4', // cyan
+  'default': '#ef4444' // red
+};
+
 const BASE_LAYERS = {
   street: {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -56,6 +68,23 @@ const BASE_LAYERS = {
     attribution: '&copy; <a href="https://opentopomap.org">OpenTopoMap</a> contributors',
     name: 'Terrain',
     icon: Mountain
+  }
+};
+
+const getShapeHtml = (shape: string, color: string) => {
+  const commonStyle = `filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.3)); stroke: ${color}; stroke-width: 3px; fill: transparent;`;
+  switch(shape) {
+     case 'square':
+       return `<svg width="20" height="20" viewBox="0 0 20 20" style="overflow: visible"><rect x="1" y="1" width="18" height="18" rx="2" style="${commonStyle}" /></svg>`;
+     case 'triangle':
+       return `<svg width="20" height="20" viewBox="0 0 20 20" style="overflow: visible"><polygon points="10,1 19,19 1,19" style="${commonStyle}" stroke-linejoin="round" /></svg>`;
+     case 'diamond':
+       return `<svg width="20" height="20" viewBox="0 0 20 20" style="overflow: visible"><polygon points="10,1 19,10 10,19 1,10" style="${commonStyle}" stroke-linejoin="round" /></svg>`;
+     case 'pin':
+       return `<svg width="20" height="28" viewBox="0 0 24 32" style="overflow: visible"><path d="M12 2C6.48 2 2 6.48 2 12c0 7.5 10 20 10 20s10-12.5 10-20c0-5.52-4.48-10-10-10zm0 14c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" style="${commonStyle}" /></svg>`;
+     case 'circle':
+     default:
+       return `<svg width="20" height="20" viewBox="0 0 20 20" style="overflow: visible"><circle cx="10" cy="10" r="9" style="${commonStyle}" /></svg>`;
   }
 };
 
@@ -160,6 +189,33 @@ interface LayerInfoProps {
 const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, featureInfo }) => {
   if (!featureInfo) return null;
 
+  const renderDescription = (text: string) => {
+    let elements: React.ReactNode[] = [];
+    let remainingText = text || '';
+
+    visualizationTemplates.forEach(template => {
+      if (remainingText.includes(template.placeholder)) {
+        const parts = remainingText.split(template.placeholder);
+        if (parts[0]) elements.push(<span key={elements.length}>{parts[0]}</span>);
+        elements.push(
+          <div key={elements.length} className="my-4 w-full overflow-hidden bg-white/50 rounded-lg p-2 shadow-inner">
+            <h4 className="font-semibold text-xs mb-2 text-center text-slate-700">{template.title}</h4>
+            <div className="transform scale-[0.8] origin-top -mt-2 -mb-8">
+                {template.previewComponent}
+            </div>
+          </div>
+        );
+        remainingText = parts.slice(1).join(template.placeholder);
+      }
+    });
+
+    if (remainingText) {
+      elements.push(<span key={elements.length}>{remainingText}</span>);
+    }
+
+    return elements.length > 0 ? elements : <span>{text}</span>;
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent 
@@ -183,25 +239,10 @@ const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, featureInfo }) =
                   </p>
                 </div>
               )}
-              <p className="text-xs sm:text-sm text-black/80">
-                {featureInfo.description}
-              </p>
+              <div className="text-xs sm:text-sm text-black/80 whitespace-pre-wrap">
+                {renderDescription(featureInfo.description)}
+              </div>
             </div>
-            
-            {featureInfo.type === 'marker' && (
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-black/80" />
-                    <h4 className="font-medium text-base text-black/90">Jam Operasional</h4>
-                  </div>
-                  <div className="ml-6 space-y-1">
-                    <p className="text-xs sm:text-sm text-black/80">
-                      Senin - Jumat: 08.00 - 16.00 WIB<br/>
-                      Sabtu - Minggu: Tutup
-                    </p>
-                  </div>
-                </div>
-            )}
           </div>
         </ScrollArea>
       </SheetContent>
@@ -441,7 +482,24 @@ export const MapComponent: React.FC = () => {
     // Draw active markers
     markers.forEach(marker => {
       if (activeOverlays.includes(marker.category)) {
-        const leafletMarker = L.marker([marker.latitude, marker.longitude])
+        const markerColor = marker.color || CATEGORY_COLORS[marker.category] || CATEGORY_COLORS['default'];
+        const markerShape = marker.shape || 'circle';
+        
+        let iconSize: [number, number] = [20, 20];
+        let iconAnchor: [number, number] = [10, 10];
+        if (markerShape === 'pin') {
+           iconSize = [20, 28];
+           iconAnchor = [10, 28]; // Anchor at bottom tip
+        }
+
+        const customIcon = L.divIcon({
+          className: 'custom-div-icon bg-transparent border-none',
+          html: getShapeHtml(markerShape, markerColor),
+          iconSize: iconSize,
+          iconAnchor: iconAnchor
+        });
+
+        const leafletMarker = L.marker([marker.latitude, marker.longitude], { icon: customIcon })
           .bindPopup(`<b>${marker.name}</b><br>${marker.description}`)
           .on('click', () => {
             setSelectedFeatureInfo({
@@ -465,9 +523,12 @@ export const MapComponent: React.FC = () => {
         try {
           const coordinates = JSON.parse(polygon.coordinates);
           if (Array.isArray(coordinates)) {
+            const polygonColor = polygon.color || CATEGORY_COLORS[polygon.category] || CATEGORY_COLORS['default'];
+            const isLine = polygon.category === 'Jalan' || polygon.category === 'Irigasi';
             const leafletPolygon = L.polygon(coordinates as LatLngTuple[], { 
-              color: polygon.name === 'Batas Administrasi Desa' ? 'blue' : 'red', // Example logic
-              weight: polygon.name === 'Batas Administrasi Desa' ? 3 : 2
+              color: polygonColor,
+              weight: polygon.category.includes('Batas') ? 3 : (isLine ? 4 : 3),
+              fillOpacity: isLine ? 0.0 : 0.05
             })
               .bindPopup(`<b>${polygon.name}</b>`)
               .on('click', () => {
