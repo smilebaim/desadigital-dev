@@ -64,6 +64,7 @@ export const seedDummyMarkers = async () => {
         { name: 'Puskesmas Pembantu', description: 'Layanan kesehatan primer untuk warga desa.', latitude: -1.221500, longitude: 104.382000, category: 'Kesehatan' },
         { name: 'Masjid Jami Al-Ikhlas', description: 'Masjid utama desa.', latitude: -1.224000, longitude: 104.385000, category: 'Ibadah' },
         { name: 'Pasar Tradisional Desa', description: 'Pusat kegiatan ekonomi warga.', latitude: -1.220500, longitude: 104.381000, category: 'Pasar' },
+        { name: 'Jembatan Utama Desa', description: 'Jembatan penghubung aliran sungai besar.', latitude: -1.222000, longitude: 104.382500, category: 'Jembatan' },
     ];
 
     dummyMarkers.forEach(marker => {
@@ -175,6 +176,54 @@ export const seedDummyPolygons = async () => {
                 [-1.2230, 104.3880],
                 [-1.2200, 104.3880],
                 [-1.2200, 104.3850]
+            ])
+        },
+        { 
+            name: 'Batas Dusun I', 
+            description: 'Wilayah administratif Dusun I.', 
+            category: 'Batas Dusun',
+            coordinates: JSON.stringify([
+                [-1.2210, 104.3810],
+                [-1.2240, 104.3810],
+                [-1.2240, 104.3840],
+                [-1.2210, 104.3840],
+                [-1.2210, 104.3810]
+            ])
+        },
+        { 
+            name: 'Pemukiman Padat', 
+            description: 'Area perumahan warga utama.', 
+            category: 'Pemukiman',
+            coordinates: JSON.stringify([
+                [-1.2220, 104.3820],
+                [-1.2230, 104.3820],
+                [-1.2230, 104.3830],
+                [-1.2220, 104.3830],
+                [-1.2220, 104.3820]
+            ])
+        },
+        { 
+            name: 'Jalan Poros Desa', 
+            description: 'Jalan utama akses desa.', 
+            category: 'Jalan',
+            coordinates: JSON.stringify([
+                [-1.2200, 104.3825],
+                [-1.2250, 104.3825],
+                [-1.2250, 104.3826],
+                [-1.2200, 104.3826],
+                [-1.2200, 104.3825]
+            ])
+        },
+        { 
+            name: 'Saluran Irigasi Induk', 
+            description: 'Irigasi penyokong persawahan.', 
+            category: 'Irigasi',
+            coordinates: JSON.stringify([
+                [-1.2200, 104.3845],
+                [-1.2250, 104.3845],
+                [-1.2250, 104.3846],
+                [-1.2200, 104.3846],
+                [-1.2200, 104.3845]
             ])
         }
     ];

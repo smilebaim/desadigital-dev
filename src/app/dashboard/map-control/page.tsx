@@ -263,6 +263,45 @@ const MapControlPage = () => {
     };
 
     // --- Polygon Handlers ---
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const geojson = JSON.parse(e.target?.result as string);
+                let extractedCoords: number[][] = [];
+                
+                let geometry = geojson.geometry;
+                if (geojson.type === 'FeatureCollection' && geojson.features.length > 0) {
+                    geometry = geojson.features[0].geometry;
+                } else if (geojson.type === 'Feature') {
+                    geometry = geojson.geometry;
+                }
+                
+                if (geometry && (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon')) {
+                    // GeoJSON coordinates are [lng, lat]
+                    const polygonRing = geometry.type === 'Polygon' ? geometry.coordinates[0] : geometry.coordinates[0][0];
+                    // Convert [lng, lat] to [lat, lng] for Leaflet
+                    extractedCoords = polygonRing.map((coord: number[]) => [coord[1], coord[0]]);
+                    
+                    setPolygonFormValues({
+                        ...polygonFormValues,
+                        coordinates: JSON.stringify(extractedCoords, null, 2)
+                    });
+                    
+                    toast({ title: 'Berhasil mengimpor dan mengekstrak GeoJSON.' });
+                } else {
+                    toast({ title: 'File tidak memiliki format Poligon GeoJSON yang valid.', variant: 'destructive' });
+                }
+            } catch (error) {
+                toast({ title: 'Gagal memparsing file.', description: 'Pastikan file memiliki format GeoJSON yang valid.', variant: 'destructive' });
+            }
+        };
+        reader.readAsText(file);
+    };
+
     const openAddPolygonForm = () => {
         setPolygonFormMode('add');
         setSelectedPolygon(null);
@@ -607,10 +646,17 @@ const MapControlPage = () => {
                                 <div className="space-y-2"><Label htmlFor="polygon-category">Kategori</Label><Input id="polygon-category" value={polygonFormValues.category} onChange={(e) => setPolygonFormValues({...polygonFormValues, category: e.target.value})} placeholder="Contoh: Bidang Tanah" disabled={isSubmitting} /></div>
                             </div>
                             <div className="space-y-2"><Label htmlFor="polygon-description">Deskripsi</Label><Textarea id="polygon-description" value={polygonFormValues.description} onChange={(e) => setPolygonFormValues({...polygonFormValues, description: e.target.value})} placeholder="Deskripsi singkat area" disabled={isSubmitting} /></div>
+                            <div className="space-y-4">
+                                <Label>Import dari File GeoJSON / KML</Label>
+                                <div className="flex flex-col gap-2">
+                                  <Input type="file" accept=".geojson,.json" onChange={handleFileUpload} disabled={isSubmitting} className="cursor-pointer" />
+                                  <p className="text-xs text-muted-foreground">Pilih file berformat .geojson untuk mengisi titik koordinat secara otomatis menggunakan ekstraksi geometri poligon pertama.</p>
+                                </div>
+                            </div>
                             <div className="space-y-2">
-                                <Label htmlFor="polygon-coordinates">Koordinat Poligon (JSON)</Label>
-                                <Textarea id="polygon-coordinates" value={polygonFormValues.coordinates} onChange={(e) => setPolygonFormValues({...polygonFormValues, coordinates: e.target.value})} placeholder='Contoh: [[-1.22, 104.38], [-1.23, 104.39], [-1.22, 104.39]]' disabled={isSubmitting} rows={6} />
-                                <p className="text-xs text-muted-foreground">Format: Array dari array `[latitude, longitude]`. Pastikan urutannya benar.</p>
+                                <Label htmlFor="polygon-coordinates">Koordinat Poligon (Data Manual)</Label>
+                                <Textarea id="polygon-coordinates" value={polygonFormValues.coordinates} onChange={(e) => setPolygonFormValues({...polygonFormValues, coordinates: e.target.value})} placeholder='Contoh: [[-1.22, 104.38], [-1.23, 104.39]]' disabled={isSubmitting} rows={6} />
+                                <p className="text-xs text-muted-foreground">Format: Array of `[latitude, longitude]`. File GeoJSON otomatis akan dikonversi (LngLat menjadi LatLng).</p>
                             </div>
                         </div>
                         <DialogFooter><Button type="button" variant="outline" onClick={() => setIsPolygonFormOpen(false)}>Batal</Button><Button type="submit" disabled={isSubmitting}><Save className="h-4 w-4 mr-2" />{isSubmitting ? 'Menyimpan...' : 'Simpan'}</Button></DialogFooter>
