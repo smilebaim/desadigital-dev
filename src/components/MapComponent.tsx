@@ -396,8 +396,7 @@ export const MapComponent: React.FC = () => {
   
   useEffect(() => {
     if (categories.length > 0 && !initializedOverlays.current) {
-      const allLayers = categories.flatMap(c => c.layers);
-      setActiveOverlays(allLayers);
+      setActiveOverlays([]);
       initializedOverlays.current = true;
     }
   }, [categories]);
