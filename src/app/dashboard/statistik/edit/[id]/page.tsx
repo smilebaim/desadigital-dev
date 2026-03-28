@@ -216,6 +216,129 @@ const IdmForm = ({ initialData, onSave, isSubmitting }: { initialData: any, onSa
     )
 }
 
+// Generic Chart Form for Custom Visualizations (Bar, Line, Pie, Doughnut)
+const GenericChartEditor = ({ initialData, onSave, isSubmitting }: { initialData: any, onSave: (data: string) => void, isSubmitting: boolean }) => {
+    const [chartType, setChartType] = useState(initialData.chartType || 'bar');
+    const [labels, setLabels] = useState<string[]>(initialData.labels || ['Kategori 1']);
+    const [datasets, setDatasets] = useState<any[]>(initialData.datasets || [{ label: 'Dataset 1', data: [0] }]);
+
+    const handleLabelChange = (index: number, value: string) => {
+        const newLabels = [...labels];
+        newLabels[index] = value;
+        setLabels(newLabels);
+    }
+
+    const handleDataChange = (datasetIndex: number, dataIndex: number, value: string) => {
+        const newDatasets = [...datasets];
+        newDatasets[datasetIndex].data[dataIndex] = Number(value) || 0;
+        setDatasets(newDatasets);
+    }
+    
+    const handleDatasetLabelChange = (datasetIndex: number, value: string) => {
+        const newDatasets = [...datasets];
+        newDatasets[datasetIndex].label = value;
+        setDatasets(newDatasets);
+    }
+
+    const addRow = () => {
+        setLabels([...labels, `Kategori ${labels.length + 1}`]);
+        setDatasets(datasets.map(ds => ({ ...ds, data: [...ds.data, 0] })));
+    }
+
+    const removeRow = (index: number) => {
+        setLabels(labels.filter((_, i) => i !== index));
+        setDatasets(datasets.map(ds => ({ ...ds, data: ds.data.filter((_: any, i: number) => i !== index) })));
+    }
+
+    const addDataset = () => {
+        setDatasets([...datasets, { label: `Dataset ${datasets.length + 1}`, data: labels.map(() => 0) }]);
+    }
+    
+    const removeDataset = (index: number) => {
+        setDatasets(datasets.filter((_, i) => i !== index));
+    }
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const finalData = { ...initialData, chartType, labels, datasets };
+        onSave(JSON.stringify(finalData, null, 2));
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="chart-type">Tipe Visualisasi</Label>
+                <Select value={chartType} onValueChange={setChartType} disabled={isSubmitting}>
+                    <SelectTrigger id="chart-type"><SelectValue/></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="bar">Diagram Batang (Bar)</SelectItem>
+                        <SelectItem value="line">Diagram Garis (Line)</SelectItem>
+                        <SelectItem value="pie">Diagram Lingkaran (Pie)</SelectItem>
+                        <SelectItem value="doughnut">Diagram Donat (Doughnut)</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+
+            <div className="space-y-4 pt-4 overflow-x-auto">
+                <div className="flex justify-between items-center border-b pb-2">
+                    <h4 className="font-semibold text-muted-foreground">Tabel Data Grafik</h4>
+                    <div className="flex gap-2">
+                         <Button type="button" size="sm" variant="outline" onClick={addDataset}><Plus className="h-4 w-4 mr-2" />Kolom Dataset</Button>
+                         <Button type="button" size="sm" variant="outline" onClick={addRow}><Plus className="h-4 w-4 mr-2" />Baris Kategori</Button>
+                    </div>
+                </div>
+
+                <div className="border rounded-md overflow-x-auto bg-white dark:bg-black w-full">
+                    <table className="w-full text-sm text-left">
+                        <thead className="bg-muted">
+                            <tr>
+                                <th className="p-3 border-b font-medium min-w-[150px] whitespace-nowrap">Label Kategori (Sumbu X)</th>
+                                {datasets.map((ds, dIdx) => (
+                                    <th key={dIdx} className="p-3 border-b border-l font-medium min-w-[200px]">
+                                        <div className="flex items-center gap-2">
+                                            <Input value={ds.label} onChange={(e) => handleDatasetLabelChange(dIdx, e.target.value)} className="h-8 font-semibold bg-background" disabled={isSubmitting}/>
+                                            {datasets.length > 1 && (
+                                                <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive flex-shrink-0" onClick={() => removeDataset(dIdx)}><Trash2 className="h-4 w-4"/></Button>
+                                            )}
+                                        </div>
+                                    </th>
+                                ))}
+                                <th className="p-3 border-b border-l w-12 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                             {labels.map((label, lIdx) => (
+                                 <tr key={lIdx} className="hover:bg-muted/50 transition-colors">
+                                    <td className="p-2 border-b">
+                                        <Input value={label} onChange={(e) => handleLabelChange(lIdx, e.target.value)} className="h-8" disabled={isSubmitting} />
+                                    </td>
+                                    {datasets.map((ds, dIdx) => (
+                                        <td key={dIdx} className="p-2 border-b border-l">
+                                            <Input type="number" value={ds.data[lIdx]} onChange={(e) => handleDataChange(dIdx, lIdx, e.target.value)} className="h-8" disabled={isSubmitting} />
+                                        </td>
+                                    ))}
+                                    <td className="p-2 border-b border-l text-center">
+                                        {labels.length > 1 && (
+                                            <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => removeRow(lIdx)}><Trash2 className="h-4 w-4"/></Button>
+                                        )}
+                                    </td>
+                                 </tr>
+                             ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div className="flex justify-end pt-4">
+                <Button type="submit" disabled={isSubmitting}>
+                    <Save className="h-4 w-4 mr-2" />
+                    {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+                </Button>
+            </div>
+        </form>
+    );
+};
+
 const EditStatistikPage = () => {
     const router = useRouter();
     const params = useParams();
@@ -268,6 +391,9 @@ const EditStatistikPage = () => {
                 case 'indeks_lingkungan':
                     return <IdmForm initialData={parsedData} onSave={handleSave} isSubmitting={isSubmitting} />;
                 default:
+                    if (parsedData.chartType && ['bar', 'line', 'pie', 'doughnut'].includes(parsedData.chartType)) {
+                        return <GenericChartEditor initialData={parsedData} onSave={handleSave} isSubmitting={isSubmitting} />;
+                    }
                     return <JsonEditor initialData={statData.data} onSave={handleSave} isSubmitting={isSubmitting} />;
             }
         } catch (e) {

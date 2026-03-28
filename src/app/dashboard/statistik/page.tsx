@@ -103,6 +103,10 @@ const StatistikPage = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [newStat, setNewStat] = useState<Omit<StatistikData, 'createdAt' | 'updatedAt'> | null>(null);
 
+  const [creationMode, setCreationMode] = useState<'template' | 'custom'>('template');
+  const [customChartType, setCustomChartType] = useState<string>('bar');
+  const [customKeyError, setCustomKeyError] = useState<string>('');
+
   useEffect(() => {
     const unsubscribe = getStatistikStream((data) => {
       setStats(data as Statistik[]);
@@ -154,6 +158,13 @@ const StatistikPage = () => {
   };
   
   const handleTemplateSelect = (key: string) => {
+    if (key === 'custom') {
+        setCreationMode('custom');
+        setNewStat({ key: '', title: '', group: 'Kustom', data: '' });
+        setCustomKeyError('');
+        return;
+    }
+    setCreationMode('template');
     if (!key || key === 'none') {
         setNewStat(null);
         return;
@@ -171,10 +182,35 @@ const StatistikPage = () => {
 
   const handleAddData = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStat || !newStat.title.trim() || !newStat.group.trim()) {
-      toast({ title: "Judul dan Grup tidak boleh kosong.", variant: "destructive" });
+    if (!newStat || !newStat.title.trim() || !newStat.group.trim() || (creationMode === 'custom' && !newStat.key.trim())) {
+      toast({ title: "Masih ada isian yang kosong.", variant: "destructive" });
       return;
     }
+
+    if (creationMode === 'custom') {
+        if (!/^[a-z0-9_]+$/.test(newStat.key)) {
+            setCustomKeyError("Kunci hanya boleh berisi huruf kecil, angka, dan garis bawah (_).");
+            return;
+        }
+        setCustomKeyError('');
+        
+        let initialData = "{}";
+        if (customChartType !== 'json') {
+             initialData = JSON.stringify({
+                 chartType: customChartType,
+                 labels: ["Kategori 1", "Kategori 2"],
+                 datasets: [
+                     {
+                         label: "Dataset 1",
+                         data: [10, 20]
+                     }
+                 ]
+             }, null, 2);
+        }
+        newStat.data = initialData;
+        newStat.key = newStat.key.toLowerCase();
+    }
+
     setIsAdding(true);
     const result = await addStatistik(newStat);
     if (result.success) {
@@ -423,24 +459,39 @@ const StatistikPage = () => {
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="data-type">Pilih Template Data</Label>
-                <Select onValueChange={handleTemplateSelect} value={newStat?.key || ''}>
+                <Select onValueChange={handleTemplateSelect} value={creationMode === 'custom' ? 'custom' : (newStat?.key || '')}>
                   <SelectTrigger id="data-type">
                     <SelectValue placeholder="Pilih jenis data..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {templatesToAdd.length > 0 ? (
-                        templatesToAdd.map(template => (
-                           <SelectItem key={template.key} value={template.key}>{template.title}</SelectItem>
-                        ))
-                    ) : (
-                        <SelectItem value="none" disabled>Semua data manual sudah ditambahkan.</SelectItem>
-                    )}
+                    <SelectItem value="custom" className="font-bold text-primary">Buat Kustom (Baru)</SelectItem>
+                    {templatesToAdd.length > 0 && <SelectItem value="none" disabled>--- Template Bawaan ---</SelectItem>}
+                    {templatesToAdd.map(template => (
+                         <SelectItem key={template.key} value={template.key}>{template.title}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
               {newStat && (
                 <>
+                    <div className="space-y-2">
+                        <Label>Kunci (Key)</Label>
+                        <Input 
+                            value={newStat.key} 
+                            disabled={isAdding || creationMode === 'template'}
+                            onChange={e => {
+                                setNewStat(s => s ? {...s, key: e.target.value.toLowerCase()} : null);
+                                setCustomKeyError('');
+                            }}
+                            placeholder="pendapatan_2026"
+                        />
+                        {customKeyError ? (
+                            <p className="text-xs text-red-500">{customKeyError}</p>
+                        ) : (
+                            <p className="text-xs text-muted-foreground">Kunci ini bersifat unik, hanya huruf kecil & garis bawah (_).</p>
+                        )}
+                    </div>
                     <div className="space-y-2">
                         <Label htmlFor="stat-title">Judul Data</Label>
                         <Input 
@@ -459,11 +510,21 @@ const StatistikPage = () => {
                             disabled={isAdding}
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label>Kunci (Key)</Label>
-                        <Input value={newStat.key} disabled />
-                        <p className="text-xs text-muted-foreground">Kunci ini tidak dapat diubah dan digunakan untuk identifikasi data.</p>
-                    </div>
+                    {creationMode === 'custom' && (
+                        <div className="space-y-2">
+                            <Label htmlFor="custom-type">Tipe Visualisasi</Label>
+                            <Select value={customChartType} onValueChange={setCustomChartType}>
+                                <SelectTrigger id="custom-type"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="bar">Diagram Batang (Bar)</SelectItem>
+                                    <SelectItem value="line">Diagram Garis (Line)</SelectItem>
+                                    <SelectItem value="pie">Diagram Lingkaran (Pie)</SelectItem>
+                                    <SelectItem value="doughnut">Diagram Donat (Doughnut)</SelectItem>
+                                    <SelectItem value="json">JSON Bebas</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
                 </>
               )}
             </div>

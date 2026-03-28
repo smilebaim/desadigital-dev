@@ -11,6 +11,7 @@ import IndeksLingkungan from "@/components/charts/IndeksLingkungan";
 import VisitorStatChart from "@/components/charts/VisitorStatChart";
 import PendapatanDesaChart from "@/components/charts/PendapatanDesaChart";
 import BelanjaDesaChart from "@/components/charts/BelanjaDesaChart";
+import DynamicStatChart from "@/components/charts/DynamicStatChart";
 import React from "react";
 import SanitizedHtml from "@/components/SanitizedHtml";
 
@@ -28,7 +29,7 @@ const CHART_PLACEHOLDERS = {
 
 // Create a regex to find all placeholders
 const allPlaceholders = Object.keys(CHART_PLACEHOLDERS).map(p => p.replace(/\[/g, '\\[').replace(/\]/g, '\\]')).join('|');
-const placeholderRegex = new RegExp(`(${allPlaceholders})`, 'g');
+const placeholderRegex = new RegExp(`(${allPlaceholders}|\\[STAT_[A-Z0-9_]+\\])`, 'g');
 
 
 export default async function CustomPage({ params }: { params: Promise<{ slug: string[] }> }) {
@@ -71,6 +72,10 @@ export default async function CustomPage({ params }: { params: Promise<{ slug: s
                        const ChartComponent = (CHART_PLACEHOLDERS as any)[part];
                        if (ChartComponent) {
                            return <React.Fragment key={index}>{ChartComponent}</React.Fragment>;
+                       }
+                       if (part.startsWith('[STAT_') && part.endsWith(']')) {
+                           const statKey = part.replace('[STAT_', '').replace(']', '').toLowerCase();
+                           return <DynamicStatChart key={`dynamic-${index}`} statKey={statKey} />;
                        }
                        return (
                            <SanitizedHtml
