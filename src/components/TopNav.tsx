@@ -87,7 +87,7 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, lo
           return (
               <AccordionItem key={parentItem.id} value={parentItem.id} className="border-black/10">
                   <AccordionTrigger className="px-2 sm:px-3 text-black hover:text-black hover:no-underline border-b border-black/10 pb-2 transition-all hover:bg-black/10">
-                      <span className="font-poppins font-semibold text-sm sm:text-base flex items-center gap-2">
+                      <span className="font-poppins text-sm sm:text-base flex items-center gap-2">
                         <ParentIcon className="h-4 w-4 text-black" />
                         {parentItem.title}
                       </span>
@@ -211,7 +211,7 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, lo
                       )}
                     </div>
                     <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-black/10">
-                      <p className="text-[10px] sm:text-xs text-black/40 italic font-bold">
+                      <p className="text-[10px] sm:text-xs text-black/40 italic">
                         Penafian : Data dan informasi yang di sajikan dalam Laman ini bersifat indikatif dan tidak di maksudkan untuk penyebarluasan informasi. Lebih lanjut hubungi pemerintah desa dan walidata terkait untuk validasi
                       </p>
                     </div>

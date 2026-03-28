@@ -60,7 +60,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
       <div className="fixed left-0 md:top-16 top-1/2 -translate-y-1/2 md:translate-y-0 h-auto md:h-[calc(100vh-9rem)] md:w-72 w-12 bg-emerald-800/90 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-r border-emerald-900 z-40 transition-all duration-300 rounded-r-[2rem] md:rounded-none md:rounded-br-[4rem]">
         <ScrollArea className="h-full max-h-[70vh] md:max-h-none md:px-4 px-1 py-8">
           <div className="space-y-2 md:pb-16">
-            <h3 className="font-semibold text-lg mb-6 text-emerald-50 border-b border-emerald-100/20 pb-3 hidden md:block flex items-center gap-2">
+            <h3 className="text-lg mb-6 text-emerald-50 border-b border-emerald-100/20 pb-3 hidden md:block flex items-center gap-2">
                 <MenuIcon className="h-5 w-5" />
                 {targetMenu.name}
             </h3>
@@ -133,7 +133,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
                     </SheetHeader>
                     <ScrollArea className="h-full">
                       <div className="space-y-3 sm:space-y-4 py-6 sm:py-8">
-                        <h3 className="font-semibold text-base sm:text-lg mb-2 text-black px-2 sm:px-3 border-b border-black/10 pb-2 transition-all hover:bg-black/10 flex items-center gap-2">
+                        <h3 className="text-base sm:text-lg mb-2 text-black px-2 sm:px-3 border-b border-black/10 pb-2 transition-all hover:bg-black/10 flex items-center gap-2">
                            <Icon className="h-5 w-5" />
                            {item.title}
                         </h3>
@@ -156,7 +156,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ className, menu, allMenus, loadin
                         })}
                       </div>
                        <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 border-t border-black/10">
-                          <p className="text-[10px] sm:text-xs text-black/40 italic font-bold">
+                          <p className="text-[10px] sm:text-xs text-black/40 italic">
                             Penafian : Data dan informasi yang di sajikan dalam Laman ini bersifat indikatif dan tidak di maksudkan untuk penyebarluasan informasi. Lebih lanjut hubungi pemerintah desa dan walidata terkait untuk validasi
                           </p>
                         </div>
