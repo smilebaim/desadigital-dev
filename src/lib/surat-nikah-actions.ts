@@ -5,6 +5,7 @@ import {
     updateDoc, 
     deleteDoc, 
     doc,
+    getDoc,
     serverTimestamp
 } from 'firebase/firestore';
 import { generateTrackingCode } from './pdf-utils';
@@ -53,3 +54,15 @@ export const deleteSuratNikah = async (id: string) => {
         return { success: false, error: error.message };
     }
 };
+
+export const getSuratNikahById = async (id: string) => {
+    try {
+        const docRef = doc(db, 'surat_nikah', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as SuratNikahData & { id: string };
+        }
+        return null;
+    } catch (error) { return null; }
+};
+

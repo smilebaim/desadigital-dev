@@ -242,7 +242,7 @@ const SuratPindahPage = () => {
                                                             </>
                                                         )}
                                                         {surat.status === 'Selesai' && (
-                                                            <DropdownMenuItem onClick={() => generateSuratPDF('Surat Keterangan Pindah', surat)}>
+                                                            <DropdownMenuItem onClick={() => window.open(`/print/surat-pindah/${surat.id}`, '_blank')}>
                                                                 <Printer className="h-4 w-4 mr-2" />Cetak
                                                             </DropdownMenuItem>
                                                         )}

@@ -240,7 +240,7 @@ const SuratPengantarPage = () => {
                                                             </>
                                                         )}
                                                         {surat.status === 'Selesai' && (
-                                                            <DropdownMenuItem onClick={() => generateSuratPDF('Surat Pengantar', surat)}>
+                                                            <DropdownMenuItem onClick={() => window.open(`/print/surat-pengantar/${surat.id}`, '_blank')}>
                                                                 <Printer className="h-4 w-4 mr-2" />Cetak
                                                             </DropdownMenuItem>
                                                         )}

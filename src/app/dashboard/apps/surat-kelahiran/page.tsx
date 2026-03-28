@@ -252,7 +252,7 @@ const SuratKelahiranPage = () => {
                                                             </>
                                                         )}
                                                         {surat.status === 'Selesai' && (
-                                                            <DropdownMenuItem onClick={() => generateSuratPDF('Surat Keterangan Kelahiran', surat)}>
+                                                            <DropdownMenuItem onClick={() => window.open(`/print/surat-kelahiran/${surat.id}`, '_blank')}>
                                                                 <Printer className="h-4 w-4 mr-2" />Cetak
                                                             </DropdownMenuItem>
                                                         )}

@@ -5,6 +5,7 @@ import {
     updateDoc, 
     deleteDoc, 
     doc,
+    getDoc,
     serverTimestamp,
     writeBatch,
     getDocs,
@@ -26,8 +27,32 @@ export interface PendudukData {
     alamat: string;
     rt: string;
     rw: string;
+    // Additional biodata fields (flexible sub-object)
+    biodata?: {
+        tempatLahir?: string;
+        tanggalLahir?: string;
+        jenisKelamin?: string;
+        agama?: string;
+        pekerjaan?: string;
+        pendidikan?: string;
+        statusPerkawinan?: string;
+    };
     createdAt?: any;
 }
+
+export const getPendudukById = async (id: string): Promise<(PendudukData & { id: string }) | null> => {
+    try {
+        const docRef = doc(db, 'penduduk', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as PendudukData & { id: string };
+        }
+        return null;
+    } catch (error) {
+        console.error("Error getting penduduk:", error);
+        return null;
+    }
+};
 
 export const addPenduduk = async (data: Omit<PendudukData, 'createdAt'>) => {
     try {

@@ -5,6 +5,7 @@ import {
     updateDoc, 
     deleteDoc, 
     doc,
+    getDoc,
     serverTimestamp
 } from 'firebase/firestore';
 import { generateTrackingCode } from './pdf-utils';
@@ -17,6 +18,8 @@ export interface SuratUsahaData {
     jenisUsaha: string;
     alamatUsaha: string;
     nomorSurat?: string;
+    keperluan?: string;
+    keterangan?: string;
     trackingCode?: string;
     status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
     createdAt: any;
@@ -51,5 +54,19 @@ export const deleteSuratUsaha = async (id: string) => {
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };
+    }
+};
+
+export const getSuratUsahaById = async (id: string) => {
+    try {
+        const docRef = doc(db, 'surat_usaha', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as SuratUsahaData & { id: string };
+        }
+        return null;
+    } catch (error) {
+        console.error("Error getting surat:", error);
+        return null;
     }
 };

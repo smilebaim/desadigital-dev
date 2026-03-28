@@ -5,6 +5,7 @@ import {
     updateDoc, 
     deleteDoc, 
     doc,
+    getDoc,
     serverTimestamp
 } from 'firebase/firestore';
 import { generateTrackingCode } from './pdf-utils';
@@ -52,3 +53,15 @@ export const deleteSuratKematian = async (id: string) => {
         return { success: false, error: error.message };
     }
 };
+
+export const getSuratKematianById = async (id: string) => {
+    try {
+        const docRef = doc(db, 'surat_kematian', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as SuratKematianData & { id: string };
+        }
+        return null;
+    } catch (error) { return null; }
+};
+
