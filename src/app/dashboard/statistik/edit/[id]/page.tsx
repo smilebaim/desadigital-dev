@@ -8,9 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import { ArrowLeft, Save, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { getStatistikById, updateStatistik, type StatistikData } from '@/lib/statistik-actions';
+import DynamicStatChart from '@/components/charts/DynamicStatChart';
 
 // --- Form Components ---
 
@@ -264,78 +265,94 @@ const GenericChartEditor = ({ initialData, onSave, isSubmitting }: { initialData
         onSave(JSON.stringify(finalData, null, 2));
     };
 
-    return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="chart-type">Tipe Visualisasi</Label>
-                <Select value={chartType} onValueChange={setChartType} disabled={isSubmitting}>
-                    <SelectTrigger id="chart-type"><SelectValue/></SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="bar">Diagram Batang (Bar)</SelectItem>
-                        <SelectItem value="line">Diagram Garis (Line)</SelectItem>
-                        <SelectItem value="pie">Diagram Lingkaran (Pie)</SelectItem>
-                        <SelectItem value="doughnut">Diagram Donat (Doughnut)</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+    const previewData = {
+        title: "Pratinjau Grafik",
+         group: "Pratinjau",
+         data: JSON.stringify({ chartType, labels, datasets })
+    };
 
-            <div className="space-y-4 pt-4 overflow-x-auto">
-                <div className="flex justify-between items-center border-b pb-2">
-                    <h4 className="font-semibold text-muted-foreground">Tabel Data Grafik</h4>
-                    <div className="flex gap-2">
-                         <Button type="button" size="sm" variant="outline" onClick={addDataset}><Plus className="h-4 w-4 mr-2" />Kolom Dataset</Button>
-                         <Button type="button" size="sm" variant="outline" onClick={addRow}><Plus className="h-4 w-4 mr-2" />Baris Kategori</Button>
+    return (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                    <Label htmlFor="chart-type">Tipe Visualisasi</Label>
+                    <Select value={chartType} onValueChange={setChartType} disabled={isSubmitting}>
+                        <SelectTrigger id="chart-type"><SelectValue/></SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="bar">Diagram Batang (Bar)</SelectItem>
+                            <SelectItem value="line">Diagram Garis (Line)</SelectItem>
+                            <SelectItem value="pie">Diagram Lingkaran (Pie)</SelectItem>
+                            <SelectItem value="doughnut">Diagram Donat (Doughnut)</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <div className="space-y-4 pt-4 overflow-x-auto">
+                    <div className="flex justify-between items-center border-b pb-2">
+                        <h4 className="font-semibold text-muted-foreground">Tabel Data Grafik</h4>
+                        <div className="flex gap-2">
+                             <Button type="button" size="sm" variant="outline" onClick={addDataset}><Plus className="h-4 w-4 mr-2" />Kolom</Button>
+                             <Button type="button" size="sm" variant="outline" onClick={addRow}><Plus className="h-4 w-4 mr-2" />Baris</Button>
+                        </div>
+                    </div>
+
+                    <div className="border rounded-md overflow-x-auto bg-white dark:bg-black w-full">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-muted">
+                                <tr>
+                                    <th className="p-3 border-b font-medium min-w-[150px] whitespace-nowrap">Kategori (Sumbu X)</th>
+                                    {datasets.map((ds, dIdx) => (
+                                        <th key={dIdx} className="p-3 border-b border-l font-medium min-w-[200px]">
+                                            <div className="flex items-center gap-2">
+                                                <Input value={ds.label} onChange={(e) => handleDatasetLabelChange(dIdx, e.target.value)} className="h-8 font-semibold bg-background" disabled={isSubmitting}/>
+                                                {datasets.length > 1 && (
+                                                    <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive flex-shrink-0" onClick={() => removeDataset(dIdx)}><Trash2 className="h-4 w-4"/></Button>
+                                                )}
+                                            </div>
+                                        </th>
+                                    ))}
+                                    <th className="p-3 border-b border-l w-12 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                 {labels.map((label, lIdx) => (
+                                     <tr key={lIdx} className="hover:bg-muted/50 transition-colors">
+                                        <td className="p-2 border-b">
+                                            <Input value={label} onChange={(e) => handleLabelChange(lIdx, e.target.value)} className="h-8" disabled={isSubmitting} />
+                                        </td>
+                                        {datasets.map((ds, dIdx) => (
+                                            <td key={dIdx} className="p-2 border-b border-l">
+                                                <Input type="number" value={ds.data[lIdx]} onChange={(e) => handleDataChange(dIdx, lIdx, e.target.value)} className="h-8" disabled={isSubmitting} />
+                                            </td>
+                                        ))}
+                                        <td className="p-2 border-b border-l text-center">
+                                            {labels.length > 1 && (
+                                                <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => removeRow(lIdx)}><Trash2 className="h-4 w-4"/></Button>
+                                            )}
+                                        </td>
+                                     </tr>
+                                 ))}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div className="border rounded-md overflow-x-auto bg-white dark:bg-black w-full">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-muted">
-                            <tr>
-                                <th className="p-3 border-b font-medium min-w-[150px] whitespace-nowrap">Label Kategori (Sumbu X)</th>
-                                {datasets.map((ds, dIdx) => (
-                                    <th key={dIdx} className="p-3 border-b border-l font-medium min-w-[200px]">
-                                        <div className="flex items-center gap-2">
-                                            <Input value={ds.label} onChange={(e) => handleDatasetLabelChange(dIdx, e.target.value)} className="h-8 font-semibold bg-background" disabled={isSubmitting}/>
-                                            {datasets.length > 1 && (
-                                                <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive flex-shrink-0" onClick={() => removeDataset(dIdx)}><Trash2 className="h-4 w-4"/></Button>
-                                            )}
-                                        </div>
-                                    </th>
-                                ))}
-                                <th className="p-3 border-b border-l w-12 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                             {labels.map((label, lIdx) => (
-                                 <tr key={lIdx} className="hover:bg-muted/50 transition-colors">
-                                    <td className="p-2 border-b">
-                                        <Input value={label} onChange={(e) => handleLabelChange(lIdx, e.target.value)} className="h-8" disabled={isSubmitting} />
-                                    </td>
-                                    {datasets.map((ds, dIdx) => (
-                                        <td key={dIdx} className="p-2 border-b border-l">
-                                            <Input type="number" value={ds.data[lIdx]} onChange={(e) => handleDataChange(dIdx, lIdx, e.target.value)} className="h-8" disabled={isSubmitting} />
-                                        </td>
-                                    ))}
-                                    <td className="p-2 border-b border-l text-center">
-                                        {labels.length > 1 && (
-                                            <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => removeRow(lIdx)}><Trash2 className="h-4 w-4"/></Button>
-                                        )}
-                                    </td>
-                                 </tr>
-                             ))}
-                        </tbody>
-                    </table>
+                <div className="flex justify-end pt-4">
+                    <Button type="submit" disabled={isSubmitting}>
+                        <Save className="h-4 w-4 mr-2" />
+                        {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+                    </Button>
                 </div>
+            </form>
+            <div className="space-y-4 sticky top-6 self-start hidden lg:block border rounded-xl overflow-hidden shadow-sm bg-muted/20">
+                 <div className="bg-muted px-4 py-3 border-b border-border/50">
+                    <h3 className="text-sm font-semibold flex items-center"><BarChart3 className="w-4 h-4 mr-2 text-primary" /> Pratinjau Tampilan Web</h3>
+                 </div>
+                 <div className="p-4 scale-[0.85] origin-top -mt-4">
+                     <DynamicStatChart previewData={previewData} />
+                 </div>
             </div>
-
-            <div className="flex justify-end pt-4">
-                <Button type="submit" disabled={isSubmitting}>
-                    <Save className="h-4 w-4 mr-2" />
-                    {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
-                </Button>
-            </div>
-        </form>
+        </div>
     );
 };
 

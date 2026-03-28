@@ -11,18 +11,34 @@ import { getStatistikByKey, type StatistikData } from '@/lib/statistik-actions';
 import { Loader } from 'lucide-react';
 
 interface DynamicStatChartProps {
-    statKey: string;
+    statKey?: string;
+    previewData?: {
+         title: string;
+         group: string;
+         data: string;
+    };
 }
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
-export default function DynamicStatChart({ statKey }: DynamicStatChartProps) {
-    const [stat, setStat] = useState<StatistikData | null>(null);
+export default function DynamicStatChart({ statKey, previewData }: DynamicStatChartProps) {
+    const [stat, setStat] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
+        if (previewData) {
+             setStat({
+                 title: previewData.title,
+                 group: previewData.group,
+                 data: previewData.data
+             });
+             setLoading(false);
+             return;
+        }
+
         const fetchStat = async () => {
+            if (!statKey) return;
             setLoading(true);
             try {
                 const data = await getStatistikByKey(statKey);
@@ -37,7 +53,7 @@ export default function DynamicStatChart({ statKey }: DynamicStatChartProps) {
             setLoading(false);
         };
         fetchStat();
-    }, [statKey]);
+    }, [statKey, previewData]);
 
     if (loading) {
         return (

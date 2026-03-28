@@ -17,9 +17,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { visualizationTemplates } from '@/lib/visualization-templates';
+import { getStatistikStream } from '@/lib/statistik-client-actions';
+import { type StatistikData } from '@/lib/statistik-actions';
 
 const pageSchema = z.object({
   title: z.string().min(1, 'Judul wajib diisi'),
@@ -37,6 +41,7 @@ const NewCustomPage = () => {
         defaultValues: { title: '', slug: '', content: '' }
     });
     const [origin, setOrigin] = useState('');
+    const [customStats, setCustomStats] = useState<StatistikData[]>([]);
 
     const titleValue = watch('title');
 
@@ -54,6 +59,10 @@ const NewCustomPage = () => {
 
     useEffect(() => {
         setOrigin(window.location.origin);
+        const unsubscribe = getStatistikStream((data) => {
+            setCustomStats(data as StatistikData[]);
+        });
+        return () => unsubscribe();
     }, []);
 
     const onSubmit = async (data: PageFormValues) => {
@@ -120,12 +129,24 @@ const NewCustomPage = () => {
                                         <ChevronDown className="h-4 w-4 ml-2" />
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent>
+                                <DropdownMenuContent className="max-h-[300px] overflow-y-auto w-56">
+                                    <DropdownMenuLabel>Template Bawaan</DropdownMenuLabel>
                                     {visualizationTemplates.map(template => (
                                         <DropdownMenuItem key={template.placeholder} onClick={() => handleInsertPlaceholder(template.placeholder)}>
                                             {template.title}
                                         </DropdownMenuItem>
                                     ))}
+                                    {customStats.length > 0 && (
+                                        <>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuLabel>Data Kustom Anda</DropdownMenuLabel>
+                                            {customStats.map(stat => (
+                                                <DropdownMenuItem key={stat.key} onClick={() => handleInsertPlaceholder(`[STAT_${stat.key.toUpperCase()}]`)}>
+                                                    {stat.title}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </>
+                                    )}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                             <Button type="submit" disabled={isSubmitting}>
