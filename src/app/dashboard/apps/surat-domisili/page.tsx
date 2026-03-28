@@ -68,6 +68,9 @@ interface Penduduk extends PendudukData {
 
 const suratDomisiliSchema = z.object({
   pendudukId: z.string().min(1, "Pemohon wajib dipilih"),
+  nomorSurat: z.string().optional(),
+  keperluan: z.string().optional(),
+  keterangan: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof suratDomisiliSchema>;
@@ -86,7 +89,7 @@ const SuratDomisiliPage = () => {
 
     const { control, handleSubmit, reset, formState: { isSubmitting, errors } } = useForm<FormValues>({
         resolver: zodResolver(suratDomisiliSchema),
-        defaultValues: { pendudukId: "" }
+        defaultValues: { pendudukId: "", nomorSurat: "", keperluan: "", keterangan: "" }
     });
 
     useEffect(() => {
@@ -106,14 +109,19 @@ const SuratDomisiliPage = () => {
     const openAddForm = () => {
         setFormMode('add');
         setSelectedSurat(null);
-        reset({ pendudukId: "" });
+        reset({ pendudukId: "", nomorSurat: "", keperluan: "", keterangan: "" });
         setIsFormOpen(true);
     };
 
     const openEditForm = (surat: Surat) => {
         setFormMode('edit');
         setSelectedSurat(surat);
-        reset({ pendudukId: surat.pendudukId });
+        reset({ 
+            pendudukId: surat.pendudukId,
+            nomorSurat: surat.nomorSurat || "",
+            keperluan: surat.keperluan || "",
+            keterangan: surat.keterangan || ""
+        });
         setIsFormOpen(true);
     };
     
@@ -140,7 +148,14 @@ const SuratDomisiliPage = () => {
         if (formMode === 'add') {
             result = await addSuratDomisili(data);
         } else if (selectedSurat) {
-            result = await updateSuratDomisili(selectedSurat.id, { pendudukId: values.pendudukId, namaPemohon: selectedPenduduk.nama, nikPemohon: selectedPenduduk.nik });
+            result = await updateSuratDomisili(selectedSurat.id, { 
+                pendudukId: values.pendudukId, 
+                namaPemohon: selectedPenduduk.nama, 
+                nikPemohon: selectedPenduduk.nik,
+                nomorSurat: values.nomorSurat,
+                keperluan: values.keperluan,
+                keterangan: values.keterangan
+            });
         }
 
         if (result?.success) {
@@ -233,7 +248,7 @@ const SuratDomisiliPage = () => {
                                                             </>
                                                         )}
                                                         {surat.status === 'Selesai' && (
-                                                            <DropdownMenuItem onClick={() => generateSuratPDF('Surat Keterangan Domisili', surat)}>
+                                                            <DropdownMenuItem onClick={() => window.open(`/print/surat-domisili/${surat.id}`, '_blank')}>
                                                                 <Printer className="h-4 w-4 mr-2" />Cetak
                                                             </DropdownMenuItem>
                                                         )}
@@ -272,6 +287,18 @@ const SuratDomisiliPage = () => {
                                     </Select>
                                 )} />
                                 {errors.pendudukId && <p className="text-xs text-red-500">{errors.pendudukId.message}</p>}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="nomorSurat">Nomor Surat Hukum/Registrasi (Jika sudah siap disahkan)</Label>
+                                <Controller name="nomorSurat" control={control} render={({ field }) => <Input {...field} placeholder="Contoh: 140/01/DS/2026" />} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="keperluan">Keperluan Pembuatan Surat</Label>
+                                <Controller name="keperluan" control={control} render={({ field }) => <Input {...field} placeholder="Cth: Mengurus Pembukaan Rekening Bank" />} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="keterangan">Keterangan Tambahan (Opsional)</Label>
+                                <Controller name="keterangan" control={control} render={({ field }) => <Input {...field} placeholder="Cth: Berlaku selama 3 bulan sejak diterbitkan" />} />
                             </div>
                         </div>
                         <DialogFooter>

@@ -19,6 +19,12 @@ export interface SiteSettings {
     contactEmail?: string;
     contactPhone?: string;
     contactAddress?: string;
+    // Identitas Persuratan & Pemerintah
+    kabupaten?: string;
+    kecamatan?: string;
+    kodePos?: string;
+    kepalaDesaName?: string;
+    kepalaDesaNip?: string;
     updatedAt?: string | null;
 }
 
@@ -34,7 +40,12 @@ const DEFAULT_SETTINGS: SiteSettings = {
     ogImageUrl: "/Background utama.png",
     contactEmail: "",
     contactPhone: "",
-    contactAddress: "Desa Remau Bako Tuo, Kecamatan ..., Kabupaten ...",
+    contactAddress: "Desa Remau Bako Tuo, Kecamatan Sadu, Kabupaten Tanjung Jabung Timur",
+    kabupaten: "Tanjung Jabung Timur",
+    kecamatan: "Sadu",
+    kodePos: "36773",
+    kepalaDesaName: "H. Abdullah",
+    kepalaDesaNip: "",
 };
 
 // Get site settings from Firestore

@@ -5,6 +5,7 @@ import {
     updateDoc, 
     deleteDoc, 
     doc,
+    getDoc,
     serverTimestamp
 } from 'firebase/firestore';
 import { generateTrackingCode } from './pdf-utils';
@@ -14,6 +15,9 @@ export interface SuratDomisiliData {
     namaPemohon: string;
     nikPemohon: string;
     status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
+    nomorSurat?: string;
+    keperluan?: string;
+    keterangan?: string;
     trackingCode?: string;
     createdAt: any;
 }
@@ -47,5 +51,19 @@ export const deleteSuratDomisili = async (id: string) => {
         return { success: true };
     } catch (error: any) {
         return { success: false, error: error.message };
+    }
+};
+
+export const getSuratDomisiliById = async (id: string) => {
+    try {
+        const docRef = doc(db, 'surat_domisili', id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            return { id: docSnap.id, ...docSnap.data() } as SuratDomisiliData & { id: string };
+        }
+        return null;
+    } catch (error) {
+        console.error("Error getting surat:", error);
+        return null;
     }
 };

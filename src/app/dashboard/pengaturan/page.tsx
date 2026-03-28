@@ -13,7 +13,7 @@ import { getSiteSettings, updateSiteSettings, type SiteSettings } from "@/lib/si
 import { seedDefaultMenus } from "@/lib/menu-actions";
 import { seedInitialStatistik } from "@/lib/statistik-actions";
 import { seedDummyPosts } from "@/lib/posts-actions";
-import { Database, LayoutGrid, BarChart, PenTool, AlertCircle } from "lucide-react";
+import { Database, LayoutGrid, BarChart, PenTool, AlertCircle, FileText } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const PengaturanPage = () => {
@@ -252,6 +252,47 @@ const PengaturanPage = () => {
                             rows={3}
                             disabled={isSaving}
                         />
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Separator />
+
+            {/* Pengaturan Kop Surat */}
+            <Card>
+                <CardHeader>
+                    <div className="flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-primary" />
+                        <CardTitle>Identitas Kop Surat &amp; Pemerintahan</CardTitle>
+                    </div>
+                    <CardDescription>
+                        Informasi ini akan digunakan secara otomatis pada cetak surat arsip (Surat Domisili, dsb).
+                    </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="kabupaten">Kabupaten / Kota</Label>
+                            <Input id="kabupaten" value={settings.kabupaten || ''} onChange={e => handleChange('kabupaten', e.target.value)} disabled={isSaving} placeholder="Tanjung Jabung Timur" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="kecamatan">Kecamatan</Label>
+                            <Input id="kecamatan" value={settings.kecamatan || ''} onChange={e => handleChange('kecamatan', e.target.value)} disabled={isSaving} placeholder="Sadu" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="kodePos">Kode Pos</Label>
+                            <Input id="kodePos" value={settings.kodePos || ''} onChange={e => handleChange('kodePos', e.target.value)} disabled={isSaving} placeholder="36773" />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="kepalaDesaName">Nama Kepala Desa</Label>
+                            <Input id="kepalaDesaName" value={settings.kepalaDesaName || ''} onChange={e => handleChange('kepalaDesaName', e.target.value)} disabled={isSaving} placeholder="H. Abdullah" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="kepalaDesaNip">NIP Kepala Desa (Jika Ada)</Label>
+                            <Input id="kepalaDesaNip" value={settings.kepalaDesaNip || ''} onChange={e => handleChange('kepalaDesaNip', e.target.value)} disabled={isSaving} placeholder="Kosongkan jika tidak ada" />
+                        </div>
                     </div>
                 </CardContent>
             </Card>

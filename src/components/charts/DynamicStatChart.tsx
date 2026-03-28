@@ -5,6 +5,8 @@ import {
   BarChart, Bar, 
   LineChart, Line, 
   PieChart, Pie, Cell, 
+  AreaChart, Area,
+  RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 import { getStatistikByKey, type StatistikData } from '@/lib/statistik-actions';
@@ -93,7 +95,7 @@ export default function DynamicStatChart({ statKey, previewData }: DynamicStatCh
     // Default to bar if not specified or not custom
     const chartType = parsedData.chartType || 'bar';
     const labels: string[] = parsedData.labels || [];
-    const datasets: { label: string, data: number[] }[] = parsedData.datasets || [];
+    const datasets: { label: string, data: number[], color?: string }[] = parsedData.datasets || [];
 
     if (labels.length === 0 || datasets.length === 0) {
         return (
@@ -116,6 +118,38 @@ export default function DynamicStatChart({ statKey, previewData }: DynamicStatCh
 
     const renderChart = () => {
         switch (chartType) {
+            case 'area':
+                return (
+                    <AreaChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
+                        {datasets.map((ds, idx) => {
+                            const color = ds.color || COLORS[idx % COLORS.length];
+                            return (
+                                <Area key={idx} type="monotone" dataKey={ds.label} stroke={color} fill={color} fillOpacity={0.3} />
+                            );
+                        })}
+                    </AreaChart>
+                );
+            case 'radar':
+                return (
+                    <RadarChart cx="50%" cy="50%" outerRadius="80%" data={chartData}>
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="name" />
+                        <PolarRadiusAxis />
+                        <Tooltip />
+                        <Legend />
+                        {datasets.map((ds, idx) => {
+                             const color = ds.color || COLORS[idx % COLORS.length];
+                             return (
+                                <Radar key={idx} name={ds.label} dataKey={ds.label} stroke={color} fill={color} fillOpacity={0.5} />
+                             );
+                        })}
+                    </RadarChart>
+                );
             case 'line':
                 return (
                     <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -124,18 +158,20 @@ export default function DynamicStatChart({ statKey, previewData }: DynamicStatCh
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        {datasets.map((ds, idx) => (
-                             <Line key={idx} type="monotone" dataKey={ds.label} stroke={COLORS[idx % COLORS.length]} strokeWidth={2} activeDot={{ r: 8 }} />
-                        ))}
+                        {datasets.map((ds, idx) => {
+                             const color = ds.color || COLORS[idx % COLORS.length];
+                             return <Line key={idx} type="monotone" dataKey={ds.label} stroke={color} strokeWidth={2} activeDot={{ r: 8 }} />;
+                        })}
                     </LineChart>
                 );
             case 'pie':
-            case 'doughnut':
-                // Pie usually works best with 1 dataset, charting the labels
+            case 'doughnut': {
                 const pieData = labels.map((label, index) => ({
                     name: label,
                     value: datasets[0]?.data[index] || 0
                 }));
+                // In pie/doughnut we typically vary color per label slice, but we can respect ds.color generically for the first slice or leave the palette.
+                // We'll leave the palette logic here since pie chart represents one dataset broken down.
                 return (
                    <PieChart margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                        <Tooltip />
@@ -156,6 +192,7 @@ export default function DynamicStatChart({ statKey, previewData }: DynamicStatCh
                        </Pie>
                    </PieChart>
                 );
+            }
             case 'bar':
             default:
                 return (
@@ -165,9 +202,10 @@ export default function DynamicStatChart({ statKey, previewData }: DynamicStatCh
                         <YAxis />
                         <Tooltip />
                         <Legend />
-                        {datasets.map((ds, idx) => (
-                             <Bar key={idx} dataKey={ds.label} fill={COLORS[idx % COLORS.length]} radius={[4, 4, 0, 0]} />
-                        ))}
+                        {datasets.map((ds, idx) => {
+                             const color = ds.color || COLORS[idx % COLORS.length];
+                             return <Bar key={idx} dataKey={ds.label} fill={color} radius={[4, 4, 0, 0]} />;
+                        })}
                     </BarChart>
                 );
         }

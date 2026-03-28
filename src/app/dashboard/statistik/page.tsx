@@ -518,8 +518,10 @@ const StatistikPage = () => {
                                 <SelectContent>
                                     <SelectItem value="bar">Diagram Batang (Bar)</SelectItem>
                                     <SelectItem value="line">Diagram Garis (Line)</SelectItem>
+                                    <SelectItem value="area">Diagram Area (Area)</SelectItem>
                                     <SelectItem value="pie">Diagram Lingkaran (Pie)</SelectItem>
                                     <SelectItem value="doughnut">Diagram Donat (Doughnut)</SelectItem>
+                                    <SelectItem value="radar">Diagram Jaring (Radar)</SelectItem>
                                     <SelectItem value="json">JSON Bebas</SelectItem>
                                 </SelectContent>
                             </Select>

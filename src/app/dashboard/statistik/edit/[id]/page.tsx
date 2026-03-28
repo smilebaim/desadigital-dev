@@ -241,6 +241,63 @@ const GenericChartEditor = ({ initialData, onSave, isSubmitting }: { initialData
         setDatasets(newDatasets);
     }
 
+    const handleDatasetColorChange = (datasetIndex: number, color: string) => {
+        const newDatasets = [...datasets];
+        newDatasets[datasetIndex].color = color;
+        setDatasets(newDatasets);
+    }
+
+    const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>, startRowIdx: number, startColIdx: number | null) => {
+        const text = e.clipboardData.getData('Text');
+        if (!text) return;
+        
+        if (text.includes('\t') || text.includes('\n')) {
+            e.preventDefault();
+            
+            const rows = text.split(/\r?\n/).filter(r => r.trim() !== '');
+            let newLabels = [...labels];
+            let newDatasets = [...datasets];
+            
+            rows.forEach((row, rIdx) => {
+                const cells = row.split('\t');
+                const targetRowIdx = startRowIdx + rIdx;
+                
+                // create rows if they don't exist
+                while (targetRowIdx >= newLabels.length) {
+                    newLabels.push(`Kategori ${newLabels.length + 1}`);
+                    newDatasets.forEach(ds => ds.data.push(0)); // pad vertically
+                }
+                
+                let cellDataOffset = 0;
+                
+                cells.forEach((val, cIdx) => {
+                    const parsedVal = val.trim();
+                    // if startColIdx === null and we're at cIdx === 0, this is the Label column
+                    if (startColIdx === null && cIdx === 0) {
+                        newLabels[targetRowIdx] = parsedVal;
+                        cellDataOffset = 1; 
+                    } else {
+                        const targetDsIdx = (startColIdx === null ? -1 : startColIdx) + cIdx - cellDataOffset + (startColIdx === null ? 1 : 0);
+                        
+                        if (targetDsIdx >= 0) {
+                            while (targetDsIdx >= newDatasets.length) {
+                                newDatasets.push({ label: `Dataset ${newDatasets.length + 1}`, data: newLabels.map(() => 0) });
+                            }
+                            
+                            const numVal = Number(parsedVal.replace(/[^0-9.-]+/g,"")); // Clean strings to valid numbers
+                            if (!isNaN(numVal) && parsedVal !== '') {
+                                newDatasets[targetDsIdx].data[targetRowIdx] = numVal;
+                            }
+                        }
+                    }
+                });
+            });
+            
+            setLabels([...newLabels]);
+            setDatasets([...newDatasets]);
+        }
+    };
+
     const addRow = () => {
         setLabels([...labels, `Kategori ${labels.length + 1}`]);
         setDatasets(datasets.map(ds => ({ ...ds, data: [...ds.data, 0] })));
@@ -281,8 +338,10 @@ const GenericChartEditor = ({ initialData, onSave, isSubmitting }: { initialData
                         <SelectContent>
                             <SelectItem value="bar">Diagram Batang (Bar)</SelectItem>
                             <SelectItem value="line">Diagram Garis (Line)</SelectItem>
+                            <SelectItem value="area">Diagram Area (Area)</SelectItem>
                             <SelectItem value="pie">Diagram Lingkaran (Pie)</SelectItem>
                             <SelectItem value="doughnut">Diagram Donat (Doughnut)</SelectItem>
+                            <SelectItem value="radar">Diagram Jaring (Radar)</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -303,8 +362,16 @@ const GenericChartEditor = ({ initialData, onSave, isSubmitting }: { initialData
                                     <th className="p-3 border-b font-medium min-w-[150px] whitespace-nowrap">Kategori (Sumbu X)</th>
                                     {datasets.map((ds, dIdx) => (
                                         <th key={dIdx} className="p-3 border-b border-l font-medium min-w-[200px]">
-                                            <div className="flex items-center gap-2">
-                                                <Input value={ds.label} onChange={(e) => handleDatasetLabelChange(dIdx, e.target.value)} className="h-8 font-semibold bg-background" disabled={isSubmitting}/>
+                                            <div className="flex items-center gap-1.5 focus-within:ring-1 focus-within:ring-ring rounded-md ring-offset-background">
+                                                <input 
+                                                    type="color" 
+                                                    value={ds.color || '#3b82f6'} 
+                                                    onChange={(e) => handleDatasetColorChange(dIdx, e.target.value)}
+                                                    className="w-8 h-8 p-0 border-0 rounded cursor-pointer shrink-0 appearance-none bg-transparent"
+                                                    title="Pilih warna untuk dataset ini"
+                                                    disabled={isSubmitting}
+                                                />
+                                                <Input value={ds.label} onChange={(e) => handleDatasetLabelChange(dIdx, e.target.value)} className="h-8 font-semibold bg-background border-none focus-visible:ring-0 px-2" disabled={isSubmitting}/>
                                                 {datasets.length > 1 && (
                                                     <Button type="button" size="icon" variant="ghost" className="h-8 w-8 text-destructive flex-shrink-0" onClick={() => removeDataset(dIdx)}><Trash2 className="h-4 w-4"/></Button>
                                                 )}
@@ -318,11 +385,25 @@ const GenericChartEditor = ({ initialData, onSave, isSubmitting }: { initialData
                                  {labels.map((label, lIdx) => (
                                      <tr key={lIdx} className="hover:bg-muted/50 transition-colors">
                                         <td className="p-2 border-b">
-                                            <Input value={label} onChange={(e) => handleLabelChange(lIdx, e.target.value)} className="h-8" disabled={isSubmitting} />
+                                            <Input 
+                                               value={label} 
+                                               onChange={(e) => handleLabelChange(lIdx, e.target.value)} 
+                                               onPaste={(e) => handlePaste(e, lIdx, null)}
+                                               className="h-8" 
+                                               disabled={isSubmitting} 
+                                               title="Tip: Copy-Paste Excel Data Di Sini"
+                                            />
                                         </td>
                                         {datasets.map((ds, dIdx) => (
                                             <td key={dIdx} className="p-2 border-b border-l">
-                                                <Input type="number" value={ds.data[lIdx]} onChange={(e) => handleDataChange(dIdx, lIdx, e.target.value)} className="h-8" disabled={isSubmitting} />
+                                                <Input 
+                                                    type="number" 
+                                                    value={ds.data[lIdx]} 
+                                                    onChange={(e) => handleDataChange(dIdx, lIdx, e.target.value)} 
+                                                    onPaste={(e) => handlePaste(e, lIdx, dIdx)}
+                                                    className="h-8" 
+                                                    disabled={isSubmitting} 
+                                                />
                                             </td>
                                         ))}
                                         <td className="p-2 border-b border-l text-center">
