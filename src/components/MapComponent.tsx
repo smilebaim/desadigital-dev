@@ -7,7 +7,7 @@ import type { LatLngTuple, LatLngBounds, Map as LeafletMap } from 'leaflet';
 import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 import 'leaflet.markercluster';
-import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, MapPin } from 'lucide-react';
+import { Map, Satellite, Mountain, Plus, Minus, Maximize2, Layers, ChevronDown, ChevronRight, Clock, Phone, Mail, Globe, Users, Home, Building2, TreePine, MapPin, Minimize2, Square, PanelRight } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Sheet, SheetContent, SheetHeader, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -175,6 +175,8 @@ const LayerPanel: React.FC<LayerPanelProps> = ({ expanded, onToggle, activeLayer
   );
 };
 
+type PanelSize = 'compact' | 'normal' | 'wide';
+
 interface LayerInfoProps {
   isOpen: boolean;
   onClose: () => void;
@@ -186,22 +188,59 @@ interface LayerInfoProps {
   } | null;
 }
 
+const PANEL_SIZE_CONFIG: Record<PanelSize, { label: string; className: string; icon: React.ReactNode }> = {
+  compact: {
+    label: 'Kecil',
+    className: 'w-[55vw] sm:w-[280px]',
+    icon: React.createElement(Minimize2, { className: 'h-3.5 w-3.5' }),
+  },
+  normal: {
+    label: 'Normal',
+    className: 'w-[70vw] sm:w-[360px]',
+    icon: React.createElement(Square, { className: 'h-3.5 w-3.5' }),
+  },
+  wide: {
+    label: 'Lebar',
+    className: 'w-[85vw] sm:w-[480px]',
+    icon: React.createElement(Maximize2, { className: 'h-3.5 w-3.5' }),
+  },
+};
+
 const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, featureInfo }) => {
+  const [panelSize, setPanelSize] = React.useState<PanelSize>('normal');
+
   if (!featureInfo) return null;
 
   const renderDescription = (text: string) => {
     let elements: React.ReactNode[] = [];
     let remainingText = text || '';
 
+    const scaleMap: Record<PanelSize, number> = { compact: 0.44, normal: 0.60, wide: 0.83 };
+    const scale = scaleMap[panelSize];
+    // Chart original width is assumed ~520px, height ~460px (card + chart)
+    const chartOrigH = 460;
+    const scaledH = Math.round(chartOrigH * scale);
+
     visualizationTemplates.forEach(template => {
       if (remainingText.includes(template.placeholder)) {
         const parts = remainingText.split(template.placeholder);
         if (parts[0]) elements.push(<span key={elements.length}>{parts[0]}</span>);
         elements.push(
-          <div key={elements.length} className="my-4 w-full overflow-hidden bg-white/50 rounded-lg p-2 shadow-inner">
-            <h4 className="font-semibold text-xs mb-2 text-center text-slate-700">{template.title}</h4>
-            <div className="transform scale-[0.8] origin-top -mt-2 -mb-8">
+          <div key={elements.length} className="my-3 w-full rounded-xl bg-white/60 shadow-inner border border-white/40 overflow-hidden">
+            <div className="px-3 pt-2">
+              <h4 className="font-semibold text-xs text-center text-slate-700">{template.title}</h4>
+            </div>
+            <div style={{ height: scaledH, overflow: 'hidden', position: 'relative' }}>
+              <div style={{
+                transformOrigin: 'top left',
+                transform: `scale(${scale})`,
+                width: `${100 / scale}%`,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+              }}>
                 {template.previewComponent}
+              </div>
             </div>
           </div>
         );
@@ -216,32 +255,51 @@ const LayerInfo: React.FC<LayerInfoProps> = ({ isOpen, onClose, featureInfo }) =
     return elements.length > 0 ? elements : <span>{text}</span>;
   };
 
+  const currentSize = PANEL_SIZE_CONFIG[panelSize];
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent 
         side="right" 
-        className="w-[70vw] sm:w-[336px] bg-white/40 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-l border-white/20 rounded-l-[2rem] top-14 sm:top-20 h-[calc(100vh-7rem)] sm:h-[calc(100vh-10rem)] transition-all duration-300"
+        className={`${currentSize.className} bg-white/40 backdrop-blur-md backdrop-saturate-200 backdrop-brightness-125 border-l border-white/20 rounded-l-[2rem] top-14 sm:top-20 h-[calc(100vh-7rem)] sm:h-[calc(100vh-10rem)] transition-all duration-300`}
       >
         <SheetHeader>
-            <SheetTitle>{featureInfo.title}</SheetTitle>
-            <SheetDescription className="sr-only">
+          <div className="flex items-start justify-between gap-2">
+            <SheetTitle className="text-base leading-tight flex-1 pr-2">{featureInfo.title}</SheetTitle>
+            {/* Resize Controls */}
+            <div className="flex items-center gap-0.5 shrink-0 bg-white/30 rounded-md p-0.5 border border-white/40">
+              {(Object.entries(PANEL_SIZE_CONFIG) as [PanelSize, typeof PANEL_SIZE_CONFIG[PanelSize]][]).map(([size, config]) => (
+                <button
+                  key={size}
+                  onClick={() => setPanelSize(size)}
+                  title={config.label}
+                  className={`flex items-center justify-center w-7 h-7 rounded transition-all ${
+                    panelSize === size
+                      ? 'bg-white/60 text-slate-800 shadow-sm'
+                      : 'text-slate-500 hover:bg-white/30 hover:text-slate-700'
+                  }`}
+                >
+                  {config.icon}
+                </button>
+              ))}
+            </div>
+          </div>
+          <SheetDescription className="sr-only">
             Informasi detail untuk {featureInfo.title}
-            </SheetDescription>
+          </SheetDescription>
         </SheetHeader>
-        <ScrollArea className="h-full px-4 py-8">
-          <div className="space-y-6 sm:space-y-8">
-            <div className="space-y-4">
-              {featureInfo.coordinates && (
-                <div className="flex items-center space-x-2 text-black/80">
-                  <MapPin className="h-4 w-4" />
-                  <p className="text-xs sm:text-sm">
-                    {featureInfo.coordinates[0].toFixed(6)}, {featureInfo.coordinates[1].toFixed(6)}
-                  </p>
-                </div>
-              )}
-              <div className="text-xs sm:text-sm text-black/80 whitespace-pre-wrap">
-                {renderDescription(featureInfo.description)}
+        <ScrollArea className="h-full px-3 py-6">
+          <div className="space-y-4">
+            {featureInfo.coordinates && (
+              <div className="flex items-center space-x-2 text-black/70 bg-white/30 rounded-lg px-3 py-2">
+                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                <p className="text-xs font-mono">
+                  {featureInfo.coordinates[0].toFixed(6)}, {featureInfo.coordinates[1].toFixed(6)}
+                </p>
               </div>
+            )}
+            <div className="text-xs sm:text-sm text-black/80 whitespace-pre-wrap leading-relaxed">
+              {renderDescription(featureInfo.description)}
             </div>
           </div>
         </ScrollArea>
