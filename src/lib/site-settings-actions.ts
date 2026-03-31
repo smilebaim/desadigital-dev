@@ -4,12 +4,19 @@ import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 const settingsDocRef = doc(db, 'site_settings', 'main');
 
 export interface SiteSettings {
-    // Halaman Utama
+    // Halaman Utama - Konten
     logoUrl: string;
     heroUrl: string;
     heroTitle?: string;
     heroSubtitle?: string;
     heroDescription?: string;
+    heroBadge?: string;
+    heroButtonText?: string;
+    heroButtonLink?: string;
+    // Halaman Utama - Tampilan
+    heroOverlayOpacity?: number;
+    heroOverlayColor?: string;
+    heroHeight?: string;
     // SEO & Identitas
     siteName?: string;
     siteDescription?: string;
@@ -34,6 +41,12 @@ const DEFAULT_SETTINGS: SiteSettings = {
     heroTitle: "SELAMAT DATANG DI LAMAN INFORMASI",
     heroSubtitle: "DESA REMAU BAKO TUO",
     heroDescription: "Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan",
+    heroBadge: "",
+    heroButtonText: "Jelajahi Desa",
+    heroButtonLink: "/informasi",
+    heroOverlayOpacity: 20,
+    heroOverlayColor: "#000000",
+    heroHeight: "full",
     siteName: "Desa Remau Bako Tuo",
     siteDescription: "Sistem Informasi Desa Remau Bako Tuo – Portal resmi layanan publik, berita, dan transparansi anggaran desa.",
     siteKeywords: "desa, remau bako tuo, sistem informasi desa, layanan desa, APBDes",
