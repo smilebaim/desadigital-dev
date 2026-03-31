@@ -13,6 +13,13 @@ import Image from "next/image";
 import { toast } from "@/components/ui/use-toast";
 import { getSiteSettings, updateSiteSettings, type SiteSettings } from "@/lib/site-settings-actions";
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
     Save,
     ImageIcon,
     Type,
@@ -59,13 +66,17 @@ const HeroPreview = ({ settings }: { settings: Partial<SiteSettings> }) => {
         settings.heroHeight === 'three-quarter' ? 'h-32' :
         settings.heroHeight === 'half' ? 'h-24' : 'h-40';
 
+    const fontStyle = {
+        fontFamily: settings.heroFontFamily || 'Poppins',
+    };
+
     return (
         <div className={`relative w-full ${heightClass} rounded-xl overflow-hidden border shadow-inner bg-slate-900`}>
             {settings.heroUrl && (
                 <img
                     src={settings.heroUrl}
                     alt="Hero Preview"
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className="absolute inset-0 w-full h-full object-cover opacity-60"
                 />
             )}
             <div className="absolute inset-0 transition-all duration-300" style={overlayStyle} />
@@ -73,26 +84,26 @@ const HeroPreview = ({ settings }: { settings: Partial<SiteSettings> }) => {
                 {settings.heroBadge && (
                     <span 
                         className="inline-block mb-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[8px] font-semibold tracking-widest uppercase"
-                        style={{ color: settings.heroBadgeColor, borderColor: `${settings.heroBadgeColor}4d` }}
+                        style={{ ...fontStyle, color: settings.heroBadgeColor, borderColor: `${settings.heroBadgeColor}4d` }}
                     >
                         {settings.heroBadge}
                     </span>
                 )}
                 <p 
                     className="text-[9px] font-semibold tracking-widest uppercase mb-0.5 leading-tight"
-                    style={{ color: settings.heroTitleColor }}
+                    style={{ ...fontStyle, color: settings.heroTitleColor }}
                 >
                     {settings.heroTitle || 'Judul Atas'}
                 </p>
                 <p 
                     className="text-sm font-bold leading-tight mb-1 line-clamp-2"
-                    style={{ color: settings.heroSubtitleColor }}
+                    style={{ ...fontStyle, color: settings.heroSubtitleColor }}
                 >
                     {settings.heroSubtitle || 'Judul Utama'}
                 </p>
                 <p 
                     className="text-[8px] leading-tight line-clamp-2 max-w-xs"
-                    style={{ color: settings.heroDescriptionColor }}
+                    style={{ ...fontStyle, color: settings.heroDescriptionColor }}
                 >
                     {settings.heroDescription || 'Deskripsi singkat...'}
                 </p>
@@ -211,6 +222,41 @@ const HalamanUtamaPage = () => {
                         </CardHeader>
                         <CardContent>
                             <HeroPreview settings={settings} />
+                        </CardContent>
+                    </Card>
+
+                    {/* Jenis Font */}
+                    <Card>
+                        <CardHeader className="pb-3">
+                            <div className="flex items-center gap-2">
+                                <Palette className="h-4 w-4 text-primary" />
+                                <CardTitle className="text-base">Jenis Font Hero</CardTitle>
+                            </div>
+                            <CardDescription>
+                                Pilih gaya tulisan yang paling sesuai dengan karakter desa Anda.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-2 max-w-xs">
+                                <Label htmlFor="hero-font">Pilih Font</Label>
+                                <Select 
+                                    value={settings.heroFontFamily || 'Poppins'} 
+                                    onValueChange={val => handleChange('heroFontFamily', val)}
+                                    disabled={isSaving}
+                                >
+                                    <SelectTrigger id="hero-font">
+                                        <SelectValue placeholder="Pilih Font" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Poppins">Poppins (Modern, Sans)</SelectItem>
+                                        <SelectItem value="Inter">Inter (Bersih, Sans)</SelectItem>
+                                        <SelectItem value="Roboto">Roboto (Standar, Sans)</SelectItem>
+                                        <SelectItem value="Montserrat">Montserrat (Elegan, Sans)</SelectItem>
+                                        <SelectItem value="Merriweather">Merriweather (Klasik, Serif)</SelectItem>
+                                        <SelectItem value="Playfair Display">Playfair Display (Formal, Serif)</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </CardContent>
                     </Card>
 

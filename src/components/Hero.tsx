@@ -17,6 +17,7 @@ interface HeroProps {
   heroOverlayOpacity?: number;
   heroOverlayColor?: string;
   heroHeight?: string;
+  heroFontFamily?: string;
 }
 
 const Hero: React.FC<HeroProps> = ({
@@ -33,6 +34,7 @@ const Hero: React.FC<HeroProps> = ({
   heroOverlayOpacity = 20,
   heroOverlayColor = '#000000',
   heroHeight = 'full',
+  heroFontFamily = 'Poppins',
 }) => {
   const heightClass =
     heroHeight === 'three-quarter'
@@ -53,6 +55,10 @@ const Hero: React.FC<HeroProps> = ({
     backgroundColor: `rgba(${hexToRgb(heroOverlayColor || '#000000')}, ${(heroOverlayOpacity ?? 20) / 100})`,
   };
 
+  const fontStyle = {
+    fontFamily: heroFontFamily,
+  };
+
   return (
     <section className={cn(`relative ${heightClass} flex items-center overflow-hidden`, className)}>
       <div className="absolute inset-0 -z-10">
@@ -70,7 +76,7 @@ const Hero: React.FC<HeroProps> = ({
             <FadeIn delay={100}>
               <span 
                 className="inline-block mb-4 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-xs font-semibold tracking-widest uppercase backdrop-blur-sm"
-                style={{ color: heroBadgeColor, borderColor: `${heroBadgeColor}4d` }}
+                style={{ ...fontStyle, color: heroBadgeColor, borderColor: `${heroBadgeColor}4d` }}
               >
                 {heroBadge}
               </span>
@@ -79,8 +85,8 @@ const Hero: React.FC<HeroProps> = ({
 
           <FadeIn delay={200}>
             <h1 
-              className="text-sm sm:text-base lg:text-lg font-poppins font-semibold tracking-widest uppercase mb-3"
-              style={{ color: heroTitleColor }}
+              className="text-sm sm:text-base lg:text-lg font-semibold tracking-widest uppercase mb-3"
+              style={{ ...fontStyle, color: heroTitleColor }}
             >
               {heroTitle || 'SELAMAT DATANG DI LAMAN INFORMASI'}
             </h1>
@@ -88,14 +94,14 @@ const Hero: React.FC<HeroProps> = ({
 
           <FadeIn delay={300}>
             <h1 
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-poppins font-bold tracking-tight leading-[1.1] mb-6"
-              style={{ color: heroSubtitleColor }}
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+              style={{ ...fontStyle, color: heroSubtitleColor }}
             >
               {heroSubtitle || 'DESA REMAU BAKO TUO'}
             </h1>
             <p 
-              className="text-sm sm:text-base md:text-lg font-poppins mb-8 max-w-2xl mx-auto leading-relaxed"
-              style={{ color: heroDescriptionColor }}
+              className="text-sm sm:text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed"
+              style={{ ...fontStyle, color: heroDescriptionColor }}
             >
               {heroDescription ||
                 'Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan'}

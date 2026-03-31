@@ -20,6 +20,7 @@ export interface SiteSettings {
     heroOverlayOpacity?: number;
     heroOverlayColor?: string;
     heroHeight?: string;
+    heroFontFamily?: string;
     // SEO & Identitas
     siteName?: string;
     siteDescription?: string;
@@ -52,6 +53,7 @@ const DEFAULT_SETTINGS: SiteSettings = {
     heroOverlayOpacity: 20,
     heroOverlayColor: "#000000",
     heroHeight: "full",
+    heroFontFamily: "Poppins",
     siteName: "Desa Remau Bako Tuo",
     siteDescription: "Sistem Informasi Desa Remau Bako Tuo – Portal resmi layanan publik, berita, dan transparansi anggaran desa.",
     siteKeywords: "desa, remau bako tuo, sistem informasi desa, layanan desa, APBDes",

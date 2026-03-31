@@ -18,6 +18,7 @@ const LandingPage = ({ settings }: { settings: SiteSettings | null }) => {
         heroOverlayOpacity={settings?.heroOverlayOpacity}
         heroOverlayColor={settings?.heroOverlayColor}
         heroHeight={settings?.heroHeight}
+        heroFontFamily={settings?.heroFontFamily}
       />
     </div>
   );
