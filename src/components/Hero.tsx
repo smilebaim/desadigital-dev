@@ -10,8 +10,10 @@ interface HeroProps {
   heroSubtitle?: string;
   heroDescription?: string;
   heroBadge?: string;
-  heroButtonText?: string;
-  heroButtonLink?: string;
+  heroBadgeColor?: string;
+  heroTitleColor?: string;
+  heroSubtitleColor?: string;
+  heroDescriptionColor?: string;
   heroOverlayOpacity?: number;
   heroOverlayColor?: string;
   heroHeight?: string;
@@ -24,8 +26,10 @@ const Hero: React.FC<HeroProps> = ({
   heroSubtitle,
   heroDescription,
   heroBadge,
-  heroButtonText,
-  heroButtonLink,
+  heroBadgeColor = '#34d399',
+  heroTitleColor = '#34d399',
+  heroSubtitleColor = '#ffffff',
+  heroDescriptionColor = '#ffffffcc',
   heroOverlayOpacity = 20,
   heroOverlayColor = '#000000',
   heroHeight = 'full',
@@ -64,38 +68,39 @@ const Hero: React.FC<HeroProps> = ({
         <div className="max-w-3xl mx-auto text-center">
           {heroBadge && (
             <FadeIn delay={100}>
-              <span className="inline-block mb-4 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold tracking-widest uppercase backdrop-blur-sm">
+              <span 
+                className="inline-block mb-4 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-xs font-semibold tracking-widest uppercase backdrop-blur-sm"
+                style={{ color: heroBadgeColor, borderColor: `${heroBadgeColor}4d` }}
+              >
                 {heroBadge}
               </span>
             </FadeIn>
           )}
 
           <FadeIn delay={200}>
-            <h1 className="text-sm sm:text-base lg:text-lg font-poppins font-semibold tracking-widest text-emerald-400 uppercase mb-3">
+            <h1 
+              className="text-sm sm:text-base lg:text-lg font-poppins font-semibold tracking-widest uppercase mb-3"
+              style={{ color: heroTitleColor }}
+            >
               {heroTitle || 'SELAMAT DATANG DI LAMAN INFORMASI'}
             </h1>
           </FadeIn>
 
           <FadeIn delay={300}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-poppins font-bold tracking-tight text-white leading-[1.1] mb-6">
+            <h1 
+              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-poppins font-bold tracking-tight leading-[1.1] mb-6"
+              style={{ color: heroSubtitleColor }}
+            >
               {heroSubtitle || 'DESA REMAU BAKO TUO'}
             </h1>
-            <p className="text-sm sm:text-base md:text-lg font-poppins text-white/80 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p 
+              className="text-sm sm:text-base md:text-lg font-poppins mb-8 max-w-2xl mx-auto leading-relaxed"
+              style={{ color: heroDescriptionColor }}
+            >
               {heroDescription ||
                 'Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan'}
             </p>
           </FadeIn>
-
-          {heroButtonText && heroButtonLink && (
-            <FadeIn delay={400}>
-              <Link
-                href={heroButtonLink}
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold text-sm transition-all duration-300 shadow-lg shadow-emerald-900/30 hover:shadow-emerald-800/40 hover:scale-105"
-              >
-                {heroButtonText}
-              </Link>
-            </FadeIn>
-          )}
         </div>
       </div>
     </section>

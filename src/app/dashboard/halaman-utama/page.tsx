@@ -20,10 +20,10 @@ import {
     Eye,
     Loader2,
     Tag,
-    MousePointerClick,
     Link as LinkIcon,
     Monitor,
     Maximize2,
+    Palette,
 } from "lucide-react";
 
 // ─── Skeleton Loader ────────────────────────────────────────────────────────
@@ -71,24 +71,31 @@ const HeroPreview = ({ settings }: { settings: Partial<SiteSettings> }) => {
             <div className="absolute inset-0 transition-all duration-300" style={overlayStyle} />
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
                 {settings.heroBadge && (
-                    <span className="inline-block mb-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[8px] font-semibold tracking-widest uppercase">
+                    <span 
+                        className="inline-block mb-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-[8px] font-semibold tracking-widest uppercase"
+                        style={{ color: settings.heroBadgeColor, borderColor: `${settings.heroBadgeColor}4d` }}
+                    >
                         {settings.heroBadge}
                     </span>
                 )}
-                <p className="text-[9px] font-semibold tracking-widest text-emerald-400 uppercase mb-0.5 leading-tight">
+                <p 
+                    className="text-[9px] font-semibold tracking-widest uppercase mb-0.5 leading-tight"
+                    style={{ color: settings.heroTitleColor }}
+                >
                     {settings.heroTitle || 'Judul Atas'}
                 </p>
-                <p className="text-sm font-bold text-white leading-tight mb-1 line-clamp-2">
+                <p 
+                    className="text-sm font-bold leading-tight mb-1 line-clamp-2"
+                    style={{ color: settings.heroSubtitleColor }}
+                >
                     {settings.heroSubtitle || 'Judul Utama'}
                 </p>
-                <p className="text-[8px] text-white/70 leading-tight line-clamp-2 max-w-xs">
+                <p 
+                    className="text-[8px] leading-tight line-clamp-2 max-w-xs"
+                    style={{ color: settings.heroDescriptionColor }}
+                >
                     {settings.heroDescription || 'Deskripsi singkat...'}
                 </p>
-                {settings.heroButtonText && (
-                    <div className="mt-2 px-3 py-0.5 rounded-full bg-emerald-500 text-white text-[8px] font-semibold">
-                        {settings.heroButtonText}
-                    </div>
-                )}
             </div>
             {/* Label overlay */}
             <div className="absolute bottom-2 right-2">
@@ -289,39 +296,67 @@ const HalamanUtamaPage = () => {
                         </CardContent>
                     </Card>
 
-                    {/* Tombol CTA */}
+                    {/* Warna Font */}
                     <Card>
                         <CardHeader className="pb-3">
                             <div className="flex items-center gap-2">
-                                <MousePointerClick className="h-4 w-4 text-primary" />
-                                <CardTitle className="text-base">Tombol Aksi (CTA)</CardTitle>
+                                <Palette className="h-4 w-4 text-primary" />
+                                <CardTitle className="text-base">Warna Font Hero</CardTitle>
                             </div>
                             <CardDescription>
-                                Tombol yang muncul di bawah deskripsi hero. Biarkan kosong untuk menyembunyikan.
+                                Atur warna teks untuk setiap elemen di section hero.
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-1.5">
-                                <Label htmlFor="hero-btn-text">Teks Tombol</Label>
-                                <Input
-                                    id="hero-btn-text"
-                                    value={settings.heroButtonText || ''}
-                                    onChange={e => handleChange('heroButtonText', e.target.value)}
-                                    placeholder="Contoh: Jelajahi Desa"
-                                    disabled={isSaving}
-                                />
-                            </div>
-                            <div className="space-y-1.5">
-                                <Label htmlFor="hero-btn-link">Link Tujuan</Label>
-                                <div className="relative">
-                                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                                    <Input
-                                        id="hero-btn-link"
-                                        value={settings.heroButtonLink || ''}
-                                        onChange={e => handleChange('heroButtonLink', e.target.value)}
-                                        placeholder="Contoh: /informasi"
+                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="color-hero-badge">Warna Badge</Label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="color-hero-badge"
+                                        type="color"
+                                        value={settings.heroBadgeColor || '#34d399'}
+                                        onChange={e => handleChange('heroBadgeColor', e.target.value)}
                                         disabled={isSaving}
-                                        className="pl-9"
+                                        className="h-9 w-full rounded-md border border-input cursor-pointer"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="color-hero-title">Warna Judul Atas</Label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="color-hero-title"
+                                        type="color"
+                                        value={settings.heroTitleColor || '#34d399'}
+                                        onChange={e => handleChange('heroTitleColor', e.target.value)}
+                                        disabled={isSaving}
+                                        className="h-9 w-full rounded-md border border-input cursor-pointer"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="color-hero-subtitle">Warna Judul Utama</Label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="color-hero-subtitle"
+                                        type="color"
+                                        value={settings.heroSubtitleColor || '#ffffff'}
+                                        onChange={e => handleChange('heroSubtitleColor', e.target.value)}
+                                        disabled={isSaving}
+                                        className="h-9 w-full rounded-md border border-input cursor-pointer"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="color-hero-description">Warna Deskripsi</Label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="color-hero-description"
+                                        type="color"
+                                        value={settings.heroDescriptionColor || '#ffffffcc'}
+                                        onChange={e => handleChange('heroDescriptionColor', e.target.value)}
+                                        disabled={isSaving}
+                                        className="h-9 w-full rounded-md border border-input cursor-pointer"
                                     />
                                 </div>
                             </div>

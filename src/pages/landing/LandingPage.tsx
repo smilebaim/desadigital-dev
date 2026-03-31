@@ -11,8 +11,10 @@ const LandingPage = ({ settings }: { settings: SiteSettings | null }) => {
         heroSubtitle={settings?.heroSubtitle}
         heroDescription={settings?.heroDescription}
         heroBadge={settings?.heroBadge}
-        heroButtonText={settings?.heroButtonText}
-        heroButtonLink={settings?.heroButtonLink}
+        heroBadgeColor={settings?.heroBadgeColor}
+        heroTitleColor={settings?.heroTitleColor}
+        heroSubtitleColor={settings?.heroSubtitleColor}
+        heroDescriptionColor={settings?.heroDescriptionColor}
         heroOverlayOpacity={settings?.heroOverlayOpacity}
         heroOverlayColor={settings?.heroOverlayColor}
         heroHeight={settings?.heroHeight}
