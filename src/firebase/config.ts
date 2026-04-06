@@ -3,12 +3,13 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
 export const firebaseConfig = {
-  "projectId": "desa-lengkap-15157263-d704f",
-  "appId": "1:464864018017:web:e5a623572ff6a038ea7420",
-  "apiKey": "AIzaSyDddQU72zuGblsonoT_OSk8wPcDvHxTcK4",
-  "authDomain": "desa-lengkap-15157263-d704f.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "464864018017"
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "desa-lengkap-15157263-d704f",
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:464864018017:web:e5a623572ff6a038ea7420",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDddQU72zuGblsonoT_OSk8wPcDvHxTcK4",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "desa-lengkap-15157263-d704f.firebaseapp.com",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "464864018017",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "desa-lengkap-15157263-d704f.appspot.com",
 };
 
 let app: FirebaseApp;
