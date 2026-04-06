@@ -10,14 +10,14 @@ import {
 import { 
   LogOut, 
   ChevronRight, 
-  User, 
   Settings, 
   Server,
   Globe,
-  Plus
+  LayoutDashboard,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useUser, useAuth, useFirestore } from '@/firebase';
@@ -33,21 +33,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Image from "next/image";
 import { useState, useEffect } from "react";
 
-const DeveloperLayout = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+// ─── Nav Item ─────────────────────────────────────────────────────────────────
+const NavItem = ({ href, icon: Icon, label, active }: { href: string; icon: any; label: string; active: boolean }) => (
+  <Link
+    href={href}
+    className={`flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg transition-all duration-150 ${
+      active
+        ? 'bg-blue-600/20 text-blue-400 border border-blue-500/20 shadow-sm font-medium'
+        : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+    }`}
+  >
+    <Icon size={16} className={active ? 'text-blue-400' : 'text-slate-500'} />
+    <span>{label}</span>
+    {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-400" />}
+  </Link>
+);
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+const DeveloperLayout = ({ children }: { children: React.ReactNode }) => {
   const { user, isUserLoading } = useUser();
   const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
+  const pathname = usePathname();
   const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+  const [userRole, setUserRole] = useState<string>('Developer');
 
   useEffect(() => {
     setIsClient(true);
@@ -57,131 +71,171 @@ const DeveloperLayout = ({
     const checkRole = async () => {
       if (isUserLoading) return;
       if (!user) {
-         router.push('/login?callbackUrl=/developer');
-         return;
+        router.push('/login?callbackUrl=/developer');
+        return;
       }
-      
+
       try {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
           const role = userDoc.data()?.role;
           if (role === 'superadmin' || role === 'developer') {
             setIsAuthorized(true);
+            setUserRole(role === 'superadmin' ? 'Super Admin' : 'Developer');
           } else {
-             toast({
-               title: "Akses Ditolak",
-               description: "Anda bukan superadmin.",
-               variant: "destructive"
-             });
-             router.push('/dashboard');
+            toast({
+              title: "Akses Ditolak",
+              description: "Anda tidak memiliki hak akses ke Developer Mode.",
+              variant: "destructive",
+            });
+            router.push('/dashboard');
           }
         } else {
-           router.push('/dashboard');
+          router.push('/dashboard');
         }
-      } catch(e) {
-        console.error(e);
+      } catch (e) {
+        console.error('Role check error:', e);
         router.push('/dashboard');
       }
     };
     checkRole();
   }, [user, isUserLoading, db, router, toast]);
-  
+
   const handleLogout = async () => {
-    toast({
-      title: "Logout",
-      description: "Anda akan dialihkan ke halaman utama.",
-    });
     await removeAuthCookie();
     await signOut(auth);
+    toast({ title: "Berhasil Keluar", description: "Sesi Anda telah diakhiri." });
     router.push('/');
   };
 
+  // Loading / Authorization state
   if (isAuthorized === null) {
-      return (
-         <div className="min-h-screen bg-slate-900 flex items-center justify-center text-slate-400">
-             Memeriksa otorisasi keamanan...
-         </div>
-      );
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-10 h-10 border-2 border-slate-700 border-t-blue-500 rounded-full animate-spin" />
+          <p className="text-slate-400 text-sm">Memverifikasi otorisasi...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-slate-900 text-slate-100">
-          <Sidebar className="bg-slate-950 border-r border-slate-800 shadow-sm text-slate-100">
-            <SidebarHeader className="flex items-center gap-2 p-4">
-              <div className="flex items-center gap-2">
-                <Server className="h-6 w-6 text-blue-400" />
-                <span className="font-semibold text-white tracking-wider">SUPERADMIN</span>
-              </div>
-            </SidebarHeader>
-            <SidebarContent>
-              <nav className="space-y-1 px-2 py-4">
-                 <Link href="/developer" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-slate-800 transition-colors text-slate-300 hover:text-white">
-                  <Globe size={18} />
-                  <span>Daftar Desa (Tenants)</span>
-                </Link>
-                 <Link href="/developer/settings" className="flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-slate-800 transition-colors text-slate-300 hover:text-white">
-                  <Settings size={18} />
-                  <span>Sistem Global</span>
-                </Link>
-              </nav>
-            </SidebarContent>
-            <SidebarFooter className="p-4">
-              {isClient && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <div className="flex items-center gap-3 cursor-pointer hover:bg-slate-800 p-2 rounded-md transition-colors">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback className="bg-blue-600 text-white text-xs">
-                          {user?.email?.charAt(0).toUpperCase() || 'SA'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium text-white truncate max-w-[120px]">{user?.email}</span>
-                        <span className="text-xs text-blue-400">Developer</span>
-                      </div>
-                    </div>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-slate-900 text-slate-100 border-slate-800">
-                    <DropdownMenuLabel>Akun Root</DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-slate-800" />
-                    <DropdownMenuItem asChild className="hover:bg-slate-800 focus:bg-slate-800">
-                      <Link href="/dashboard">
-                        <ChevronRight className="mr-2 h-4 w-4" />
-                        <span>Ke Dashboard Reguler</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-slate-800" />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-400 hover:bg-slate-800 hover:text-red-300 focus:bg-slate-800 focus:text-red-300">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Keluar Sistem</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </SidebarFooter>
-          </Sidebar>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-slate-950 text-slate-100">
 
-          <div className="flex flex-col flex-grow overflow-auto">
-            <header className="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between shadow-sm">
-              <div className="flex items-center">
-                <SidebarTrigger className="mr-2 text-slate-400 hover:text-white" />
-                <h1 className="text-xl font-semibold text-white">Developer Mode</h1>
+        {/* ── Sidebar ── */}
+        <Sidebar className="bg-slate-950 border-r border-slate-800/70 shadow-xl text-slate-100">
+          <SidebarHeader className="p-4 border-b border-slate-800/70">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 bg-blue-600/20 rounded-lg border border-blue-500/20">
+                <Server className="h-4 w-4 text-blue-400" />
               </div>
-              <div className="flex items-center gap-2">
-                <Link href="/">
-                  <Button variant="outline" size="sm" className="bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white">
-                    Lihat Main Site
-                  </Button>
-                </Link>
+              <div>
+                <span className="font-bold text-white text-sm tracking-wide">Developer Mode</span>
+                <p className="text-[10px] text-slate-500">DesaHub Platform</p>
               </div>
-            </header>
-            <main className="flex-grow p-6 text-slate-100">
-              {children}
-            </main>
-          </div>
+            </div>
+          </SidebarHeader>
+
+          <SidebarContent className="py-4">
+            <nav className="space-y-1 px-3">
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-600 px-2 mb-2">Management</p>
+              <NavItem
+                href="/developer"
+                icon={Globe}
+                label="Daftar Desa (Tenants)"
+                active={pathname === '/developer'}
+              />
+              <NavItem
+                href="/developer/settings"
+                icon={Settings}
+                label="Sistem Global"
+                active={pathname === '/developer/settings'}
+              />
+            </nav>
+          </SidebarContent>
+
+          <SidebarFooter className="p-3 border-t border-slate-800/70">
+            {isClient && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="flex items-center gap-3 cursor-pointer hover:bg-slate-800/60 p-2 rounded-lg transition-colors">
+                    <Avatar className="h-8 w-8 shrink-0">
+                      <AvatarFallback className="bg-gradient-to-br from-blue-600 to-blue-800 text-white text-xs font-bold">
+                        {user?.email?.charAt(0).toUpperCase() ?? 'SA'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-xs font-semibold text-white truncate">{user?.email}</span>
+                      <span className="text-[10px] text-blue-400 font-medium">{userRole}</span>
+                    </div>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" side="top" className="w-56 bg-slate-900 text-slate-100 border-slate-800 shadow-2xl mb-2">
+                  <DropdownMenuLabel className="text-slate-400 text-xs">Akun Administrator</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-slate-800" />
+                  <DropdownMenuItem asChild className="hover:bg-slate-800 focus:bg-slate-800 gap-2 cursor-pointer">
+                    <Link href="/dashboard">
+                      <LayoutDashboard className="h-4 w-4 text-slate-400" />
+                      Dashboard Reguler
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="hover:bg-slate-800 focus:bg-slate-800 gap-2 cursor-pointer">
+                    <a href="/" target="_blank">
+                      <ExternalLink className="h-4 w-4 text-slate-400" />
+                      Lihat Main Site
+                    </a>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-slate-800" />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-red-400 hover:bg-red-950/30 hover:text-red-300 focus:bg-red-950/30 focus:text-red-300 gap-2 cursor-pointer"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Keluar Sistem
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </SidebarFooter>
+        </Sidebar>
+
+        {/* ── Main Content ── */}
+        <div className="flex flex-col flex-grow overflow-auto">
+          <header className="bg-slate-950/80 backdrop-blur border-b border-slate-800/70 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+            <div className="flex items-center gap-3">
+              <SidebarTrigger className="text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg p-1.5 transition-colors" />
+              <div className="h-4 w-px bg-slate-800" />
+              <div className="text-sm text-slate-400 flex items-center gap-1.5">
+                <span className="text-slate-600">Developer Mode</span>
+                <ChevronRight size={13} className="text-slate-700" />
+                <span className="text-white font-medium">
+                  {pathname === '/developer/settings' ? 'Sistem Global' : 'Dashboard Tenant'}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Link href="/" target="_blank">
+                <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white hover:bg-slate-800 gap-1.5 text-xs">
+                  <ExternalLink size={13} />
+                  Main Site
+                </Button>
+              </Link>
+            </div>
+          </header>
+
+          <main className="flex-grow p-6 text-slate-100">
+            {children}
+          </main>
+
+          <footer className="px-6 py-3 border-t border-slate-800/70 text-center text-[10px] text-slate-700">
+            DesaHub Platform — Developer Console · Semua perubahan disinkronisasi ke Firestore secara real-time
+          </footer>
         </div>
-      </SidebarProvider>
+
+      </div>
+    </SidebarProvider>
   );
 };
 

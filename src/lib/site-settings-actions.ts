@@ -1,36 +1,39 @@
 import { db } from '@/firebase/config';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
-const settingsDocRef = doc(db, 'site_settings', 'main');
+// ─── IMPORTANT ────────────────────────────────────────────────────────────────
+// Do NOT create doc refs at module level — Firebase may not be initialized yet.
+// Always create refs inside the function body.
+// ──────────────────────────────────────────────────────────────────────────────
 
 export interface SiteSettings {
-    // Halaman Utama - Konten
+    // Hero Content
     logoUrl: string;
     heroUrl: string;
     heroTitle?: string;
     heroSubtitle?: string;
     heroDescription?: string;
     heroBadge?: string;
-    // Halaman Utama - Warna Font
+    // Hero Colors
     heroBadgeColor?: string;
     heroTitleColor?: string;
     heroSubtitleColor?: string;
     heroDescriptionColor?: string;
-    // Halaman Utama - Tampilan
+    // Hero Appearance
     heroOverlayOpacity?: number;
     heroOverlayColor?: string;
     heroHeight?: string;
     heroFontFamily?: string;
-    // SEO & Identitas
+    // SEO & Identity
     siteName?: string;
     siteDescription?: string;
     siteKeywords?: string;
     ogImageUrl?: string;
-    // Kontak Desa
+    // Contact
     contactEmail?: string;
     contactPhone?: string;
     contactAddress?: string;
-    // Identitas Persuratan & Pemerintah
+    // Government Identity
     kabupaten?: string;
     kecamatan?: string;
     kodePos?: string;
@@ -39,7 +42,7 @@ export interface SiteSettings {
     updatedAt?: string | null;
 }
 
-const DEFAULT_SETTINGS: SiteSettings = {
+export const DEFAULT_SETTINGS: SiteSettings = {
     logoUrl: "/logo-desa.png",
     heroUrl: "/Background utama.png",
     heroTitle: "SELAMAT DATANG DI LAMAN INFORMASI",
@@ -68,7 +71,10 @@ const DEFAULT_SETTINGS: SiteSettings = {
     kepalaDesaNip: "",
 };
 
-// Get site settings from Firestore (Tenant-Aware)
+/**
+ * Get site settings from Firestore.
+ * Uses tenantId as the document ID; falls back to 'main' (global default).
+ */
 export const getSiteSettings = async (tenantId?: string): Promise<SiteSettings | null> => {
     try {
         const docId = tenantId || 'main';
@@ -81,16 +87,34 @@ export const getSiteSettings = async (tenantId?: string): Promise<SiteSettings |
                 ...DEFAULT_SETTINGS,
                 ...data,
                 updatedAt: data.updatedAt ? data.updatedAt.toDate().toISOString() : null,
-            };
+            } as SiteSettings;
         }
+
+        // Tenant-specific doc not found — try falling back to 'main'
+        if (tenantId && docId !== 'main') {
+            const mainRef = doc(db, 'site_settings', 'main');
+            const mainSnap = await getDoc(mainRef);
+            if (mainSnap.exists()) {
+                const mainData = mainSnap.data();
+                return {
+                    ...DEFAULT_SETTINGS,
+                    ...mainData,
+                    updatedAt: mainData.updatedAt ? mainData.updatedAt.toDate().toISOString() : null,
+                } as SiteSettings;
+            }
+        }
+
         return DEFAULT_SETTINGS;
     } catch (error) {
-        console.error("Error getting site settings: ", error);
-        return null;
+        console.error("Error fetching site settings:", error);
+        return DEFAULT_SETTINGS; // Return defaults on error instead of null
     }
 };
 
-// Update site settings in Firestore (Tenant-Aware)
+/**
+ * Save site settings to Firestore.
+ * Uses tenantId as the document ID; defaults to 'main'.
+ */
 export const updateSiteSettings = async (settings: Partial<SiteSettings>, tenantId?: string): Promise<boolean> => {
     try {
         const docId = tenantId || 'main';
@@ -101,7 +125,25 @@ export const updateSiteSettings = async (settings: Partial<SiteSettings>, tenant
         }, { merge: true });
         return true;
     } catch (error) {
-        console.error("Error updating site settings: ", error);
+        console.error("Error saving site settings:", error);
+        return false;
+    }
+};
+
+/**
+ * Reset site settings to defaults for a given tenant (or 'main').
+ */
+export const resetSiteSettings = async (tenantId?: string): Promise<boolean> => {
+    try {
+        const docId = tenantId || 'main';
+        const docRef = doc(db, 'site_settings', docId);
+        await setDoc(docRef, {
+            ...DEFAULT_SETTINGS,
+            updatedAt: serverTimestamp()
+        });
+        return true;
+    } catch (error) {
+        console.error("Error resetting site settings:", error);
         return false;
     }
 };
