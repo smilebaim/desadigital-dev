@@ -15,6 +15,7 @@ import {
   Globe,
   LayoutDashboard,
   ExternalLink,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from 'next/navigation';
@@ -148,6 +149,12 @@ const DeveloperLayout = ({ children }: { children: React.ReactNode }) => {
                 active={pathname === '/developer'}
               />
               <NavItem
+                href="/developer/users"
+                icon={Users}
+                label="Manajemen User"
+                active={pathname === '/developer/users'}
+              />
+              <NavItem
                 href="/developer/settings"
                 icon={Settings}
                 label="Sistem Global"
@@ -211,7 +218,11 @@ const DeveloperLayout = ({ children }: { children: React.ReactNode }) => {
                 <span className="text-slate-600">Developer Mode</span>
                 <ChevronRight size={13} className="text-slate-700" />
                 <span className="text-white font-medium">
-                  {pathname === '/developer/settings' ? 'Sistem Global' : 'Dashboard Tenant'}
+                  {pathname === '/developer/settings'
+                    ? 'Sistem Global'
+                    : pathname === '/developer/users'
+                    ? 'Manajemen User'
+                    : 'Dashboard Tenant'}
                 </span>
               </div>
             </div>

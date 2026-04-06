@@ -10,7 +10,12 @@ import {
     query,
     where,
     onSnapshot,
-    writeBatch
+    writeBatch,
+    DocumentData,
+    Query,
+    limit,
+    startAfter,
+    QueryDocumentSnapshot,
 } from 'firebase/firestore';
 
 export interface TenantData {
@@ -22,7 +27,34 @@ export interface TenantData {
   createdAt?: any;
 }
 
-// Add a new tenant (village) — validates subdomain uniqueness first
+// ─── Helper: Chunked Collection Delete ───────────────────────────────────────
+/**
+ * Menghapus semua dokumen dalam suatu Query secara aman, batch per 400 dokumen.
+ * Menghindari batas 500 operasi per-batch Firestore.
+ */
+const deleteQueryBatch = async (baseQuery: Query<DocumentData>) => {
+    const CHUNK_SIZE = 400;
+    let lastDoc: QueryDocumentSnapshot<DocumentData> | undefined = undefined;
+    let hasMore = true;
+
+    while (hasMore) {
+        const pageQuery: Query<DocumentData> = lastDoc
+            ? query(baseQuery, limit(CHUNK_SIZE), startAfter(lastDoc))
+            : query(baseQuery, limit(CHUNK_SIZE));
+
+        const snapshot = await getDocs(pageQuery);
+        if (snapshot.size === 0) break;
+
+        const batch = writeBatch(db);
+        snapshot.docs.forEach((d) => batch.delete(d.ref));
+        await batch.commit();
+
+        lastDoc = snapshot.docs[snapshot.docs.length - 1] as QueryDocumentSnapshot<DocumentData>;
+        if (snapshot.size < CHUNK_SIZE) hasMore = false;
+    }
+};
+
+// ─── Add Tenant ───────────────────────────────────────────────────────────────
 export const addTenant = async (tenantData: Omit<TenantData, 'id' | 'createdAt' | 'status'>) => {
     try {
         const cleanSubdomain = tenantData.subdomain.toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -46,7 +78,7 @@ export const addTenant = async (tenantData: Omit<TenantData, 'id' | 'createdAt' 
             createdAt: serverTimestamp()
         });
 
-        // Auto-create site_settings entry for the new tenant based on defaults
+        // Auto-create workspace entry for the new tenant
         await addDoc(collection(db, "workspaces"), {
             name: tenantData.name,
             description: `Workspace otomatis untuk desa ${tenantData.name}`,
@@ -63,7 +95,7 @@ export const addTenant = async (tenantData: Omit<TenantData, 'id' | 'createdAt' 
     }
 };
 
-// Real-time stream of all tenants
+// ─── Real-time Stream ─────────────────────────────────────────────────────────
 export const getTenantsStream = (callback: (tenants: TenantData[]) => void) => {
     const q = query(collection(db, 'tenants'));
     return onSnapshot(q, (querySnapshot) => {
@@ -71,7 +103,6 @@ export const getTenantsStream = (callback: (tenants: TenantData[]) => void) => {
         querySnapshot.forEach((d) => {
             tenants.push({ id: d.id, ...d.data() } as TenantData);
         });
-        // Sort by createdAt descending
         tenants.sort((a, b) => {
             const aTime = a.createdAt?.seconds ?? 0;
             const bTime = b.createdAt?.seconds ?? 0;
@@ -84,7 +115,7 @@ export const getTenantsStream = (callback: (tenants: TenantData[]) => void) => {
     });
 };
 
-// Toggle tenant status between active and suspended
+// ─── Update Status ────────────────────────────────────────────────────────────
 export const updateTenantStatus = async (tenantId: string, newStatus: 'active' | 'suspended') => {
     try {
         await updateDoc(doc(db, "tenants", tenantId), {
@@ -98,39 +129,63 @@ export const updateTenantStatus = async (tenantId: string, newStatus: 'active' |
     }
 };
 
-// Cascade delete: removes tenant + its site_settings + associated workspaces
+// ─── Cascade Delete ───────────────────────────────────────────────────────────
+/**
+ * Menghapus tenant beserta SEMUA data yang terkait secara aman:
+ *   1. Dokumen tenant utama
+ *   2. site_settings/{tenantSubdomain}
+ *   3. workspaces WHERE tenantId == subdomain (+ sub-koleksi items)
+ *   4. users WHERE tenantId == subdomain
+ *
+ * CATATAN: Data `penduduk` dan `surat_*` tidak memiliki tenantId pada arsitektur
+ * lama (single-tenant), sehingga tidak dapat dihapus per-tenant secara selektif.
+ */
 export const deleteTenant = async (tenantDocId: string, tenantSubdomain: string) => {
     try {
-        const batch = writeBatch(db);
+        // ── 1. Delete main tenant document ──────────────────────────────────
+        await deleteDoc(doc(db, "tenants", tenantDocId));
 
-        // 1. Delete the tenant document itself
-        batch.delete(doc(db, "tenants", tenantDocId));
+        // ── 2. Delete site_settings for this tenant ──────────────────────────
+        try {
+            await deleteDoc(doc(db, "site_settings", tenantSubdomain));
+        } catch {
+            // May not exist if never configured — safe to ignore
+        }
 
-        // 2. Delete tenant-specific site_settings
-        batch.delete(doc(db, "site_settings", tenantSubdomain));
-
-        // 3. Find and delete associated workspaces
+        // ── 3. Delete associated workspaces (+ their items sub-collection) ───
         const workspacesQuery = query(
-            collection(db, "workspaces"),
+            collection(db, "workspaces") as Query<DocumentData>,
             where("tenantId", "==", tenantSubdomain)
         );
         const workspaceSnaps = await getDocs(workspacesQuery);
-        workspaceSnaps.forEach((d) => {
-            batch.delete(d.ref);
-        });
+        for (const wsDoc of workspaceSnaps.docs) {
+            // Delete the items sub-collection first
+            const itemsBaseQuery = query(
+                collection(db, 'workspaces', wsDoc.id, 'items') as Query<DocumentData>
+            );
+            await deleteQueryBatch(itemsBaseQuery);
+            // Then delete the workspace document itself
+            await deleteDoc(wsDoc.ref);
+        }
 
-        await batch.commit();
+        // ── 4. Delete users associated with this tenant ──────────────────────
+        const usersQuery = query(
+            collection(db, "users") as Query<DocumentData>,
+            where("tenantId", "==", tenantSubdomain)
+        );
+        await deleteQueryBatch(usersQuery);
+
         return { success: true };
     } catch (error: any) {
         console.error("Error deleting tenant:", error);
-        return { success: false, error: error.message };
+        return { success: false, error: `Gagal menghapus: ${error.message}` };
     }
 };
 
-// Check if Firestore is reachable
+// ─── Check Firestore Connection ───────────────────────────────────────────────
 export const checkFirestoreConnection = async (): Promise<'online' | 'offline'> => {
     try {
-        const q = query(collection(db, 'tenants'));
+        const q = query(collection(db, 'tenants'), limit(1));
         await getDocs(q);
         return 'online';
     } catch {
