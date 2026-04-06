@@ -8,7 +8,16 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // Check if user is superadmin or developer
+    function isSuperAdmin() {
+      return isSignedIn() && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'developer');
+    }
+
     // Public readable collections (auth required to write)
+    match /tenants/{document=**} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
     match /posts/{document=**} {
       allow read: if true;
       allow write: if isSignedIn();
