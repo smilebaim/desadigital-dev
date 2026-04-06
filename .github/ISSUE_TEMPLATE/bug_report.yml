@@ -1,0 +1,48 @@
+name: Bug Report
+description: Laporkan bug atau masalah sistem agar dapat diperbaiki.
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih telah melaporkan masalah! Lengkapi form di bawah ini selengkap mungkin.
+  - type: textarea
+    id: description
+    attributes:
+      label: Deskripsi Masalah
+      description: Ceritakan masalah yang Anda alami secara jelas dan ringkas.
+      placeholder: Saat saya menekan tombol X, seharusnya yang muncul adalah Y, tetapi aplikasi memberikan error Z.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Langkah Reproduksi (Cara mereplikasi bug)
+      description: Tuliskan tahapan untuk kami memunculkan error yang sama di tempat kami.
+      value: |
+        1. Buka halaman '...'
+        2. Klik tombol '...'
+        3. Scroll ke bagian '...'
+        4. Lihat error yang muncul.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Perilaku yang Diharapkan
+      description: Apa yang seharusnya terjadi jika tidak ada bug?
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Lingkungan
+      description: Di mana Anda menjalankan kode ini?
+      options:
+        - Lokal (localhost)
+        - Vercel (Production)
+        - Firebase Hosting (Production)
+        - Netlify (Production)
+    validations:
+      required: true

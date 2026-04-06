@@ -1,0 +1,29 @@
+name: Feature Request
+description: Sarankan fitur atau ide baru untuk peningkatan platform DesaHub.
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih atas ide Anda! Silakan jelaskan fitur yang Anda butuhkan selengkap mungkin.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Apakah fitur ini berkaitan dengan suatu masalah?
+      description: Masalah apa yang fitur ini coba selesaikan?
+      placeholder: Saya merasa kesulitan ketika... / Saat ini tidak ada cara untuk...
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Solusi yang Diinginkan
+      description: Jelaskan seperti apa fitur yang Anda ekspektasikan beroperasi.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatif
+      description: Apakah ada alternatif atau cara lain yang saat ini Anda gunakan?
