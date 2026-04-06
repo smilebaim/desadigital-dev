@@ -68,10 +68,13 @@ const DEFAULT_SETTINGS: SiteSettings = {
     kepalaDesaNip: "",
 };
 
-// Get site settings from Firestore
-export const getSiteSettings = async (): Promise<SiteSettings | null> => {
+// Get site settings from Firestore (Tenant-Aware)
+export const getSiteSettings = async (tenantId?: string): Promise<SiteSettings | null> => {
     try {
-        const docSnap = await getDoc(settingsDocRef);
+        const docId = tenantId || 'main';
+        const docRef = doc(db, 'site_settings', docId);
+        const docSnap = await getDoc(docRef);
+        
         if (docSnap.exists()) {
             const data = docSnap.data();
             return {
@@ -87,10 +90,12 @@ export const getSiteSettings = async (): Promise<SiteSettings | null> => {
     }
 };
 
-// Update site settings in Firestore
-export const updateSiteSettings = async (settings: Partial<SiteSettings>): Promise<boolean> => {
+// Update site settings in Firestore (Tenant-Aware)
+export const updateSiteSettings = async (settings: Partial<SiteSettings>, tenantId?: string): Promise<boolean> => {
     try {
-        await setDoc(settingsDocRef, {
+        const docId = tenantId || 'main';
+        const docRef = doc(db, 'site_settings', docId);
+        await setDoc(docRef, {
             ...settings,
             updatedAt: serverTimestamp()
         }, { merge: true });
