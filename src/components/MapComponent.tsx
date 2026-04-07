@@ -15,6 +15,7 @@ import { visualizationTemplates } from '@/lib/visualization-templates';
 
 import { getMarkersStream, getPolygonsStream, getLayerCategoriesStream } from '@/lib/map-client-actions';
 import type { MapMarker, MapPolygon, MapLayerCategory } from '@/lib/map-actions';
+import { useTenant } from '@/contexts/TenantContext';
 
 
 // Fix Leaflet default marker issue
@@ -437,6 +438,7 @@ const MapControls: React.FC<MapControlsProps> = ({
 
 
 export const MapComponent: React.FC = () => {
+  const { tenantId, isLoading: isTenantLoading } = useTenant();
   const mapRef = useRef<LeafletMap | null>(null);
   const featureLayersRef = useRef<{[key: string]: L.Layer}>({});
 
@@ -460,16 +462,17 @@ export const MapComponent: React.FC = () => {
   }, [categories]);
   
   useEffect(() => {
-    const unsubMarkers = getMarkersStream((data) => setMarkers(data as Marker[]));
-    const unsubPolygons = getPolygonsStream((data) => setPolygons(data as Polygon[]));
-    const unsubCategories = getLayerCategoriesStream((data) => setCategories(data as Category[]));
+    if (isTenantLoading) return;
+    const unsubMarkers = getMarkersStream((data) => setMarkers(data as Marker[]), tenantId);
+    const unsubPolygons = getPolygonsStream((data) => setPolygons(data as Polygon[]), tenantId);
+    const unsubCategories = getLayerCategoriesStream((data) => setCategories(data as Category[]), tenantId);
 
     return () => {
         unsubMarkers();
         unsubPolygons();
         unsubCategories();
     };
-  }, []);
+  }, [tenantId, isTenantLoading]);
 
   useEffect(() => {
     if (mapRef.current) return;

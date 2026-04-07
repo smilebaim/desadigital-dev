@@ -26,7 +26,7 @@ const VisitorChart = dynamic(() => import('@/components/dashboard/VisitorChart')
 });
 
 const DashboardHome = () => {
-  const { tenantId } = useTenant();
+  const { tenantId, isLoading: isTenantLoading } = useTenant();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [residentCount, setResidentCount] = useState(0);
   const [postCount, setPostCount] = useState(0);
@@ -36,6 +36,9 @@ const DashboardHome = () => {
 
 
   useEffect(() => {
+    // Tunggu hingga data tenant selesai dimuat untuk menghindari double-subscription yang menyebabkan error ABORTED
+    if (isTenantLoading) return;
+
     // Fetch site settings
     const fetchSettings = async () => {
       const s = await getSiteSettings(tenantId || undefined);
@@ -80,7 +83,7 @@ const DashboardHome = () => {
       unsubPosts();
       unsubscribers.forEach(unsub => unsub());
     };
-  }, [tenantId]);
+  }, [tenantId, isTenantLoading]);
 
 
   return (

@@ -83,7 +83,7 @@ const pendudukSchema = z.object({
 type PendudukFormValues = z.infer<typeof pendudukSchema>;
 
 const PendudukPage = () => {
-  const { tenantId } = useTenant();
+  const { tenantId, isLoading: isTenantLoading } = useTenant();
   const { toast } = useToast();
   const [data, setData] = useState<Penduduk[]>([]);
   const [loading, setLoading] = useState(true);
@@ -109,12 +109,13 @@ const PendudukPage = () => {
   });
 
   useEffect(() => {
+    if (isTenantLoading) return;
     const unsubscribe = getPendudukStream((data) => {
       setData(data as Penduduk[]);
       setLoading(false);
     }, tenantId);
     return () => unsubscribe();
-  }, [tenantId]);
+  }, [tenantId, isTenantLoading]);
 
   const openAddForm = () => {
     setFormMode('add');

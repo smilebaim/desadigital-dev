@@ -108,7 +108,9 @@ const LoginForm = () => {
       if (!callbackUrl) {
         callbackUrl = isSuperadmin && !activeSubdomain ? '/developer' : '/dashboard';
       }
-      router.push(callbackUrl);
+      
+      // Gunakan router.replace untuk auth redirect agar tidak bisa back ke login
+      router.replace(callbackUrl);
 
     } catch (error: any) {
       const code = error?.code || '';

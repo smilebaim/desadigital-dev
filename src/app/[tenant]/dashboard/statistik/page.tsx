@@ -92,7 +92,7 @@ const automaticStats: Statistik[] = [
 
 
 const StatistikPage = () => {
-  const { tenantId } = useTenant();
+  const { tenantId, isLoading: isTenantLoading } = useTenant();
   const [stats, setStats] = useState<Statistik[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
@@ -110,12 +110,13 @@ const StatistikPage = () => {
   const [customKeyError, setCustomKeyError] = useState<string>('');
 
   useEffect(() => {
+    if (isTenantLoading) return;
     const unsubscribe = getStatistikStream((data) => {
       setStats(data as Statistik[]);
       setLoading(false);
     }, tenantId);
     return () => unsubscribe();
-  }, [tenantId]);
+  }, [tenantId, isTenantLoading]);
   
   const handleSeedData = async () => {
     setIsSeeding(true);

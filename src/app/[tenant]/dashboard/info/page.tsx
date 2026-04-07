@@ -53,7 +53,7 @@ interface Post extends PostData {
 }
 
 const BeritaDashboardPage = () => {
-  const { tenantId } = useTenant();
+  const { tenantId, isLoading: isTenantLoading } = useTenant();
   const { user } = useUser();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,6 +63,8 @@ const BeritaDashboardPage = () => {
   const [isSeeding, setIsSeeding] = useState(false);
 
   useEffect(() => {
+    if (isTenantLoading) return;
+
     if (user?.uid) {
       const unsubscribe = getPostsStream((data) => {
         setPosts(data as Post[]);
@@ -74,7 +76,7 @@ const BeritaDashboardPage = () => {
       setLoading(false);
       setPosts([]);
     }
-  }, [user, tenantId]);
+  }, [user, tenantId, isTenantLoading]);
 
   const handleDelete = async () => {
     if (!postToDelete) return;

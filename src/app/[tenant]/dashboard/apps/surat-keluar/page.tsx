@@ -78,7 +78,7 @@ const suratKeluarSchema = z.object({
 type FormValues = z.infer<typeof suratKeluarSchema>;
 
 const SuratKeluarPage = () => {
-    const { tenantId } = useTenant();
+    const { tenantId, isLoading: isTenantLoading } = useTenant();
     const { toast } = useToast();
     const storage = useStorage();
     const [suratList, setSuratList] = useState<Surat[]>([]);
@@ -98,12 +98,13 @@ const SuratKeluarPage = () => {
     });
 
     useEffect(() => {
+        if (isTenantLoading) return;
         const unsubSurat = getSuratKeluarStream((data) => {
             setSuratList(data as Surat[]);
             setLoading(false);
         }, tenantId);
         return () => unsubSurat();
-    }, [tenantId]);
+    }, [tenantId, isTenantLoading]);
 
     const openAddForm = () => {
         setFormMode('add');

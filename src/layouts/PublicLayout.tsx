@@ -9,12 +9,14 @@ import { getMenusWithItems } from '@/lib/menu-actions';
 import { getSiteSettings } from '@/lib/site-settings-actions';
 import type { SiteSettings } from '@/lib/site-settings-actions';
 import AiAssistant from '@/components/AiAssistant';
+import { useTenant } from '@/contexts/TenantContext';
 
 const PublicLayout = ({
   children,
 }: {
   children: React.ReactNode
 }) => {
+  const { tenantId, isLoading: isTenantLoading } = useTenant();
   const pathname = usePathname();
   const [menus, setMenus] = useState<Menu[]>([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +25,8 @@ const PublicLayout = ({
 
   useEffect(() => {
     setIsClient(true);
+    if (isTenantLoading) return;
+
     const fetchMenus = async () => {
       setLoading(true);
       const menusData = await getMenusWithItems();
@@ -30,12 +34,12 @@ const PublicLayout = ({
       setLoading(false);
     };
     const fetchSettings = async () => {
-        const settingsData = await getSiteSettings();
+        const settingsData = await getSiteSettings(tenantId || undefined);
         setSiteSettings(settingsData);
     };
     fetchMenus();
     fetchSettings();
-  }, []);
+  }, [tenantId, isTenantLoading]);
 
   const topNavMenu = menus.find(m => m.location === 'topnav');
   const bottomNavMenu = menus.find(m => m.location === 'bottomnav');

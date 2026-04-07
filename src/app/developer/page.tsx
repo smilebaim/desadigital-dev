@@ -122,16 +122,20 @@ const DeveloperDashboard = () => {
 
   // ── Effects ─────────────────────────────────────────────────────────────────
   useEffect(() => {
+    // Tunggu hingga user di-load untuk menghindari error ABORTED jika navigasi cepat
+    if (user === undefined) return;
+
     const unsubscribe = getTenantsStream((data) => {
       setTenants(data);
       setIsLoading(false);
     });
     return () => unsubscribe();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
+    if (user === undefined) return;
     checkFirestoreConnection().then((s) => setFirestoreStatus(s));
-  }, []);
+  }, [user]);
 
   // ── Filtered tenants ────────────────────────────────────────────────────────
   const filteredTenants = tenants.filter((t) =>

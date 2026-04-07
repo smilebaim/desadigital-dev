@@ -6,23 +6,26 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { getKegiatanStream, type KegiatanData } from '@/lib/kegiatan-client-actions';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface Kegiatan extends KegiatanData {
   id: string;
 }
 
 const AgendaList = () => {
+  const { tenantId, isLoading: isTenantLoading } = useTenant();
   const [kegiatan, setKegiatan] = useState<Kegiatan[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isTenantLoading) return;
     setLoading(true);
     const unsub = getKegiatanStream((data) => {
       setKegiatan(data as Kegiatan[]);
       setLoading(false);
-    });
+    }, tenantId);
     return () => unsub();
-  }, []);
+  }, [tenantId, isTenantLoading]);
 
   return (
     <div className="container mx-auto px-4 py-8 mt-16 mb-20">

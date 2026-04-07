@@ -77,7 +77,7 @@ const suratKematianSchema = z.object({
 type FormValues = z.infer<typeof suratKematianSchema>;
 
 const SuratKematianPage = () => {
-    const { tenantId } = useTenant();
+    const { tenantId, isLoading: isTenantLoading } = useTenant();
     const { toast } = useToast();
     const [suratList, setSuratList] = useState<Surat[]>([]);
     const [pendudukList, setPendudukList] = useState<Penduduk[]>([]);
@@ -95,6 +95,7 @@ const SuratKematianPage = () => {
     });
 
     useEffect(() => {
+        if (isTenantLoading) return;
         const unsubSurat = getSuratKematianStream((data) => {
             setSuratList(data as Surat[]);
             setLoading(false);
@@ -102,11 +103,12 @@ const SuratKematianPage = () => {
         const unsubPenduduk = getPendudukStream((data) => {
             setPendudukList(data as Penduduk[]);
         }, tenantId);
+
         return () => {
             unsubSurat();
             unsubPenduduk();
         };
-    }, [tenantId]);
+    }, [tenantId, isTenantLoading]);
 
     const openAddForm = () => {
         setFormMode('add');

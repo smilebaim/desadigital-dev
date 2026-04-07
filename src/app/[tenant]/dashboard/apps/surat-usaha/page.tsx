@@ -77,7 +77,7 @@ const suratUsahaSchema = z.object({
 type FormValues = z.infer<typeof suratUsahaSchema>;
 
 const SuratUsahaPage = () => {
-    const { tenantId } = useTenant();
+    const { tenantId, isLoading: isTenantLoading } = useTenant();
     const { toast } = useToast();
     const [suratList, setSuratList] = useState<Surat[]>([]);
     const [pendudukList, setPendudukList] = useState<Penduduk[]>([]);
@@ -95,6 +95,7 @@ const SuratUsahaPage = () => {
     });
 
     useEffect(() => {
+        if (isTenantLoading) return;
         const unsubSurat = getSuratUsahaStream((data) => {
             setSuratList(data as Surat[]);
             setLoading(false);
@@ -102,11 +103,12 @@ const SuratUsahaPage = () => {
         const unsubPenduduk = getPendudukStream((data) => {
             setPendudukList(data as Penduduk[]);
         }, tenantId);
+
         return () => {
             unsubSurat();
             unsubPenduduk();
         };
-    }, [tenantId]);
+    }, [tenantId, isTenantLoading]);
 
     const openAddForm = () => {
         setFormMode('add');

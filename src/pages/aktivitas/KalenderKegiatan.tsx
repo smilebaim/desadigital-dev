@@ -7,24 +7,27 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { getKegiatanStream, type KegiatanData } from '@/lib/kegiatan-client-actions';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface Kegiatan extends KegiatanData {
   id: string;
 }
 
 const KalenderKegiatan = () => {
+  const { tenantId, isLoading: isTenantLoading } = useTenant();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [kegiatan, setKegiatan] = useState<Kegiatan[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isTenantLoading) return;
     setLoading(true);
     const unsub = getKegiatanStream((data) => {
       setKegiatan(data as Kegiatan[]);
       setLoading(false);
-    });
+    }, tenantId);
     return () => unsub();
-  }, []);
+  }, [tenantId, isTenantLoading]);
   
   const selectedDateString = date ? format(date, "yyyy-MM-dd") : "";
   const eventsForSelectedDay = kegiatan.filter(event => event.date === selectedDateString);
