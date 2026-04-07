@@ -1,71 +1,115 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const session = request.cookies.get('session');
-  const url = request.nextUrl.clone();
-  
-  // 1. Multi-Tenancy Subdomain Detection
+// ─────────────────────────────────────────────────────────────────────────────
+// DesaHub Multi-Tenant Middleware
+//
+// Tiga aliran trafik utama:
+//   (A) Domain Utama  — "localhost" / "www.desahub.id"
+//       → Halaman landing SaaS + /developer dashboard
+//   (B) Subdomain Tenant — "[nama-desa].desahub.id" / "[nama-desa].localhost"
+//       → Web Publik desa & /dashboard khusus desa tersebut
+//   (C) Direct Routes — /api, /_next, /favicon.ico (lalu-lintas teknis, tidak diubah)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Subdomains yang BUKAN tenant (dikecualikan dari rewrite)
+const EXCLUDED_SUBDOMAINS = new Set(['www', 'localhost', '127', 'developer', 'app', 'api']);
+
+function extractSubdomain(request: NextRequest): string | null {
   const hostHeader = request.headers.get('host') || '';
-  const hostname = hostHeader.split(':')[0]; // Strip port
-  // e.g. "sukamaju.localhost" -> "sukamaju"
-  let subdomain = hostname.split('.')[0].toLowerCase();
-  
-  // Exclude IP forms like "127.0.0.1" which resolves to "127"
-  const isExcludedSubdomain = ['www', 'localhost', '127', 'developer'].includes(subdomain);
-  
-  // 2. Tentukan apakah ini Tenant Route
-  const isTenantRoute = !isExcludedSubdomain && subdomain !== '';
-  let activeTenant = isTenantRoute ? subdomain : null;
+  const hostname = hostHeader.split(':')[0].toLowerCase();
+  const parts = hostname.split('.');
 
-  // Paths yang tidak boleh di-rewrite ke dalam folder tenant
-  const isDirectRoute = url.pathname.startsWith('/api') || 
-                        url.pathname.startsWith('/_next') || 
-                        url.pathname.startsWith('/login') ||
-                        url.pathname.startsWith('/developer') ||
-                        url.pathname === '/favicon.ico';
+  // Format single-part: "localhost" → tidak ada subdomain
+  if (parts.length === 1) return null;
 
-  // 3. RBAC & Auth Checks dengan `callbackUrl`
-  // Proteksi Rute Super Admin
-  if (url.pathname.startsWith('/developer')) {
-    if (!session) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('callbackUrl', url.pathname);
-      return NextResponse.redirect(loginUrl);
-    }
+  // Format: "sukamaju.localhost" atau "sukamaju.desahub.id"
+  const candidateSub = parts[0];
+  if (EXCLUDED_SUBDOMAINS.has(candidateSub)) return null;
+
+  // Cegah IP address (angka saja) dikira subdomain
+  if (/^\d+$/.test(candidateSub)) return null;
+
+  return candidateSub;
+}
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const session = request.cookies.get('session');
+
+  // ── (C) Technical / Static routes → pass through ─────────────────────────
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname === '/favicon.ico' ||
+    pathname.startsWith('/icons') ||
+    pathname.startsWith('/images')
+  ) {
+    return NextResponse.next();
   }
 
-  // Proteksi Rute Tenant Khusus Dashboard
-  if (url.pathname.startsWith('/dashboard')) {
-    if (!session) {
+  // ── Identifikasi subdomain aktif ──────────────────────────────────────────
+  const subdomain = extractSubdomain(request);
+  const isTenantRequest = subdomain !== null;
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // (B) ALIRAN TENANT: ada subdomain aktif
+  // ══════════════════════════════════════════════════════════════════════════
+  if (isTenantRequest) {
+    const response = NextResponse.next();
+
+    // Simpan tenant aktif di cookie untuk akses server-component
+    response.cookies.set('x-tenant-id', subdomain, { path: '/', sameSite: 'lax' });
+
+    // Proteksi: akses /dashboard di subdomain wajib login
+    if (pathname.startsWith('/dashboard') && !session) {
       const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('callbackUrl', url.pathname);
+      loginUrl.searchParams.set('callbackUrl', pathname);
       return NextResponse.redirect(loginUrl);
     }
-  }
 
-  // Handle halaman /login: jika sudah login, diarahkan sesuai callbackUrl atau dashboard
-  if (url.pathname.startsWith('/login')) {
-    if (session) {
+    // Jika sudah login dan coba buka /login → redirect ke /dashboard
+    if (pathname.startsWith('/login') && session) {
       const callback = request.nextUrl.searchParams.get('callbackUrl') || '/dashboard';
       return NextResponse.redirect(new URL(callback, request.url));
     }
+
+    // Rewrite path: / → /[tenant]/  |  /dashboard → /[tenant]/dashboard
+    const url = request.nextUrl.clone();
+
+    // Hindari double-rewrite (e.g., /_next sudah di-handle di atas)
+    if (!pathname.startsWith(`/${subdomain}`)) {
+      url.pathname = `/${subdomain}${pathname}`;
+      const rewriteRes = NextResponse.rewrite(url);
+      rewriteRes.cookies.set('x-tenant-id', subdomain, { path: '/', sameSite: 'lax' });
+      return rewriteRes;
+    }
+
+    return response;
   }
 
-  // 4. Lakukan Next.js Rewrite untuk Subdomain Tenant
-  let response = NextResponse.next();
-  
-  if (isTenantRoute && !isDirectRoute) {
-    // Rewrite path: dari `/dashboard` menjadi `/[tenant]/dashboard`
-    url.pathname = `/${activeTenant}${url.pathname}`;
-    response = NextResponse.rewrite(url);
+  // ══════════════════════════════════════════════════════════════════════════
+  // (A) ALIRAN DOMAIN UTAMA: tidak ada subdomain
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // Bersihkan cookie tenant jika kembali ke domain utama
+  const response = NextResponse.next();
+  response.cookies.delete('x-tenant-id');
+
+  // Proteksi rute /developer — wajib login
+  if (pathname.startsWith('/developer')) {
+    if (!session) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('callbackUrl', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    return response;
   }
 
-  // 5. Setting Cookie
-  if (activeTenant) {
-    response.cookies.set('x-tenant-id', activeTenant, { path: '/' });
-  } else {
-    response.cookies.delete('x-tenant-id');
+  // /login di domain utama: jika sudah login, arahkan ke /developer
+  if (pathname.startsWith('/login') && session) {
+    const callback = request.nextUrl.searchParams.get('callbackUrl') || '/developer';
+    return NextResponse.redirect(new URL(callback, request.url));
   }
 
   return response;
@@ -73,6 +117,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    // Cocokkan semua path kecuali static Next.js assets
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };
