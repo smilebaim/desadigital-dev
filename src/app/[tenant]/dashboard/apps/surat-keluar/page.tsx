@@ -61,6 +61,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { addSuratKeluar, updateSuratKeluar, deleteSuratKeluar, type SuratKeluarData } from "@/lib/surat-keluar-actions";
 import { getSuratKeluarStream } from "@/lib/surat-keluar-client-actions";
 import { generateSuratPDF } from "@/lib/pdf-utils";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface Surat extends SuratKeluarData {
   id: string;
@@ -77,6 +78,7 @@ const suratKeluarSchema = z.object({
 type FormValues = z.infer<typeof suratKeluarSchema>;
 
 const SuratKeluarPage = () => {
+    const { tenantId } = useTenant();
     const { toast } = useToast();
     const storage = useStorage();
     const [suratList, setSuratList] = useState<Surat[]>([]);
@@ -99,9 +101,9 @@ const SuratKeluarPage = () => {
         const unsubSurat = getSuratKeluarStream((data) => {
             setSuratList(data as Surat[]);
             setLoading(false);
-        });
+        }, tenantId);
         return () => unsubSurat();
-    }, []);
+    }, [tenantId]);
 
     const openAddForm = () => {
         setFormMode('add');
@@ -126,50 +128,66 @@ const SuratKeluarPage = () => {
         setIsDeleteOpen(true);
     };
 
+    const handleFileUpload = async (file: File) => {
+        const path = `surat_keluar/${tenantId || 'main'}/${Date.now()}_${file.name}`;
+        const fileRef = ref(storage, path);
+        const uploadTask = uploadBytesResumable(fileRef, file);
+
+        return new Promise<{ url: string, path: string }>((resolve, reject) => {
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    setUploadProgress(progress);
+                }, 
+                (error) => reject(error), 
+                async () => {
+                    const url = await getDownloadURL(uploadTask.snapshot.ref);
+                    resolve({ url, path });
+                }
+            );
+        });
+    };
+
     const onSubmit = async (values: FormValues) => {
         if (formMode === 'add' && !file) {
             toast({ title: "File surat wajib diunggah.", variant: 'destructive' });
             return;
         }
 
-        const handleDatabaseOp = async (fileData?: { fileUrl: string; filePath: string }) => {
-            const dataToSave = { ...values, ...fileData };
-            
-            let result;
-            if (formMode === 'add') {
-                result = await addSuratKeluar(dataToSave);
-            } else if (selectedSurat) {
-                result = await updateSuratKeluar(selectedSurat.id, dataToSave);
-            }
-
-            if (result?.success) {
-                toast({ title: `Arsip surat berhasil ${formMode === 'add' ? 'disimpan' : 'diperbarui'}.` });
-                setIsFormOpen(false);
-            } else {
-                toast({ title: `Gagal ${formMode === 'add' ? 'menyimpan' : 'memperbarui'} arsip.`, description: result?.error, variant: 'destructive' });
-            }
-        };
+        let fileData = selectedSurat ? { fileUrl: selectedSurat.fileUrl, filePath: selectedSurat.filePath } : undefined;
 
         if (file) {
-            setUploadProgress(0);
-            const storagePath = `surat_keluar/${Date.now()}-${file.name}`;
-            const storageRef = ref(storage, storagePath);
-            const uploadTask = uploadBytesResumable(storageRef, file);
+            try {
+                const uploaded = await handleFileUpload(file);
+                fileData = { fileUrl: uploaded.url, filePath: uploaded.path };
+            } catch (err) {
+                console.error("Upload failed:", err);
+                toast({ title: "Gagal unggah file.", variant: 'destructive' });
+                setUploadProgress(null);
+                return;
+            }
+        }
 
-            uploadTask.on('state_changed',
-                (snapshot) => setUploadProgress((snapshot.bytesTransferred / snapshot.totalBytes) * 100),
-                (error) => {
-                    console.error("Upload failed:", error);
-                    toast({ title: 'Gagal mengunggah file.', variant: 'destructive' });
-                    setUploadProgress(null);
-                },
-                async () => {
-                    const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                    await handleDatabaseOp({ fileUrl: downloadURL, filePath: storagePath });
-                }
-            );
+        const dataToSave = { 
+            ...values, 
+            ...fileData,
+            tenantId: tenantId || 'main'
+        };
+        
+        let result;
+        if (formMode === 'add') {
+            result = await addSuratKeluar(dataToSave);
+        } else if (selectedSurat) {
+            result = await updateSuratKeluar(selectedSurat.id, dataToSave);
+        }
+
+        if (result?.success) {
+            toast({ title: `Arsip surat berhasil ${formMode === 'add' ? 'disimpan' : 'diperbarui'}.` });
+            setIsFormOpen(false);
+            setUploadProgress(null);
         } else {
-            await handleDatabaseOp();
+            toast({ title: `Gagal ${formMode === 'add' ? 'menyimpan' : 'memperbarui'} arsip.`, description: result?.error, variant: 'destructive' });
+            setUploadProgress(null);
         }
     };
 

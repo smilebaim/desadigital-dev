@@ -19,6 +19,7 @@ export interface SuratNikahData {
     wanita_nik: string;
     nomorSurat?: string;
     trackingCode?: string;
+    tenantId?: string;
     status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
     createdAt: any;
 }
@@ -27,6 +28,7 @@ export const addSuratNikah = async (data: Omit<SuratNikahData, 'createdAt'>) => 
     try {
         await addDoc(collection(db, 'surat_nikah'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });

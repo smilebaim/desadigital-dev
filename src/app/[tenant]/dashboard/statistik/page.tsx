@@ -9,6 +9,7 @@ import { getStatistikStream } from "@/lib/statistik-client-actions";
 import { seedInitialStatistik, deleteStatistik, addStatistik, type StatistikData, deleteAllStatistik } from "@/lib/statistik-actions";
 import { initialStatistikTemplates } from "@/lib/statistik-templates";
 import { useToast } from "@/components/ui/use-toast";
+import { useTenant } from "@/contexts/TenantContext";
 import {
   Tooltip,
   TooltipContent,
@@ -91,6 +92,7 @@ const automaticStats: Statistik[] = [
 
 
 const StatistikPage = () => {
+  const { tenantId } = useTenant();
   const [stats, setStats] = useState<Statistik[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSeeding, setIsSeeding] = useState(false);
@@ -111,20 +113,20 @@ const StatistikPage = () => {
     const unsubscribe = getStatistikStream((data) => {
       setStats(data as Statistik[]);
       setLoading(false);
-    });
+    }, tenantId);
     return () => unsubscribe();
-  }, []);
+  }, [tenantId]);
   
   const handleSeedData = async () => {
     setIsSeeding(true);
-    const result = await seedInitialStatistik();
+    const result = await seedInitialStatistik(tenantId || 'main');
     if (result.success) {
-      toast({ title: "Berhasil!", description: result.message });
+      toast({ title: "Berhasil!", description: "Data statistik awal telah ditambahkan." });
     } else {
-      toast({ title: 'Gagal', description: result.error, variant: 'destructive' });
+      toast({ title: "Gagal!", description: result.error, variant: "destructive" });
     }
     setIsSeeding(false);
-  }
+  };
 
   const handleDelete = async () => {
       if (!statToDelete) return;

@@ -17,6 +17,7 @@ export interface SuratPengantarData {
     keperluan: string;
     nomorSurat?: string;
     trackingCode?: string;
+    tenantId?: string;
     status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
     createdAt: any;
 }
@@ -25,6 +26,7 @@ export const addSuratPengantar = async (data: Omit<SuratPengantarData, 'createdA
     try {
         await addDoc(collection(db, 'surat_pengantar'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });

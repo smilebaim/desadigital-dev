@@ -18,6 +18,7 @@ export interface KegiatanData {
     time: string; // HH:mm
     location: string;
     description: string;
+    tenantId?: string;
     createdAt?: any;
 }
 
@@ -25,6 +26,7 @@ export const addKegiatan = async (data: Omit<KegiatanData, 'createdAt'>) => {
     try {
         await addDoc(collection(db, 'kegiatan'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             createdAt: serverTimestamp()
         });
         return { success: true };

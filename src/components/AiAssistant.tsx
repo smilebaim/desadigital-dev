@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { askAssistant } from '@/lib/genkit-actions';
 import { getSiteSettings } from '@/lib/site-settings-actions';
 import ReactMarkdown from 'react-markdown';
+import { useTenant } from '@/contexts/TenantContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -13,6 +14,7 @@ interface Message {
 }
 
 const AiAssistant = () => {
+  const { tenantId } = useTenant();
   const [isOpen, setIsOpen] = useState(false);
   const [siteName, setSiteName] = useState('Desa');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -30,7 +32,7 @@ const AiAssistant = () => {
 
   useEffect(() => {
     const init = async () => {
-      const settings = await getSiteSettings();
+      const settings = await getSiteSettings(tenantId || undefined);
       if (settings?.siteName) {
         setSiteName(settings.siteName);
         setMessages([
@@ -43,7 +45,7 @@ const AiAssistant = () => {
       }
     };
     init();
-  }, []);
+  }, [tenantId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -70,7 +72,7 @@ const AiAssistant = () => {
     setIsLoading(true);
 
     try {
-      const result = await askAssistant(userMessage, historyToSend);
+      const result = await askAssistant(userMessage, historyToSend, tenantId || undefined);
       
       if (result.success && result.text) {
         setMessages(prev => [...prev, { role: 'assistant', content: result.text! }]);

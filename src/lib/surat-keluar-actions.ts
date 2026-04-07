@@ -19,6 +19,7 @@ export interface SuratKeluarData {
     fileUrl?: string;
     filePath?: string;
     trackingCode?: string;
+    tenantId?: string;
     createdAt?: any;
 }
 
@@ -26,6 +27,7 @@ export const addSuratKeluar = async (data: Omit<SuratKeluarData, 'createdAt'>) =
     try {
         await addDoc(collection(db, 'surat_keluar'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });

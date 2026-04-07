@@ -4,11 +4,22 @@ import {
     collection, 
     onSnapshot, 
     query, 
-    orderBy
+    orderBy,
+    where
 } from 'firebase/firestore';
 
-export const getSuratKematianStream = (callback: (data: any[]) => void) => {
-    const q = query(collection(db, "surat_kematian"), orderBy("createdAt", "desc"));
+export const getSuratKematianStream = (callback: (data: any[]) => void, tenantId?: string | null) => {
+    let q;
+    if (tenantId) {
+        q = query(
+            collection(db, "surat_kematian"), 
+            where("tenantId", "==", tenantId),
+            orderBy("createdAt", "desc")
+        );
+    } else {
+        q = query(collection(db, "surat_kematian"), orderBy("createdAt", "desc"));
+    }
+    
     return onSnapshot(q, (querySnapshot) => {
         const data = querySnapshot.docs.map(doc => ({
             id: doc.id,

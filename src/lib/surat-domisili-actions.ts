@@ -19,6 +19,7 @@ export interface SuratDomisiliData {
     keperluan?: string;
     keterangan?: string;
     trackingCode?: string;
+    tenantId?: string;
     createdAt: any;
 }
 
@@ -26,6 +27,7 @@ export const addSuratDomisili = async (data: Omit<SuratDomisiliData, 'createdAt'
     try {
         await addDoc(collection(db, 'surat_domisili'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });

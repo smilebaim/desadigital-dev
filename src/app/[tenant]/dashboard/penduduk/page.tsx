@@ -58,6 +58,7 @@ import * as z from "zod";
 
 import { addPenduduk, updatePenduduk, deletePenduduk, addPendudukBatch, type PendudukData, seedDummyPenduduk } from "@/lib/penduduk-actions";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface Penduduk extends PendudukData {
   id: string;
@@ -82,6 +83,7 @@ const pendudukSchema = z.object({
 type PendudukFormValues = z.infer<typeof pendudukSchema>;
 
 const PendudukPage = () => {
+  const { tenantId } = useTenant();
   const { toast } = useToast();
   const [data, setData] = useState<Penduduk[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,9 +112,9 @@ const PendudukPage = () => {
     const unsubscribe = getPendudukStream((data) => {
       setData(data as Penduduk[]);
       setLoading(false);
-    });
+    }, tenantId);
     return () => unsubscribe();
-  }, []);
+  }, [tenantId]);
 
   const openAddForm = () => {
     setFormMode('add');
@@ -140,9 +142,9 @@ const PendudukPage = () => {
   const onSubmit = async (values: PendudukFormValues) => {
     let result;
     if (formMode === 'add') {
-      result = await addPenduduk(values);
+      result = await addPenduduk({ ...values, tenantId: tenantId || 'main' });
     } else if (selectedItem) {
-      result = await updatePenduduk(selectedItem.id, values);
+      result = await updatePenduduk(selectedItem.id, { ...values, tenantId: tenantId || 'main' });
     }
 
     if (result?.success) {
@@ -205,21 +207,14 @@ const PendudukPage = () => {
   };
 
   const handleSeedData = async () => {
-      setIsSeeding(true);
-      const result = await seedDummyPenduduk();
-      if (result.success) {
-          toast({
-              title: "Data Dummy Berhasil Ditambahkan",
-              description: `${result.count} data penduduk dummy telah ditambahkan ke database.`,
-          });
-      } else {
-          toast({
-              title: "Gagal Menambahkan Data Dummy",
-              description: result.error,
-              variant: "destructive",
-          });
-      }
-      setIsSeeding(false);
+    setIsSeeding(true);
+    const result = await seedDummyPenduduk(tenantId || 'main');
+    if (result.success) {
+      toast({ title: "Berhasil!", description: "Data penduduk dummy telah ditambahkan." });
+    } else {
+      toast({ title: "Gagal!", description: result.error, variant: "destructive" });
+    }
+    setIsSeeding(false);
   };
 
   const handleExportExcel = () => {

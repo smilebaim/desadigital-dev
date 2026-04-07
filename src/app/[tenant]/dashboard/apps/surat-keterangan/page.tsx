@@ -58,6 +58,7 @@ import { getPendudukStream } from "@/lib/penduduk-client-actions";
 import type { PendudukData } from "@/lib/penduduk-actions";
 import { Badge } from "@/components/ui/badge";
 import { generateSuratPDF } from "@/lib/pdf-utils";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface Surat extends SuratKeteranganData {
   id: string;
@@ -75,6 +76,7 @@ const suratKeteranganSchema = z.object({
 type FormValues = z.infer<typeof suratKeteranganSchema>;
 
 const SuratKeteranganPage = () => {
+    const { tenantId } = useTenant();
     const { toast } = useToast();
     const [suratList, setSuratList] = useState<Surat[]>([]);
     const [pendudukList, setPendudukList] = useState<Penduduk[]>([]);
@@ -95,15 +97,15 @@ const SuratKeteranganPage = () => {
         const unsubSurat = getSuratKeteranganStream((data) => {
             setSuratList(data as Surat[]);
             setLoading(false);
-        });
+        }, tenantId);
         const unsubPenduduk = getPendudukStream((data) => {
             setPendudukList(data as Penduduk[]);
-        });
+        }, tenantId);
         return () => {
             unsubSurat();
             unsubPenduduk();
         };
-    }, []);
+    }, [tenantId]);
 
     const openAddForm = () => {
         setFormMode('add');
@@ -138,7 +140,8 @@ const SuratKeteranganPage = () => {
             ...values,
             namaPemohon: selectedPenduduk.nama,
             nikPemohon: selectedPenduduk.nik,
-            status: 'Diproses'
+            status: (formMode === 'edit' && selectedSurat) ? selectedSurat.status : 'Diproses',
+            tenantId: tenantId || 'main'
         };
 
         let result;

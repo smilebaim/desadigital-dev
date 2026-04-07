@@ -27,6 +27,7 @@ export interface PendudukData {
     alamat: string;
     rt: string;
     rw: string;
+    tenantId?: string;
     // Additional biodata fields (flexible sub-object)
     biodata?: {
         tempatLahir?: string;
@@ -58,6 +59,7 @@ export const addPenduduk = async (data: Omit<PendudukData, 'createdAt'>) => {
     try {
         await addDoc(collection(db, 'penduduk'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             createdAt: serverTimestamp()
         });
         return { success: true };
@@ -66,14 +68,18 @@ export const addPenduduk = async (data: Omit<PendudukData, 'createdAt'>) => {
     }
 };
 
-export const addPendudukBatch = async (data: PendudukData[]) => {
+export const addPendudukBatch = async (data: PendudukData[], tenantId?: string) => {
     const batch = writeBatch(db);
     try {
         data.forEach(penduduk => {
             // Basic validation to ensure required fields are present
             if (penduduk.nama && penduduk.nik) {
                 const docRef = doc(collection(db, 'penduduk'));
-                batch.set(docRef, { ...penduduk, createdAt: serverTimestamp() });
+                batch.set(docRef, { 
+                    ...penduduk, 
+                    tenantId: tenantId || penduduk.tenantId || 'main',
+                    createdAt: serverTimestamp() 
+                });
             }
         });
         await batch.commit();
@@ -102,16 +108,20 @@ export const deletePenduduk = async (id: string) => {
     }
 };
 
-export const seedDummyPenduduk = async () => {
+export const seedDummyPenduduk = async (tenantId?: string) => {
     const pendudukCollection = collection(db, 'penduduk');
-    const q = query(pendudukCollection, limit(1));
+    const q = query(
+        pendudukCollection, 
+        where("tenantId", "==", tenantId || 'main'),
+        limit(1)
+    );
     const snapshot = await getDocs(q);
 
     if (!snapshot.empty) {
         return { success: false, error: 'Data penduduk sudah ada. Tidak ada data dummy yang ditambahkan.' };
     }
 
-    const dummyData: Omit<PendudukData, 'createdAt'>[] = [
+    const dummyData: Omit<PendudukData, 'createdAt' | 'tenantId'>[] = [
         { nama: "Budi Santoso", nik: "3601010101800001", kk: "3601010101800001", jenisKelamin: "Laki-laki", tempatLahir: "Jambi", tanggalLahir: "1980-01-01", agama: "Islam", pendidikan: "S1", pekerjaan: "Petani", statusPerkawinan: "Kawin", alamat: "Dusun Harapan", rt: "001", rw: "001" },
         { nama: "Siti Aminah", nik: "3601014102820002", kk: "3601010101800001", jenisKelamin: "Perempuan", tempatLahir: "Jambi", tanggalLahir: "1982-02-14", agama: "Islam", pendidikan: "SMA", pekerjaan: "Ibu Rumah Tangga", statusPerkawinan: "Kawin", alamat: "Dusun Harapan", rt: "001", rw: "001" },
         { nama: "Agus Wijaya", nik: "3601021203750003", kk: "3601021203750003", jenisKelamin: "Laki-laki", tempatLahir: "Jambi", tanggalLahir: "1975-03-12", agama: "Islam", pendidikan: "SMP", pekerjaan: "Nelayan", statusPerkawinan: "Kawin", alamat: "Dusun Bahari", rt: "002", rw: "001" },
@@ -138,7 +148,11 @@ export const seedDummyPenduduk = async () => {
     try {
         dummyData.forEach(penduduk => {
             const docRef = doc(pendudukCollection);
-            batch.set(docRef, { ...penduduk, createdAt: serverTimestamp() });
+            batch.set(docRef, { 
+                ...penduduk, 
+                tenantId: tenantId || 'main',
+                createdAt: serverTimestamp() 
+            });
         });
         await batch.commit();
         return { success: true, count: dummyData.length };

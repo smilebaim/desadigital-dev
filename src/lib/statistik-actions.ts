@@ -19,13 +19,18 @@ export interface StatistikData {
     title: string;
     group: string;
     data: string; // JSON String
+    tenantId?: string;
     createdAt?: any;
     updatedAt?: any;
 }
 
-export const addStatistikByKey = async (key: string) => {
+export const addStatistikByKey = async (key: string, tenantId?: string) => {
     // Check if key exists already
-    const q = query(collection(db, 'statistik'), where("key", "==", key));
+    const q = query(
+        collection(db, 'statistik'), 
+        where("key", "==", key),
+        where("tenantId", "==", tenantId || 'main')
+    );
     const existing = await getDocs(q);
     if (!existing.empty) {
         return { success: false, error: 'Data statistik dengan kunci ini sudah ada.' };
@@ -39,6 +44,7 @@ export const addStatistikByKey = async (key: string) => {
     try {
         await addDoc(collection(db, 'statistik'), {
             ...template,
+            tenantId: tenantId || 'main',
             createdAt: serverTimestamp()
         });
         return { success: true };
@@ -50,7 +56,11 @@ export const addStatistikByKey = async (key: string) => {
 export const addStatistik = async (data: Omit<StatistikData, 'createdAt' | 'updatedAt'>) => {
     try {
         // Check for duplicate key
-        const q = query(collection(db, 'statistik'), where("key", "==", data.key));
+        const q = query(
+            collection(db, 'statistik'), 
+            where("key", "==", data.key),
+            where("tenantId", "==", data.tenantId || 'main')
+        );
         const existing = await getDocs(q);
         if (!existing.empty) {
             return { success: false, error: 'Kunci (key) ini sudah digunakan. Harap gunakan kunci unik.' };
@@ -58,6 +68,7 @@ export const addStatistik = async (data: Omit<StatistikData, 'createdAt' | 'upda
 
         await addDoc(collection(db, 'statistik'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             createdAt: serverTimestamp()
         });
         return { success: true };
@@ -75,9 +86,19 @@ export const deleteStatistik = async (id: string) => {
     }
 };
 
-export const getStatistikByKey = async (key: string): Promise<(StatistikData & {id: string}) | null> => {
+export const getStatistikByKey = async (key: string, tenantId?: string): Promise<(StatistikData & {id: string}) | null> => {
     try {
-        const q = query(collection(db, 'statistik'), where("key", "==", key));
+        let q;
+        if (tenantId) {
+            q = query(
+                collection(db, 'statistik'), 
+                where("key", "==", key),
+                where("tenantId", "==", tenantId)
+            );
+        } else {
+            q = query(collection(db, 'statistik'), where("key", "==", key));
+        }
+        
         const querySnapshot = await getDocs(q);
         if (!querySnapshot.empty) {
             const docSnap = querySnapshot.docs[0];
@@ -130,9 +151,13 @@ export const updateStatistik = async (id: string, data: { data: string }) => {
 };
 
 
-export const seedInitialStatistik = async () => {
+export const seedInitialStatistik = async (tenantId?: string) => {
     const statistikCollection = collection(db, 'statistik');
-    const snapshot = await getDocs(statistikCollection);
+    const q = query(
+        statistikCollection, 
+        where("tenantId", "==", tenantId || 'main')
+    );
+    const snapshot = await getDocs(q);
     const existingKeys = new Set(snapshot.docs.map(doc => doc.data().key));
 
     const batch = writeBatch(db);
@@ -141,7 +166,11 @@ export const seedInitialStatistik = async () => {
     initialStatistikTemplates.forEach(stat => {
         if (!existingKeys.has(stat.key)) {
             const docRef = doc(statistikCollection);
-            batch.set(docRef, { ...stat, createdAt: serverTimestamp() });
+            batch.set(docRef, { 
+                ...stat, 
+                tenantId: tenantId || 'main',
+                createdAt: serverTimestamp() 
+            });
             addedCount++;
         }
     });

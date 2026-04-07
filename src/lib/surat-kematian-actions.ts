@@ -18,6 +18,7 @@ export interface SuratKematianData {
     penyebabKematian: string;
     nomorSurat?: string;
     trackingCode?: string;
+    tenantId?: string;
     status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
     createdAt: any;
 }
@@ -26,6 +27,7 @@ export const addSuratKematian = async (data: Omit<SuratKematianData, 'createdAt'
     try {
         await addDoc(collection(db, 'surat_kematian'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });

@@ -18,6 +18,7 @@ export interface SuratPindahData {
     alasanPindah: string;
     nomorSurat?: string;
     trackingCode?: string;
+    tenantId?: string;
     status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
     createdAt: any;
 }
@@ -26,6 +27,7 @@ export const addSuratPindah = async (data: Omit<SuratPindahData, 'createdAt'>) =
     try {
         await addDoc(collection(db, 'surat_pindah'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });

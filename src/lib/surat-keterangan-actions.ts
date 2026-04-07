@@ -17,6 +17,7 @@ export interface SuratKeteranganData {
     keterangan: string;
     nomorSurat?: string;
     trackingCode?: string;
+    tenantId?: string;
     status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
     createdAt: any;
 }
@@ -25,6 +26,7 @@ export const addSuratKeterangan = async (data: Omit<SuratKeteranganData, 'create
     try {
         await addDoc(collection(db, 'surat_keterangan'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });

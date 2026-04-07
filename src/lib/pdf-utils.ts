@@ -1,24 +1,26 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { SiteSettings, DEFAULT_SETTINGS } from './site-settings-actions';
 
 export const generateTrackingCode = () => {
     return Math.random().toString(36).substring(2, 10).toUpperCase();
 };
 
-export const generateSuratPDF = async (type: string, data: any) => {
+export const generateSuratPDF = async (type: string, data: any, settings?: SiteSettings) => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
+    const s = settings || DEFAULT_SETTINGS;
 
     // Kop Surat
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('PEMERINTAH KABUPATEN TANJUNG JABUNG TIMUR', pageWidth / 2, 20, { align: 'center' });
-    doc.text('KECAMATAN SADU', pageWidth / 2, 27, { align: 'center' });
+    doc.text(`PEMERINTAH KABUPATEN ${s.kabupaten?.toUpperCase() || '...' }`, pageWidth / 2, 20, { align: 'center' });
+    doc.text(`KECAMATAN ${s.kecamatan?.toUpperCase() || '...'}`, pageWidth / 2, 27, { align: 'center' });
     doc.setFontSize(16);
-    doc.text('DESA REMAU BAKO TUO', pageWidth / 2, 35, { align: 'center' });
+    doc.text(s.siteName?.toUpperCase() || 'DESA ...', pageWidth / 2, 35, { align: 'center' });
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Alamat: Jl. Raya Desa No. 1, Desa Remau Bako Tuo, Kec. Sadu, Kab. Tanjung Jabung Timur', pageWidth / 2, 42, { align: 'center' });
+    doc.text(`Alamat: ${s.contactAddress || '...'}`, pageWidth / 2, 42, { align: 'center' });
     
     // Garis Kop
     doc.setLineWidth(1);
@@ -38,7 +40,7 @@ export const generateSuratPDF = async (type: string, data: any) => {
 
     // Isi Surat
     doc.setFontSize(11);
-    doc.text('Yang bertanda tangan di bawah ini, Kepala Desa Remau Bako Tuo, Kecamatan Sadu, Kabupaten Tanjung Jabung Timur, dengan ini menerangkan bahwa:', 20, 80, { maxWidth: pageWidth - 40 });
+    doc.text(`Yang bertanda tangan di bawah ini, Kepala ${s.siteName || 'Desa'}, Kecamatan ${s.kecamatan || '...'}, Kabupaten ${s.kabupaten || '...'}, dengan ini menerangkan bahwa:`, 20, 80, { maxWidth: pageWidth - 40 });
 
     // Data Penduduk
     const tableData = [
@@ -85,11 +87,11 @@ export const generateSuratPDF = async (type: string, data: any) => {
 
     // Tanda Tangan
     const today = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-    doc.text(`Remau Bako Tuo, ${today}`, pageWidth - 80, finalY + 40);
-    doc.text('Kepala Desa Remau Bako Tuo', pageWidth - 80, finalY + 47);
+    doc.text(`${s.siteName || 'Desa'}, ${today}`, pageWidth - 80, finalY + 40);
+    doc.text(`Kepala ${s.siteName || 'Desa'}`, pageWidth - 80, finalY + 47);
     
     doc.setFont('helvetica', 'bold');
-    doc.text('H. ABDULLAH', pageWidth - 80, finalY + 75);
+    doc.text(s.kepalaDesaName?.toUpperCase() || '...', pageWidth - 80, finalY + 75);
 
     // Footer Tracking
     if (data.trackingCode) {
@@ -98,5 +100,5 @@ export const generateSuratPDF = async (type: string, data: any) => {
         doc.text(`Tracking Code: ${data.trackingCode}`, 20, doc.internal.pageSize.getHeight() - 10);
     }
 
-    doc.save(`${type.replace(/\s+/g, '_')}_${data.nikPemohon || data.namaPemohon}.pdf`);
+    doc.save(`${type.replace(/\s+/g, '_').toLowerCase()}_${data.trackingCode || Date.now()}.pdf`);
 };

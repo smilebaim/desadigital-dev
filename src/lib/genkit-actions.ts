@@ -7,14 +7,14 @@ import { getPublishedPosts } from './posts-actions';
 
 type ClientMessage = { role: 'user' | 'assistant'; content: string };
 
-export async function askAssistant(question: string, history: ClientMessage[] = []) {
+export async function askAssistant(question: string, history: ClientMessage[] = [], tenantId?: string) {
   try {
     // 🔍 Fetch Dynamic Context
     const [settings, statsAnggaran, statsPenduduk, recentPosts] = await Promise.all([
-      getSiteSettings(),
-      getStatistikByKey('belanja_desa'),
-      getStatistikByKey('penduduk_desa'), // Assuming this key exists or will be added
-      getPublishedPosts().then(posts => posts.slice(0, 3))
+      getSiteSettings(tenantId),
+      getStatistikByKey('belanja_desa', tenantId),
+      getStatistikByKey('penduduk_desa', tenantId), // Assuming this key exists or will be added
+      getPublishedPosts(tenantId).then(posts => posts.slice(0, 3))
     ]);
 
     const siteName = settings?.siteName || "Desa Remau Bako Tuo";

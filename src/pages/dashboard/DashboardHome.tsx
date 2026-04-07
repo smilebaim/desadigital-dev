@@ -1,7 +1,7 @@
 'use client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, FileText, Settings, BarChart3, Map, Mail } from "lucide-react";
+import { Users, FileText, Settings, BarChart3, Map, Mail, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
@@ -16,6 +16,8 @@ import { getSuratNikahStream } from "@/lib/surat-nikah-client-actions";
 import { getSuratPindahStream } from "@/lib/surat-pindah-client-actions";
 import { getSuratPengantarStream } from "@/lib/surat-pengantar-client-actions";
 import { getSuratKeteranganStream } from "@/lib/surat-keterangan-client-actions";
+import { useTenant } from "@/contexts/TenantContext";
+import { getSiteSettings, type SiteSettings } from "@/lib/site-settings-actions";
 
 
 const VisitorChart = dynamic(() => import('@/components/dashboard/VisitorChart'), {
@@ -24,6 +26,8 @@ const VisitorChart = dynamic(() => import('@/components/dashboard/VisitorChart')
 });
 
 const DashboardHome = () => {
+  const { tenantId } = useTenant();
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [residentCount, setResidentCount] = useState(0);
   const [postCount, setPostCount] = useState(0);
   const [letterCount, setLetterCount] = useState(0);
@@ -32,12 +36,19 @@ const DashboardHome = () => {
 
 
   useEffect(() => {
+    // Fetch site settings
+    const fetchSettings = async () => {
+      const s = await getSiteSettings(tenantId || undefined);
+      setSettings(s);
+    };
+    fetchSettings();
+
     // Set visitor stats on client mount to avoid hydration errors
     setVisitorCount(Math.floor(Math.random() * (2000 - 500 + 1) + 500));
     setVisitorChange(Math.floor(Math.random() * (25 - -10 + 1) + -10));
 
-    const unsubPenduduk = getPendudukStream((data) => setResidentCount(data.length));
-    const unsubPosts = getPostsStream((data) => setPostCount(data.length));
+    const unsubPenduduk = getPendudukStream((data) => setResidentCount(data.length), tenantId);
+    const unsubPosts = getPostsStream((data) => setPostCount(data.length), tenantId);
 
     const letterStreams = [
       getSuratUsahaStream,
@@ -61,7 +72,7 @@ const DashboardHome = () => {
       return stream((data: any[]) => {
         pendingCounts[index] = data.filter(s => s.status === 'Diproses').length;
         updateLetterCount();
-      });
+      }, tenantId);
     });
 
     return () => {
@@ -69,7 +80,7 @@ const DashboardHome = () => {
       unsubPosts();
       unsubscribers.forEach(unsub => unsub());
     };
-  }, []);
+  }, [tenantId]);
 
 
   return (
@@ -77,7 +88,7 @@ const DashboardHome = () => {
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
         <p className="text-muted-foreground">
-          Selamat datang di panel admin Desa Remau Bakotuo.
+          Selamat datang di panel admin {settings?.siteName || 'Desa'}.
         </p>
       </div>
 
@@ -159,25 +170,43 @@ const DashboardHome = () => {
         <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Button variant="outline" asChild>
                 <Link href="/dashboard/info" className="flex flex-col h-24 justify-center items-center">
-                    <FileText className="h-6 w-6 mb-2" />
+                    <FileText className="h-6 w-6 mb-2 text-blue-500" />
                     <span>Info & Berita</span>
                 </Link>
             </Button>
             <Button variant="outline" asChild>
                 <Link href="/dashboard/penduduk" className="flex flex-col h-24 justify-center items-center">
-                    <Users className="h-6 w-6 mb-2" />
+                    <Users className="h-6 w-6 mb-2 text-emerald-500" />
                     <span>Data Penduduk</span>
                 </Link>
             </Button>
             <Button variant="outline" asChild>
+                <Link href="/dashboard/apps/surat-domisili" className="flex flex-col h-24 justify-center items-center">
+                    <Mail className="h-6 w-6 mb-2 text-orange-500" />
+                    <span>Layanan Surat</span>
+                </Link>
+            </Button>
+            <Button variant="outline" asChild>
+                <Link href="/dashboard/statistik" className="flex flex-col h-24 justify-center items-center">
+                    <BarChart3 className="h-6 w-6 mb-2 text-purple-500" />
+                    <span>Statistik</span>
+                </Link>
+            </Button>
+            <Button variant="outline" asChild>
                 <Link href="/dashboard/map-control" className="flex flex-col h-24 justify-center items-center">
-                    <Map className="h-6 w-6 mb-2" />
+                    <Map className="h-6 w-6 mb-2 text-red-500" />
                     <span>Kontrol Peta</span>
+                </Link>
+            </Button>
+            <Button variant="outline" asChild>
+                <Link href="/dashboard/halaman-utama" className="flex flex-col h-24 justify-center items-center">
+                    <LayoutGrid className="h-6 w-6 mb-2 text-cyan-500" />
+                    <span>Kelola Konten</span>
                 </Link>
             </Button>
              <Button variant="outline" asChild>
                 <Link href="/dashboard/pengaturan" className="flex flex-col h-24 justify-center items-center">
-                    <Settings className="h-6 w-6 mb-2" />
+                    <Settings className="h-6 w-6 mb-2 text-gray-500" />
                     <span>Pengaturan</span>
                 </Link>
             </Button>

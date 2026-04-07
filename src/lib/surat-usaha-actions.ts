@@ -21,6 +21,7 @@ export interface SuratUsahaData {
     keperluan?: string;
     keterangan?: string;
     trackingCode?: string;
+    tenantId?: string;
     status: 'Diajukan' | 'Diproses' | 'Selesai' | 'Ditolak';
     createdAt: any;
 }
@@ -29,6 +30,7 @@ export const addSuratUsaha = async (data: Omit<SuratUsahaData, 'createdAt'>) => 
     try {
         await addDoc(collection(db, 'surat_usaha'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             trackingCode: generateTrackingCode(),
             createdAt: serverTimestamp()
         });

@@ -25,6 +25,7 @@ export interface PostData {
     status: 'Published' | 'Draft';
     author: string;
     userId: string;
+    tenantId?: string;
     createdAt?: string | null;
     updatedAt?: string | null;
     views?: number;
@@ -33,12 +34,22 @@ export interface PostData {
 // --- Post Actions ---
 
 // Get all published posts
-export const getPublishedPosts = async () => {
+export const getPublishedPosts = async (tenantId?: string) => {
     try {
-        const q = query(
-            collection(db, "posts"),
-            where("status", "==", "Published")
-        );
+        let q;
+        if (tenantId) {
+            q = query(
+                collection(db, "posts"),
+                where("status", "==", "Published"),
+                where("tenantId", "==", tenantId)
+            );
+        } else {
+            q = query(
+                collection(db, "posts"),
+                where("status", "==", "Published")
+            );
+        }
+        
         const querySnapshot = await getDocs(q);
         const posts = querySnapshot.docs.map(doc => {
             const data = doc.data();
@@ -83,6 +94,7 @@ export const addPost = async (postData: Omit<PostData, 'createdAt' | 'updatedAt'
     try {
         await addDoc(collection(db, "posts"), {
             ...postData,
+            tenantId: postData.tenantId || 'main',
             views: 0,
             createdAt: serverTimestamp()
         });
@@ -148,20 +160,24 @@ export const deletePost = async (postId: string) => {
     }
 };
 
-export const seedDummyPosts = async (userId: string, author: string) => {
+export const seedDummyPosts = async (userId: string, author: string, tenantId?: string) => {
     if (!userId || !author) {
         return { success: false, error: "User ID dan nama author dibutuhkan." };
     }
 
     const postsCollection = collection(db, 'posts');
-    const q = query(postsCollection, limit(1));
+    const q = query(
+        postsCollection, 
+        where("tenantId", "==", tenantId || 'main'),
+        limit(1)
+    );
     const snapshot = await getDocs(q);
 
     if (!snapshot.empty) {
         return { success: false, error: 'Koleksi Info & Berita sudah berisi data. Data dummy tidak ditambahkan.' };
     }
 
-    const dummyPosts: Omit<PostData, 'createdAt' | 'updatedAt' | 'views' | 'userId' | 'author'>[] = [
+    const dummyPosts: Omit<PostData, 'createdAt' | 'updatedAt' | 'views' | 'userId' | 'author' | 'tenantId'>[] = [
         {
             title: "Pembangunan Jalan Usaha Tani di Dusun Harapan",
             content: "Pemerintah Desa Remau Bako Tuo telah menyelesaikan pembangunan jalan usaha tani sepanjang 500 meter di Dusun Harapan. Pembangunan ini diharapkan dapat mempermudah akses petani dalam mengangkut hasil panen dan meningkatkan perekonomian warga. Jalan yang sebelumnya berupa tanah kini telah diperkeras dengan beton, sehingga dapat dilalui kendaraan roda empat.",
@@ -190,6 +206,7 @@ export const seedDummyPosts = async (userId: string, author: string) => {
                 ...post, 
                 userId,
                 author,
+                tenantId: tenantId || 'main',
                 views: 0,
                 createdAt: serverTimestamp() 
             });

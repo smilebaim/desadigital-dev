@@ -44,6 +44,7 @@ import { deletePost, type PostData, seedDummyPosts } from "@/lib/posts-actions";
 import { getPostsStream } from "@/lib/posts-client-actions";
 import { useUser } from '@/firebase';
 import { useToast } from "@/components/ui/use-toast";
+import { useTenant } from "@/contexts/TenantContext";
 
 interface Post extends PostData {
   id: string;
@@ -52,6 +53,7 @@ interface Post extends PostData {
 }
 
 const BeritaDashboardPage = () => {
+  const { tenantId } = useTenant();
   const { user } = useUser();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,14 +67,14 @@ const BeritaDashboardPage = () => {
       const unsubscribe = getPostsStream((data) => {
         setPosts(data as Post[]);
         setLoading(false);
-      });
+      }, tenantId);
       return () => unsubscribe();
     } else if (user === null) {
       // Handle logged out state
       setLoading(false);
       setPosts([]);
     }
-  }, [user]);
+  }, [user, tenantId]);
 
   const handleDelete = async () => {
     if (!postToDelete) return;
@@ -91,7 +93,7 @@ const BeritaDashboardPage = () => {
           return;
       }
       setIsSeeding(true);
-      const result = await seedDummyPosts(user.uid, user.displayName || user.email || 'Admin');
+      const result = await seedDummyPosts(user.uid, user.displayName || user.email || 'Admin', tenantId || 'main');
       if (result.success) {
           toast({
               title: "Data Dummy Berhasil Ditambahkan",

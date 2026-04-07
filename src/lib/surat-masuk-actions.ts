@@ -21,6 +21,7 @@ export interface SuratMasukData {
     fileUrl?: string;
     filePath?: string;
     disposisi?: string;
+    tenantId?: string;
     createdAt?: any;
 }
 
@@ -28,6 +29,7 @@ export const addSuratMasuk = async (data: Omit<SuratMasukData, 'createdAt'>) => 
     try {
         await addDoc(collection(db, 'surat_masuk'), {
             ...data,
+            tenantId: data.tenantId || 'main',
             createdAt: serverTimestamp()
         });
         return { success: true };
