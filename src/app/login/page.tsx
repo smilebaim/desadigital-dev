@@ -11,16 +11,12 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Shield, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 
+import { extractSubdomain } from '@/lib/subdomain';
+
 // ── Helper: baca subdomain dari window.location ─────────────────────────────
 const getActiveSubdomain = (): string | null => {
   if (typeof window === 'undefined') return null;
-  const hostname = window.location.hostname.split(':')[0].toLowerCase();
-  const parts = hostname.split('.');
-  const excluded = ['www', 'localhost', '127', 'developer'];
-  const sub = parts[0];
-  // Hanya anggap subdomain jika bukan domain utama / excluded
-  if (excluded.includes(sub) || parts.length === 1) return null;
-  return sub;
+  return extractSubdomain(window.location.hostname);
 };
 
 const LoginForm = () => {

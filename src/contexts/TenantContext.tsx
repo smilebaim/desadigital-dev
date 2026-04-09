@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { db } from '@/firebase/config';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { TenantData } from '@/lib/tenant-actions';
+import { extractSubdomain } from '@/lib/subdomain';
 
 interface TenantContextState {
     tenantId: string | null;
@@ -26,12 +27,10 @@ export const TenantProvider = ({ children, initialTenantId }: { children: React.
         // Fallback for client side if not passed from server
         let activeTenant = initialTenantId;
         if (!activeTenant && typeof window !== 'undefined') {
-            const hostname = window.location.hostname;
-            const subdomain = hostname.split('.')[0].toLowerCase();
-            const isExcluded = ['www', 'localhost', '127'].includes(subdomain);
-            if (!isExcluded && subdomain) {
-                activeTenant = subdomain;
-                setTenantId(subdomain);
+            const detectedSub = extractSubdomain(window.location.hostname);
+            if (detectedSub) {
+                activeTenant = detectedSub;
+                setTenantId(detectedSub);
             }
         }
 

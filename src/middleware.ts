@@ -12,26 +12,7 @@ import type { NextRequest } from 'next/server';
 //   (C) Direct Routes — /api, /_next, /favicon.ico (lalu-lintas teknis, tidak diubah)
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Subdomains yang BUKAN tenant (dikecualikan dari rewrite)
-const EXCLUDED_SUBDOMAINS = new Set(['www', 'localhost', '127', 'developer', 'app', 'api']);
-
-function extractSubdomain(request: NextRequest): string | null {
-  const hostHeader = request.headers.get('host') || '';
-  const hostname = hostHeader.split(':')[0].toLowerCase();
-  const parts = hostname.split('.');
-
-  // Format single-part: "localhost" → tidak ada subdomain
-  if (parts.length === 1) return null;
-
-  // Format: "sukamaju.localhost" atau "sukamaju.desahub.id"
-  const candidateSub = parts[0];
-  if (EXCLUDED_SUBDOMAINS.has(candidateSub)) return null;
-
-  // Cegah IP address (angka saja) dikira subdomain
-  if (/^\d+$/.test(candidateSub)) return null;
-
-  return candidateSub;
-}
+import { extractSubdomain } from './lib/subdomain';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -49,7 +30,8 @@ export function middleware(request: NextRequest) {
   }
 
   // ── Identifikasi subdomain aktif ──────────────────────────────────────────
-  const subdomain = extractSubdomain(request);
+  const hostHeader = request.headers.get('host') || '';
+  const subdomain = extractSubdomain(hostHeader);
   const isTenantRequest = subdomain !== null;
 
   // ══════════════════════════════════════════════════════════════════════════
