@@ -15,7 +15,7 @@ interface Surat extends SuratDomisiliData {
 
 const PrintSuratDomisili = () => {
   const params = useParams();
-  const id = params.id as string;
+  const id = params?.id as string;
   
   const [surat, setSurat] = useState<Surat | null>(null);
   const [penduduk, setPenduduk] = useState<PendudukData | null>(null);

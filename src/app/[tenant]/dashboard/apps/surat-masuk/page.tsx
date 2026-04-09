@@ -163,7 +163,8 @@ const SuratMasukPage = () => {
 
         if (file) {
             try {
-                fileData = await handleFileUpload(file);
+                const uploadResult = await handleFileUpload(file);
+                fileData = { fileUrl: uploadResult.url, filePath: uploadResult.path };
             } catch (err) {
                 toast({ title: "Gagal mengunggah file.", variant: 'destructive' });
                 return;

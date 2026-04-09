@@ -1,0 +1,18 @@
+﻿.next/types/app/[tenant]/layout.ts(38,33): error TS2344: Type '{ params: { tenant: string; }; }' does not satisfy the constraint 'LayoutProps'.
+  Types of property 'params' are incompatible.
+    Type '{ tenant: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+src/app/[tenant]/dashboard/apps/surat-masuk/page.tsx(166,17): error TS2739: Type '{ url: string; path: string; }' is missing the following properties from type '{ fileUrl: string | undefined; filePath: string | undefined; }': fileUrl, filePath
+src/app/[tenant]/dashboard/layout.tsx(149,28): error TS18047: 'pathname' is possibly 'null'.
+src/app/[tenant]/dashboard/layout.tsx(163,24): error TS18047: 'pathname' is possibly 'null'.
+src/app/[tenant]/dashboard/layout.tsx(192,24): error TS18047: 'pathname' is possibly 'null'.
+src/app/[tenant]/print/surat-domisili/[id]/page.tsx(18,14): error TS18047: 'params' is possibly 'null'.
+src/app/login/page.tsx(107,25): error TS18047: 'searchParams' is possibly 'null'.
+src/components/GaugeChart.tsx(81,17): error TS2322: Type '({ viewBox }: { viewBox?: ViewBox; }) => React.JSX.Element | null' is not assignable to type 'ContentType | undefined'.
+  Type '({ viewBox }: { viewBox?: ViewBox; }) => React.JSX.Element | null' is not assignable to type '(props: Props) => ReactNode'.
+    Types of parameters '__0' and 'props' are incompatible.
+      Type 'Props' is not assignable to type '{ viewBox?: ViewBox | undefined; }'.
+        Types of property 'viewBox' are incompatible.
+          Type 'import("D:/Projek/Desa-Lengkap/node_modules/recharts/types/util/types").ViewBox | undefined' is not assignable to type 'ViewBox | undefined'.
+            Type 'CartesianViewBox' is missing the following properties from type 'ViewBox': cx, cy
+src/components/ui/calendar.tsx(55,9): error TS2353: Object literal may only specify known properties, and 'IconLeft' does not exist in type 'Partial<CustomComponents>'.
+src/lib/penduduk-actions.ts(115,9): error TS2304: Cannot find name 'where'.

@@ -6,10 +6,11 @@ interface TenantLayoutProps {
   params: { tenant: string };
 }
 
-export async function generateMetadata({ params }: { params: { tenant: string } }): Promise<Metadata> {
-  const settings = await getSiteSettings(params.tenant);
+export async function generateMetadata({ params }: { params: Promise<{ tenant: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  const settings = await getSiteSettings(resolvedParams.tenant);
 
-  const siteName = settings?.siteName || `Desa ${params.tenant.charAt(0).toUpperCase() + params.tenant.slice(1)}`;
+  const siteName = settings?.siteName || `Desa ${resolvedParams.tenant.charAt(0).toUpperCase() + resolvedParams.tenant.slice(1)}`;
   const description = settings?.siteDescription || `Sistem Informasi Resmi Desa ${siteName}`;
   const keywords = settings?.siteKeywords || "desa, sistem informasi desa, layanan publik";
   const ogImage = settings?.ogImageUrl || "/Background utama.png";

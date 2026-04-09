@@ -10,7 +10,8 @@ import {
     writeBatch,
     getDocs,
     query,
-    limit
+    limit,
+    where
 } from 'firebase/firestore';
 
 export interface PendudukData {

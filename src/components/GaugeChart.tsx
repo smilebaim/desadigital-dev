@@ -78,7 +78,7 @@ const GaugeChart: React.FC<GaugeChartProps> = ({ value, status, size = 'md', sho
             <Cell fill="#e5e7eb" />
             {showLabel && (
               <Label
-                content={({ viewBox }: { viewBox?: ViewBox }) => {
+                content={({ viewBox }: any) => {
                   if (!viewBox) return null;
                   const { cx, cy } = viewBox;
                   return (

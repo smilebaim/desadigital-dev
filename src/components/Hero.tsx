@@ -2,6 +2,7 @@ import React from 'react';
 import { cn } from '@/lib/utils';
 import FadeIn from './animations/FadeIn';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface HeroProps {
   className?: string;
@@ -62,10 +63,13 @@ const Hero: React.FC<HeroProps> = ({
   return (
     <section className={cn(`relative ${heightClass} flex items-center overflow-hidden`, className)}>
       <div className="absolute inset-0 -z-10">
-        <img
+        <Image
           src={heroUrl || '/Background utama.png'}
-          alt="Desa Remau Bako Tuo"
-          className="w-full h-full object-cover"
+          alt="Latar Belakang Utama"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
         />
         <div className="absolute inset-0" style={overlayStyle}></div>
       </div>

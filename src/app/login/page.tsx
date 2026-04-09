@@ -104,7 +104,7 @@ const LoginForm = () => {
       // Superadmin dari domain developer → /developer
       // Superadmin dari tenant subdomain → /dashboard (review mode)
       // Admin/Staff biasa → /dashboard
-      let callbackUrl = searchParams.get('callbackUrl');
+      let callbackUrl = searchParams?.get('callbackUrl');
       if (!callbackUrl) {
         callbackUrl = isSuperadmin && !activeSubdomain ? '/developer' : '/dashboard';
       }

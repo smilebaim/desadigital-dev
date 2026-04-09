@@ -146,7 +146,7 @@ const DashboardLayout = ({
     if (isLoadingRole || !isClient) return;
     const isStaff = userRole === 'staff' || userRole === 'pending';
     // Ekstrak pathname tanpa prefix tenant (misal /sukamaju/dashboard/pengaturan → /dashboard/pengaturan)
-    const normalizedPath = pathname.replace(/^\/[^/]+/, '');
+    const normalizedPath = (pathname || '').replace(/^\/[^/]+/, '');
     if (isStaff && ADMIN_ONLY_PATHS.has(normalizedPath)) {
       toast({
         title: 'Akses Dibatasi',
@@ -160,7 +160,7 @@ const DashboardLayout = ({
   // ── Breadcrumbs dari pathname ──────────────────────────────────────────────
   const buildBreadcrumbs = () => {
     // Hapus prefix tenant dari pathname
-    const normalized = pathname.replace(/^\/[^/]+(?=\/dashboard)/, '');
+    const normalized = (pathname || '').replace(/^\/[^/]+(?=\/dashboard)/, '');
     const parts = normalized.split('/').filter(Boolean);
     const crumbs: { label: string; href: string }[] = [];
     let cumPath = '';
@@ -189,7 +189,7 @@ const DashboardLayout = ({
 
   // ── Nav Link helper ───────────────────────────────────────────────────────
   const isActive = (href: string) => {
-    const normalized = pathname.replace(/^\/[^/]+(?=\/dashboard)/, '');
+    const normalized = (pathname || '').replace(/^\/[^/]+(?=\/dashboard)/, '');
     return normalized === href || normalized.startsWith(href + '/');
   };
 
