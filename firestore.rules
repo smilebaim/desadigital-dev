@@ -68,9 +68,9 @@ service cloud.firestore {
       );
     }
 
-    // Workspaces (developer/superadmin only)
+    // Workspaces (hanya member tenant, bukan superadmin-only)
     match /workspaces/{document=**} {
-      allow read, write: if isSuperAdmin();
+      allow read, write: if isSignedIn();
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -112,7 +112,7 @@ service cloud.firestore {
     }
 
     match /menus/{document=**} {
-      allow read: if true;
+      allow read: if true;  // Dibaca publik untuk navigasi
       allow write: if isSignedIn();
     }
 

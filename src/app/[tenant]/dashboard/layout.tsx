@@ -114,17 +114,25 @@ const DashboardLayout = ({
   const router = useRouter();
   const pathname = usePathname();
   const { toast } = useToast();
-  const [isClient, setIsClient] = useState(false);
   const [userRole, setUserRole] = useState<UserRole>('staff');
   const [isLoadingRole, setIsLoadingRole] = useState(true);
 
+  // Fallback: jika tidak ada user setelah mount, hentikan loading
   useEffect(() => {
-    setIsClient(true);
+    const timer = setTimeout(() => {
+      setIsLoadingRole(false);
+    }, 3000); // Max 3 detik loading
+    return () => clearTimeout(timer);
   }, []);
 
   // ── Ambil role user dari Firestore ────────────────────────────────────────
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      // User belum ada (not logged in / still loading auth state)
+      // Jangan biarkan isLoadingRole tetap true selamanya
+      setIsLoadingRole(false);
+      return;
+    }
     const fetchRole = async () => {
       try {
         const docSnap = await getDoc(doc(db, 'users', user.uid));
@@ -143,7 +151,7 @@ const DashboardLayout = ({
 
   // ── Access Interceptor: blokir staff dari menu admin-only ─────────────────
   useEffect(() => {
-    if (isLoadingRole || !isClient) return;
+    if (isLoadingRole) return;
     const isStaff = userRole === 'staff' || userRole === 'pending';
     // Ekstrak pathname tanpa prefix tenant (misal /sukamaju/dashboard/pengaturan → /dashboard/pengaturan)
     const normalizedPath = (pathname || '').replace(/^\/[^/]+/, '');
@@ -155,7 +163,7 @@ const DashboardLayout = ({
       });
       router.replace('/dashboard');
     }
-  }, [pathname, userRole, isLoadingRole, isClient, router, toast]);
+  }, [pathname, userRole, isLoadingRole, router, toast]);
 
   // ── Breadcrumbs dari pathname ──────────────────────────────────────────────
   const buildBreadcrumbs = () => {
@@ -257,8 +265,7 @@ const DashboardLayout = ({
                 <span>Kontrol Peta</span>
               </Link>
 
-              {isClient && (
-                <Accordion type="multiple" className="w-full" defaultValue={[]}>
+              <Accordion type="multiple" className="w-full" defaultValue={[]}>
                   {/* Kelola Halaman */}
                   <AccordionItem value="halaman" className="border-none">
                     <AccordionTrigger className="px-3 py-2 text-sm rounded-lg hover:bg-emerald-800/70 text-emerald-100/80 hover:text-emerald-100 transition-all [&>svg]:text-emerald-500">
@@ -337,8 +344,7 @@ const DashboardLayout = ({
                       </ul>
                     </AccordionContent>
                   </AccordionItem>
-                </Accordion>
-              )}
+              </Accordion>
 
               {/* Pengaturan — admin only */}
               <Link href="/dashboard/pengaturan" className={linkClass('/dashboard/pengaturan', true)}>
@@ -352,7 +358,6 @@ const DashboardLayout = ({
           </SidebarContent>
 
           <SidebarFooter className="p-3 border-t border-emerald-900/40">
-            {isClient && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-emerald-800/50 transition-colors text-left group">
@@ -397,7 +402,6 @@ const DashboardLayout = ({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            )}
           </SidebarFooter>
         </Sidebar>
 
@@ -442,13 +446,7 @@ const DashboardLayout = ({
           </header>
 
           <main className="flex-grow p-6">
-            {isLoadingRole ? (
-              <div className="flex items-center justify-center min-h-[300px]">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
-              </div>
-            ) : (
-              children
-            )}
+            {children}
           </main>
         </div>
       </div>
