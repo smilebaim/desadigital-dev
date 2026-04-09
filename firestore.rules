@@ -3,92 +3,167 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function
+    // ─────────────────────────────────────────────────────────────────────────
+    // Helper Functions
+    // ─────────────────────────────────────────────────────────────────────────
+
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Check if user is superadmin or developer
-    function isSuperAdmin() {
-      return isSignedIn() && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superadmin' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'developer');
+    // Ambil data user dari Firestore
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
 
-    // Public readable collections (auth required to write)
-    match /tenants/{document=**} {
+    function isSuperAdmin() {
+      return isSignedIn() && (
+        getUserData().role == 'superadmin' ||
+        getUserData().role == 'developer'
+      );
+    }
+
+    // Cek apakah user adalah admin/staff dari tenant tertentu
+    function isTenantMember(tenantId) {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        getUserData().tenantId == tenantId
+      );
+    }
+
+    // Cek apakah dokumen yang ditulis memiliki tenantId yang sesuai
+    function isWritingToOwnTenant() {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        request.resource.data.tenantId == getUserData().tenantId
+      );
+    }
+
+    // Cek apakah dokumen yang dibaca milik tenant user ini
+    function isReadingOwnTenant() {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        resource.data.tenantId == getUserData().tenantId
+      );
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Platform-Level Collections (Superadmin Only)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Daftar tenant di platform — bisa dibaca publik (untuk UI landing)
+    match /tenants/{tenantId} {
       allow read: if true;
       allow write: if isSuperAdmin();
     }
-    match /posts/{document=**} {
-      allow read: if true;
-      allow write: if isSignedIn();
+
+    // Data user — hanya user itu sendiri atau superadmin
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, delete: if isSuperAdmin();
+      allow update: if isSuperAdmin() || (
+        request.auth.uid == userId &&
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['role', 'status', 'tenantId'])
+      );
     }
-    match /categories/{document=**} {
-      allow read: if true;
-      allow write: if isSignedIn();
+
+    // Workspaces (developer/superadmin only)
+    match /workspaces/{document=**} {
+      allow read, write: if isSuperAdmin();
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Tenant-Scoped Public Content (Bisa dibaca publik, tulis harus tenant member)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isWritingToOwnTenant();
+      allow update, delete: if isReadingOwnTenant();
+    }
+
+    match /site_settings/{settingId} {
+      allow read: if true;
+      allow write: if isTenantMember(resource.data.tenantId);
+    }
+
     match /settings/{document=**} {
       allow read: if true;
       allow write: if isSignedIn();
     }
-    match /site_settings/{document=**} {
+
+    match /statistik/{statId} {
       allow read: if true;
-      allow write: if isSignedIn();
-    }
-    match /statistik/{document=**} {
-      allow read: if true;
-      allow write: if isSignedIn();
-    }
-    match /pages/{document=**} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow create: if isWritingToOwnTenant();
+      allow update, delete: if isReadingOwnTenant();
     }
 
-    // Public content needed for website navigation and custom pages
+    match /pages/{pageId} {
+      allow read: if true;
+      allow create: if isWritingToOwnTenant();
+      allow update, delete: if isReadingOwnTenant();
+    }
+
     match /custom_pages/{document=**} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow create: if isWritingToOwnTenant();
+      allow update, delete: if isReadingOwnTenant();
     }
+
     match /menus/{document=**} {
       allow read: if true;
       allow write: if isSignedIn();
     }
 
-    // Protected collections (Data Penduduk, Users, Statistik, dsb)
-    // ONLY authenticated users can read and write
-    match /users/{userId} {
-      allow read: if isSignedIn();
-      allow create, delete: if isSuperAdmin();
-      allow update: if isSuperAdmin() || (
-        request.auth.uid == userId && 
-        !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'status', 'tenantId'])
-      );
-    }
-    match /penduduk/{document=**} {
-      allow read, write: if isSignedIn();
-    }
-    match /workspaces/{document=**} {
-      allow read, write: if isSignedIn();
-    }
-
-    // Surat Collections: Allow public CREATE, but restrict others to Admin
-    match /surat_usaha/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
-    match /surat_domisili/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
-    match /surat_kelahiran/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
-    match /surat_nikah/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
-    match /surat_kematian/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
-    match /surat_pindah/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
-    match /surat_pengantar/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
-    match /surat_keterangan/{document=**} { allow create: if true; allow read, write: if isSignedIn(); }
-    match /surat_masuk/{document=**} { allow read, write: if isSignedIn(); }
-    match /surat_keluar/{document=**} { allow read, write: if isSignedIn(); }
-
-    match /kegiatan/{document=**} {
+    match /kegiatan/{kegiatanId} {
       allow read: if true;
-      allow write: if isSignedIn();
+      allow create: if isWritingToOwnTenant();
+      allow update, delete: if isReadingOwnTenant();
     }
-    
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Tenant-Scoped Private Collections (Hanya tenant member yang bisa akses)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Data Kependudukan — SANGAT SENSITIF
+    match /penduduk/{pendudukId} {
+      allow read: if isReadingOwnTenant();
+      allow create: if isWritingToOwnTenant();
+      allow update, delete: if isReadingOwnTenant();
+    }
+
+    // Surat Keluar & Masuk (internal)
+    match /surat_masuk/{suratId} {
+      allow read: if isReadingOwnTenant();
+      allow create: if isWritingToOwnTenant();
+      allow update, delete: if isReadingOwnTenant();
+    }
+    match /surat_keluar/{suratId} {
+      allow read: if isReadingOwnTenant();
+      allow create: if isWritingToOwnTenant();
+      allow update, delete: if isReadingOwnTenant();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Surat Layanan Warga (Publik bisa CREATE, tapi baca/edit oleh tenant saja)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    match /surat_usaha/{document=**}      { allow create: if true; allow read, update, delete: if isReadingOwnTenant(); }
+    match /surat_domisili/{document=**}   { allow create: if true; allow read, update, delete: if isReadingOwnTenant(); }
+    match /surat_kelahiran/{document=**}  { allow create: if true; allow read, update, delete: if isReadingOwnTenant(); }
+    match /surat_nikah/{document=**}      { allow create: if true; allow read, update, delete: if isReadingOwnTenant(); }
+    match /surat_kematian/{document=**}   { allow create: if true; allow read, update, delete: if isReadingOwnTenant(); }
+    match /surat_pindah/{document=**}     { allow create: if true; allow read, update, delete: if isReadingOwnTenant(); }
+    match /surat_pengantar/{document=**}  { allow create: if true; allow read, update, delete: if isReadingOwnTenant(); }
+    match /surat_keterangan/{document=**} { allow create: if true; allow read, update, delete: if isReadingOwnTenant(); }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Fallback: Blokir semua akses yang tidak cocok aturan di atas
+    // ─────────────────────────────────────────────────────────────────────────
     match /{document=**} {
-      allow read, write: if isSignedIn();
+      allow read, write: if isSuperAdmin();
     }
+
   }
 }

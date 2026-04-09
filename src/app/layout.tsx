@@ -6,6 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
 import { getSiteSettings } from "@/lib/site-settings-actions";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -39,15 +40,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="id">
       <body className={inter.className}>
-        <FirebaseClientProvider>
-          <TooltipProvider>
-            {children}
-            <Toaster />
-            <Sonner />
-          </TooltipProvider>
-        </FirebaseClientProvider>
+        <ErrorBoundary>
+          <FirebaseClientProvider>
+            <TooltipProvider>
+              {children}
+              <Toaster />
+              <Sonner />
+            </TooltipProvider>
+          </FirebaseClientProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
