@@ -115,7 +115,7 @@ const WorkspaceDetailPage = () => {
   const [itemToDelete, setItemToDelete] = useState<WorkspaceItem | null>(null);
 
 
-  const workspaceId = Array.isArray(params?.workspaceId) ? params.workspaceId[0] : params?.workspaceId as string;
+  const workspaceId = (Array.isArray(params?.workspaceId) ? params.workspaceId[0] : params?.workspaceId) as string;
 
   const fetchWorkspace = useCallback(async () => {
     if (!workspaceId || !user) return;
@@ -128,7 +128,14 @@ const WorkspaceDetailPage = () => {
       return;
     }
     
-    setWorkspace(data as unknown as Workspace);
+    setWorkspace({
+      id: data.id ?? workspaceId,
+      name: data.name ?? '',
+      description: data.description ?? '',
+      ownerUid: data.ownerUid ?? (data.owner?.id ?? ''),
+      owner: data.owner ?? { id: '', displayName: '', email: '' },
+      members: data.members ?? [],
+    } as Workspace);
     setLoading(false);
     setError(null);
   }, [workspaceId, user]);

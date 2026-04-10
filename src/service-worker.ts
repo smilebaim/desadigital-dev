@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 // @ts-nocheck
 
-const CACHE_NAME = 'desa-remaubakotuo-cache-v1';
+const CACHE_NAME = 'desahub-app-cache-v1';
 const MAP_DATA_CACHE = 'map-data-cache';
 
 const sw = self as unknown as ServiceWorkerGlobalScope & typeof globalThis;

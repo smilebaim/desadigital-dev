@@ -13,6 +13,14 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Paket server-only yang tidak perlu di-bundle oleh webpack
+  serverExternalPackages: [
+    "genkit",
+    "@genkit-ai/googleai",
+    "@genkit-ai/core",
+    "@genkit-ai/next",
+    "@opentelemetry/sdk-node",
+  ],
   images: {
     remotePatterns: [
       {
@@ -34,6 +42,17 @@ const nextConfig = {
         pathname: "/**",
       },
     ],
+  },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Abaikan modul optional dari opentelemetry yang tidak terinstall
+      config.ignoreWarnings = [
+        ...(config.ignoreWarnings || []),
+        { module: /@opentelemetry\/exporter-jaeger/ },
+        { module: /@genkit-ai\/firebase/ },
+      ];
+    }
+    return config;
   },
 };
 

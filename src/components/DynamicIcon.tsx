@@ -6,8 +6,7 @@ interface DynamicIconProps extends LucideProps {
 }
 
 const DynamicIcon = ({ name, ...props }: DynamicIconProps) => {
-  // @ts-ignore - Indexing Icons dynamically
-  const IconComponent = Icons[name as keyof typeof Icons] as React.ElementType;
+  const IconComponent = (Icons as Record<string, React.ElementType>)[name];
 
   if (!IconComponent) {
     // Return a default icon or nothing if the icon name is invalid

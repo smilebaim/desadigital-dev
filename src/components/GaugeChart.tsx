@@ -8,10 +8,6 @@ interface GaugeChartProps {
   showLabel?: boolean;
 }
 
-interface ViewBox {
-  cx: number;
-  cy: number;
-}
 
 const GaugeChart: React.FC<GaugeChartProps> = ({ value, status, size = 'md', showLabel = true }) => {
   const data = [

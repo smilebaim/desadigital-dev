@@ -17,8 +17,9 @@ export async function askAssistant(question: string, history: ClientMessage[] = 
       getPublishedPosts(tenantId).then(posts => posts.slice(0, 3))
     ]);
 
-    const siteName = settings?.siteName || "Desa Remau Bako Tuo";
+    const siteName = settings?.siteName || "Desa";
     const contact = `Email: ${settings?.contactEmail || '-'}, Telp: ${settings?.contactPhone || '-'}, Alamat: ${settings?.contactAddress || '-'}`;
+    const location = settings?.contactAddress || "Indonesia";
     
     // Parse stats if available
     let budgetInfo = "Data anggaran belum tersedia.";
@@ -43,11 +44,12 @@ export async function askAssistant(question: string, history: ClientMessage[] = 
         ? recentPosts.map(p => `- ${p.title}`).join('\n') 
         : "Belum ada berita terbaru.";
 
-    const systemPrompt = `Anda adalah Asisten Virtual AI untuk ${siteName}, Kabupaten Tanjung Jabung Timur. 
+    const systemPrompt = `Anda adalah Asisten Virtual AI untuk ${siteName}. 
 Tugas Anda adalah membantu warga menjawab pertanyaan terkait layanan administrasi desa, profil desa, tata ruang, atau informasi umum pedesaan.
 
 KONTEKS DESA SAAT INI (Data Real-time):
 - Nama Desa: ${siteName}
+- Lokasi: ${location}
 - Kontak Desa: ${contact}
 - Statistik Penduduk: ${populationInfo}
 - Informasi Anggaran (APBDes): ${budgetInfo}
@@ -57,11 +59,10 @@ ${newsList}
 FITUR WEBSITE:
 - Profil Desa, Berita, Tata Ruang (Peta Interaktif), dan Aplikasi Layanan Desa mandiri.
 - Layanan Surat Menyurat Mandiri meliputi 8 urusan: Surat Keterangan Usaha, Surat Domisili, Surat Pindah, Pengantar, Keterangan, Nikah, Kelahiran, dan Kematian. Untuk buat surat, arahkan warga ke menu Dasbor -> Aplikasi Desa.
-- Lokasi Desa: Kecamatan Dendang, Kabupaten Tanjung Jabung Timur, Provinsi Jambi.
 - Jam Pelayanan Kantor: Senin - Jumat (08.00 - 15.00 WIB).
 
 Aturan Menjawab:
-- Gunakan bahasa Indonesia yang sopan, ramah, dan ramah lingkungan (human-like).
+- Gunakan bahasa Indonesia yang sopan, ramah, dan mudah dipahami.
 - Wajib menggunakan format Markdown (titik bullet, teks tebal, atau tabel singkat) agar sangat mudah dibaca.
 - Jawablah berdasarkan konteks desa yang diberikan di atas. Jika data spesifik tidak ada, jawab secara umum tentang prosedur desa.
 - Jika ditanya tentang layanan khusus, beri tahu cara mengakses fitur mandirinya di Web ini.

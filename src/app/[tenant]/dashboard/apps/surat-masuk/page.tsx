@@ -24,7 +24,7 @@ import {
   Upload,
   Loader2,
   Download,
-  Sparkles
+  Wand2
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -257,7 +257,7 @@ const SuratMasukPage = () => {
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={handleSeedData} disabled={isSeeding || suratList.length > 0}>
-                                            <Sparkles className="h-4 w-4 mr-2" />
+                                            <Wand2 className="h-4 w-4 mr-2" />
                                             {isSeeding ? 'Menambahkan...' : 'Input Data Dummy'}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem className="text-red-600" onClick={() => setIsDeleteAllOpen(true)} disabled={isDeletingAll || suratList.length === 0}>

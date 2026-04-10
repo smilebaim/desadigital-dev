@@ -440,7 +440,7 @@ const GenericChartEditor = ({ initialData, onSave, isSubmitting }: { initialData
 const EditStatistikPage = () => {
     const router = useRouter();
     const params = useParams();
-    const statId = params?.id as string;
+    const statId = (Array.isArray(params?.id) ? params.id[0] : params?.id) as string;
     const { toast } = useToast();
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);

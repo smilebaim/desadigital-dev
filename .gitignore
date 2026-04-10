@@ -52,3 +52,11 @@ firestore-debug.log
 # workspace artifacts
 .idx/
 .modified
+
+# debug & test scripts (jangan commit ke repo)
+test-*.js
+test-*.ts
+list-*.js
+ts-errors.txt
+ts-error-log.txt
+ts-out*.txt

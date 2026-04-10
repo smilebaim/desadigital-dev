@@ -19,7 +19,7 @@ const EditPostPage = () => {
     const params = useParams();
     const { toast } = useToast();
     
-    const postId = params?.id as string;
+    const postId = (Array.isArray(params?.id) ? params.id[0] : params?.id) as string;
 
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState<'Berita' | 'Pengumuman'>('Berita');

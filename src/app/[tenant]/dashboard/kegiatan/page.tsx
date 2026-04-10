@@ -20,7 +20,7 @@ import {
   Trash2, 
   Save,
   Calendar as CalendarIcon,
-  Sparkles
+  Wand2
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -177,7 +177,7 @@ const KegiatanPage = () => {
                           <div className="flex gap-2">
                             {kegiatanList.length === 0 && !loading && (
                                 <Button variant="outline" size="sm" onClick={handleSeedData} disabled={isSeeding}>
-                                    <Sparkles className="h-4 w-4 mr-2" />
+                                    <Wand2 className="h-4 w-4 mr-2" />
                                     {isSeeding ? 'Menambahkan...' : 'Tambah Data Dummy'}
                                 </Button>
                             )}
