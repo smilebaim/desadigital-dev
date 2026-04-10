@@ -180,7 +180,7 @@ export const seedDummyPosts = async (userId: string, author: string, tenantId?: 
     const dummyPosts: Omit<PostData, 'createdAt' | 'updatedAt' | 'views' | 'userId' | 'author' | 'tenantId'>[] = [
         {
             title: "Pembangunan Jalan Usaha Tani di Dusun Harapan",
-            content: "Pemerintah Desa Remau Bako Tuo telah menyelesaikan pembangunan jalan usaha tani sepanjang 500 meter di Dusun Harapan. Pembangunan ini diharapkan dapat mempermudah akses petani dalam mengangkut hasil panen dan meningkatkan perekonomian warga. Jalan yang sebelumnya berupa tanah kini telah diperkeras dengan beton, sehingga dapat dilalui kendaraan roda empat.",
+            content: "Pemerintah Desa telah menyelesaikan pembangunan jalan usaha tani sepanjang 500 meter di Dusun Harapan. Pembangunan ini diharapkan dapat mempermudah akses petani dalam mengangkut hasil panen dan meningkatkan perekonomian warga. Jalan yang sebelumnya berupa tanah kini telah diperkeras dengan beton, sehingga dapat dilalui kendaraan roda empat.",
             category: 'Berita',
             status: 'Published',
         },

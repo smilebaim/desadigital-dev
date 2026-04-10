@@ -325,7 +325,7 @@ const HalamanUtamaPage = () => {
                                     id="hero-subtitle"
                                     value={settings.heroSubtitle || ''}
                                     onChange={e => handleChange('heroSubtitle', e.target.value)}
-                                    placeholder="Contoh: DESA REMAU BAKO TUO"
+                                    placeholder="Contoh: DESA DIGITAL"
                                     disabled={isSaving}
                                 />
                                 <CharCounter value={settings.heroSubtitle || ''} max={60} />

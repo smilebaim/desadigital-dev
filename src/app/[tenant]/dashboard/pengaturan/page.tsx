@@ -125,7 +125,7 @@ const PengaturanPage = () => {
                             id="siteName"
                             value={settings.siteName || ''}
                             onChange={e => handleChange('siteName', e.target.value)}
-                            placeholder="Contoh: Desa Remau Bako Tuo"
+                            placeholder="Contoh: Website Resmi Desa"
                             disabled={isSaving}
                         />
                         <p className="text-xs text-muted-foreground">Tampil di tab browser dan hasil pencarian Google.</p>
@@ -234,7 +234,7 @@ const PengaturanPage = () => {
                                 type="email"
                                 value={settings.contactEmail || ''}
                                 onChange={e => handleChange('contactEmail', e.target.value)}
-                                placeholder="admin@desaremaubakotuo.id"
+                                placeholder="admin@desa.id"
                                 disabled={isSaving}
                             />
                         </div>
@@ -256,7 +256,7 @@ const PengaturanPage = () => {
                             id="contactAddress"
                             value={settings.contactAddress || ''}
                             onChange={e => handleChange('contactAddress', e.target.value)}
-                            placeholder="Jl. Raya Desa No. 1, Desa Remau Bako Tuo, Kecamatan ..., Kabupaten ..."
+                            placeholder="Jl. Raya Desa No. 1, Desa ..., Kecamatan ..., Kabupaten ..."
                             rows={3}
                             disabled={isSaving}
                         />

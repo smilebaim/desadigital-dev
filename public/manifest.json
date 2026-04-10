@@ -1,7 +1,7 @@
 {
-  "name": "Sistem Informasi Desa Remau Bako Tuo",
+  "name": "Sistem Informasi Desa Digital",
   "short_name": "SiDesa",
-  "description": "Portal Informasi dan Pelayanan Mandiri Desa Remau Bako Tuo",
+  "description": "Portal Informasi dan Pelayanan Mandiri Desa Digital",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
