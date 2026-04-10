@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "@/components/ui/use-toast";
 import { getSiteSettings, updateSiteSettings, type SiteSettings } from "@/lib/site-settings-actions";
@@ -127,6 +128,9 @@ const CharCounter = ({ value, max }: { value: string; max: number }) => (
 
 // ─── Main Page Component ─────────────────────────────────────────────────────
 const HalamanUtamaPage = () => {
+    const params = useParams();
+    const tenantId = (Array.isArray(params?.tenant) ? params.tenant[0] : params?.tenant) as string | undefined;
+
     const [settings, setSettings] = useState<Partial<SiteSettings>>({
         heroOverlayOpacity: 20,
         heroOverlayColor: '#000000',
@@ -138,12 +142,12 @@ const HalamanUtamaPage = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             setIsLoading(true);
-            const data = await getSiteSettings();
+            const data = await getSiteSettings(tenantId);
             if (data) setSettings(data);
             setIsLoading(false);
         };
         fetchSettings();
-    }, []);
+    }, [tenantId]);
 
     const handleChange = (field: keyof SiteSettings, value: string | number) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -152,7 +156,7 @@ const HalamanUtamaPage = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            const success = await updateSiteSettings(settings);
+            const success = await updateSiteSettings(settings, tenantId);
             if (success) {
                 toast({ title: "✅ Perubahan berhasil disimpan!" });
             } else {

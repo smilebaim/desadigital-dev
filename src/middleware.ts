@@ -24,7 +24,8 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/_next') ||
     pathname === '/favicon.ico' ||
     pathname.startsWith('/icons') ||
-    pathname.startsWith('/images')
+    pathname.startsWith('/images') ||
+    pathname === '/suspended'
   ) {
     return NextResponse.next();
   }
@@ -38,6 +39,18 @@ export function middleware(request: NextRequest) {
   // (B) ALIRAN TENANT: ada subdomain aktif
   // ══════════════════════════════════════════════════════════════════════════
   if (isTenantRequest) {
+    // ── Cek status suspend dari cookie ─────────────────────────────────────
+    // Cookie x-tenant-status di-set oleh API route /api/tenant/status
+    // yang dipanggil saat pertama kali tenant load.
+    const tenantStatus = request.cookies.get('x-tenant-status')?.value;
+    const tenantStatusFor = request.cookies.get('x-tenant-status-for')?.value;
+
+    // Jika cookie status sudah ada & cocok untuk subdomain ini & nilainya suspended
+    if (tenantStatus === 'suspended' && tenantStatusFor === subdomain) {
+      const suspendedUrl = new URL('/suspended', request.url);
+      return NextResponse.redirect(suspendedUrl);
+    }
+
     const response = NextResponse.next();
 
     // Simpan tenant aktif di cookie untuk akses server-component
@@ -77,6 +90,8 @@ export function middleware(request: NextRequest) {
   // Bersihkan cookie tenant jika kembali ke domain utama
   const response = NextResponse.next();
   response.cookies.delete('x-tenant-id');
+  response.cookies.delete('x-tenant-status');
+  response.cookies.delete('x-tenant-status-for');
 
   // Proteksi rute /developer — wajib login
   if (pathname.startsWith('/developer')) {

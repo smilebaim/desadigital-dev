@@ -26,7 +26,7 @@ export default async function BeritaPage() {
                         <div>
                             <h2 className="text-3xl font-bold tracking-tight">Kabar Desa</h2>
                             <p className="text-muted-foreground">
-                                Kumpulan berita dan liputan kegiatan terbaru di Desa Remau Bako Tuo.
+                                Kumpulan berita dan liputan kegiatan terbaru dari desa.
                             </p>
                         </div>
                     </div>

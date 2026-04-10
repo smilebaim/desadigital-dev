@@ -10,18 +10,21 @@ interface TenantContextState {
     tenantId: string | null;
     tenantData: TenantData | null;
     isLoading: boolean;
+    isSuspended: boolean;
 }
 
 const TenantContext = createContext<TenantContextState>({
     tenantId: null,
     tenantData: null,
-    isLoading: true
+    isLoading: true,
+    isSuspended: false,
 });
 
 export const TenantProvider = ({ children, initialTenantId }: { children: React.ReactNode, initialTenantId?: string | null }) => {
     const [tenantId, setTenantId] = useState<string | null>(initialTenantId || null);
     const [tenantData, setTenantData] = useState<TenantData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isSuspended, setIsSuspended] = useState(false);
 
     useEffect(() => {
         // Fallback for client side if not passed from server
@@ -35,9 +38,23 @@ export const TenantProvider = ({ children, initialTenantId }: { children: React.
         }
 
         if (activeTenant) {
-            // Fetch tenant metadata
             const fetchTenant = async () => {
                 try {
+                    // 1. Panggil API untuk set cookie status (untuk middleware suspend check)
+                    const statusRes = await fetch(`/api/tenant/status?tenantId=${activeTenant}`);
+                    if (statusRes.ok) {
+                        const statusData = await statusRes.json();
+                        if (statusData.status === 'suspended') {
+                            setIsSuspended(true);
+                            // Redirect ke halaman suspended
+                            if (typeof window !== 'undefined') {
+                                window.location.href = '/suspended';
+                            }
+                            return;
+                        }
+                    }
+
+                    // 2. Ambil data lengkap tenant dari Firestore
                     const q = query(collection(db, "tenants"), where("subdomain", "==", activeTenant));
                     const snapshots = await getDocs(q);
                     if (!snapshots.empty) {
@@ -56,7 +73,7 @@ export const TenantProvider = ({ children, initialTenantId }: { children: React.
     }, [initialTenantId]);
 
     return (
-        <TenantContext.Provider value={{ tenantId, tenantData, isLoading }}>
+        <TenantContext.Provider value={{ tenantId, tenantData, isLoading, isSuspended }}>
             {children}
         </TenantContext.Provider>
     );

@@ -9,14 +9,15 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const PrintSuratKelahiran = () => {
-  const { id } = useParams() as { id: string };
+  const { id, tenant } = useParams() as { id: string; tenant: string };
+  const tenantId = Array.isArray(tenant) ? tenant[0] : tenant;
   const [surat, setSurat] = useState<(SuratKelahiranData & { id: string }) | null>(null);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      const [suratData, settingsData] = await Promise.all([getSuratKelahiranById(id), getSiteSettings()]);
+      const [suratData, settingsData] = await Promise.all([getSuratKelahiranById(id), getSiteSettings(tenantId)]);
       if (suratData) setSurat(suratData);
       if (settingsData) setSettings(settingsData);
       setLoading(false);

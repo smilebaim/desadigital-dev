@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Save, Globe, Search, Phone, ExternalLink } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
@@ -15,8 +16,14 @@ import { seedInitialStatistik } from "@/lib/statistik-actions";
 import { seedDummyPosts } from "@/lib/posts-actions";
 import { Database, LayoutGrid, BarChart, PenTool, AlertCircle, FileText } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useUser } from "@/firebase";
 
 const PengaturanPage = () => {
+    const params = useParams();
+    const { user } = useUser();
+    // Ekstrak tenantId dari URL params (contoh: /[tenant]/dashboard/pengaturan)
+    const tenantId = (Array.isArray(params?.tenant) ? params.tenant[0] : params?.tenant) as string | undefined;
+
     const [settings, setSettings] = useState<Partial<SiteSettings>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -24,12 +31,13 @@ const PengaturanPage = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             setIsLoading(true);
-            const data = await getSiteSettings();
+            const data = await getSiteSettings(tenantId);
             if (data) setSettings(data);
             setIsLoading(false);
         };
         fetchSettings();
-    }, []);
+    }, [tenantId]);
+
 
     const handleChange = (field: keyof SiteSettings, value: string) => {
         setSettings(prev => ({ ...prev, [field]: value }));
@@ -38,7 +46,7 @@ const PengaturanPage = () => {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            const success = await updateSiteSettings(settings);
+            const success = await updateSiteSettings(settings, tenantId);
             if (success) {
                 toast({ title: "✅ Pengaturan berhasil disimpan!" });
             } else {
@@ -59,9 +67,9 @@ const PengaturanPage = () => {
         
         try {
             let result;
-            if (type === 'menus') result = await seedDefaultMenus();
-            else if (type === 'stats') result = await seedInitialStatistik();
-            else if (type === 'posts') result = await seedDummyPosts('system', 'Admin Desa');
+            if (type === 'menus') result = await seedDefaultMenus(tenantId);
+            else if (type === 'stats') result = await seedInitialStatistik(tenantId);
+            else if (type === 'posts') result = await seedDummyPosts(user?.uid || 'system', user?.displayName || user?.email?.split('@')[0] || 'Admin Desa', tenantId);
 
             if (result?.success) {
                 toast({ title: `✅ Berhasil!`, description: (result as any).message || "Data berhasil diinisialisasi." });

@@ -17,7 +17,7 @@ export default function AktivitasPage() {
             <div>
                 <h2 className="text-3xl font-bold tracking-tight">Aktivitas Desa</h2>
                 <p className="text-muted-foreground">
-                    Ikuti perkembangan dan jadwal kegiatan terbaru di Desa Remau Bako Tuo.
+                    Ikuti perkembangan dan jadwal kegiatan terbaru di desa.
                 </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -230,8 +230,12 @@ export const updateMenuItemsOrder = async (menuId: string, items: { id: string, 
 };
 
 // Seed default menus and items
-export const seedDefaultMenus = async () => {
-    const menusCollection = collection(db, 'menus');
+export const seedDefaultMenus = async (tenantId?: string) => {
+    // Tentukan path koleksi berdasarkan tenantId
+    const menusCollectionPath = tenantId 
+        ? `tenants/${tenantId}/menus` 
+        : 'menus';
+    const menusCollection = collection(db, menusCollectionPath);
     const snapshot = await getDocs(menusCollection);
     
     if (!snapshot.empty) {

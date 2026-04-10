@@ -432,17 +432,25 @@ const DashboardLayout = ({
             </div>
 
             {/* Right: "Lihat Website" button */}
-            <Link href="/" target="_blank" rel="noreferrer">
-              <Button
-                id="btn-view-website"
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1.5 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-950"
-              >
-                <ExternalLink size={13} />
-                <span className="hidden sm:inline">Lihat Website</span>
-              </Button>
-            </Link>
+            {(() => {
+              // Ekstrak tenant prefix dari pathname untuk membangun URL website publik
+              const tenantMatch = (pathname || '').match(/^\/([^/]+)(?=\/dashboard)/);
+              const tenantPrefix = tenantMatch ? tenantMatch[1] : '';
+              const websiteUrl = tenantPrefix ? `/${tenantPrefix}` : '/';
+              return (
+                <Link href={websiteUrl} target="_blank" rel="noreferrer">
+                  <Button
+                    id="btn-view-website"
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-1.5 text-xs border-emerald-200 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-900 dark:text-emerald-400 dark:hover:bg-emerald-950"
+                  >
+                    <ExternalLink size={13} />
+                    <span className="hidden sm:inline">Lihat Website</span>
+                  </Button>
+                </Link>
+              );
+            })()}
           </header>
 
           <main className="flex-grow p-6">

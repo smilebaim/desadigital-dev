@@ -96,7 +96,13 @@ const PublicLayout = ({
 
   return (
     <div className="flex flex-col min-h-screen">
-      <TopNav menu={topNavMenu} loading={loading} logoUrl={siteSettings?.logoUrl} />
+      <TopNav 
+        menu={topNavMenu} 
+        loading={loading} 
+        logoUrl={siteSettings?.logoUrl}
+        siteName={siteSettings?.siteName}
+        kabupaten={siteSettings?.kabupaten}
+      />
       <main className={`flex-grow transition-all duration-300 ${needsSidebar ? 'md:pl-72 pl-12' : ''}`}>
         {children}
       </main>

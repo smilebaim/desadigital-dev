@@ -58,6 +58,7 @@ import * as z from "zod";
 
 import { addPenduduk, updatePenduduk, deletePenduduk, addPendudukBatch, type PendudukData, seedDummyPenduduk } from "@/lib/penduduk-actions";
 import { getPendudukStream } from "@/lib/penduduk-client-actions";
+import { getSiteSettings } from "@/lib/site-settings-actions";
 import { useTenant } from "@/contexts/TenantContext";
 
 interface Penduduk extends PendudukData {
@@ -235,17 +236,23 @@ const PendudukPage = () => {
     });
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (data.length === 0) {
       toast({ title: "Tidak ada data", description: "Minimal perlu 1 data penduduk untuk bisa diekspor.", variant: "destructive" });
       return;
     }
-    Promise.all([import('jspdf'), import('jspdf-autotable')]).then(([jspdf, autotable]) => {
+    try {
+      const [jspdf, autotable, settingsData] = await Promise.all([
+        import('jspdf'), 
+        import('jspdf-autotable'),
+        getSiteSettings(tenantId || undefined)
+      ]);
       const jsPDF = jspdf.default;
       const autoTable = autotable.default;
       const doc = new jsPDF('landscape');
+      const desaName = settingsData?.siteName || 'Desa';
       
-      doc.text("Data Kependudukan Desa Remau Bako Tuo", 14, 15);
+      doc.text(`Data Kependudukan ${desaName}`, 14, 15);
       
       const head = [['Nama Lengkap', 'NIK', 'JK', 'Tempat/Tgl Lahir', 'Agama', 'Pendidikan', 'Pekerjaan', 'Status Kawin', 'Alamat']];
       const body = data.map(item => [
@@ -265,14 +272,14 @@ const PendudukPage = () => {
         body,
         startY: 20,
         styles: { fontSize: 8 },
-        headStyles: { fillColor: [5, 150, 105] }, // emerald-600 color
+        headStyles: { fillColor: [5, 150, 105] },
       });
 
-      doc.save("Data_Penduduk_Desa.pdf");
+      doc.save(`Data_Penduduk_${desaName.replace(/\s+/g, '_')}.pdf`);
       toast({ title: "Berhasil!", description: "Data penduduk diekspor ke format PDF." });
-    }).catch(err => {
+    } catch (err: any) {
       toast({ title: "Gagal memproses file PDF", description: err.message, variant: "destructive" });
-    });
+    }
   };
 
   const filteredData = data.filter(item => 

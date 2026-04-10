@@ -14,7 +14,7 @@ export async function generateMetadata(
 
   if (!post) {
     return {
-      title: 'Halaman Tidak Ditemukan | Desa Remau Bako Tuo',
+      title: 'Halaman Tidak Ditemukan | DesaHub',
     };
   }
 

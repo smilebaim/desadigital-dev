@@ -16,7 +16,7 @@ export default function PustakaPage() {
             <div>
                 <h2 className="text-3xl font-bold tracking-tight">Pustaka Desa</h2>
                 <p className="text-muted-foreground">
-                    Pusat informasi dan dokumen digital Desa Remau Bako Tuo.
+                    Pusat informasi dan dokumen digital desa.
                 </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

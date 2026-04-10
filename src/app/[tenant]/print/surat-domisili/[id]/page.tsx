@@ -16,6 +16,7 @@ interface Surat extends SuratDomisiliData {
 const PrintSuratDomisili = () => {
   const params = useParams();
   const id = params?.id as string;
+  const tenantId = (Array.isArray(params?.tenant) ? params.tenant[0] : params?.tenant) as string | undefined;
   
   const [surat, setSurat] = useState<Surat | null>(null);
   const [penduduk, setPenduduk] = useState<PendudukData | null>(null);
@@ -29,7 +30,7 @@ const PrintSuratDomisili = () => {
       
       const [suratData, settingsData] = await Promise.all([
         getSuratDomisiliById(id),
-        getSiteSettings()
+        getSiteSettings(tenantId)
       ]);
 
       if (suratData) {

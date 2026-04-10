@@ -37,6 +37,8 @@ interface TopNavProps {
   menu?: Menu;
   loading: boolean;
   logoUrl?: string;
+  siteName?: string;
+  kabupaten?: string;
 }
 
 const getIcon = (name?: string): React.FC<any> => {
@@ -46,7 +48,7 @@ const getIcon = (name?: string): React.FC<any> => {
 };
 
 
-const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, loading, logoUrl }) => {
+const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, loading, logoUrl, siteName, kabupaten }) => {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const pathname = usePathname();
   const { user } = useUser();
@@ -125,11 +127,13 @@ const TopNav: React.FC<TopNavProps> = ({ className, hasNewNews = false, menu, lo
             <img src={logoUrl || "/logo-desa.png"} alt="Logo Desa" className="h-8 w-8 sm:h-10 sm:w-10 object-contain transition-all duration-300" />
             <div className="ml-1">
               <Link href="/" className="text-base sm:text-xl font-poppins font-medium tracking-tight text-black hover:text-black transition-all">
-                Desa Remau Bako Tuo
+                {siteName || 'Portal Desa'}
               </Link>
-              <div className="text-xs sm:text-sm font-poppins text-black/80">
-                Kabupaten Tanjung Jabung Timur
-              </div>
+              {kabupaten && (
+                <div className="text-xs sm:text-sm font-poppins text-black/80">
+                  Kabupaten {kabupaten}
+                </div>
+              )}
             </div>
           </div>
 

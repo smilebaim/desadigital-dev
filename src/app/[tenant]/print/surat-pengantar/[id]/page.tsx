@@ -10,7 +10,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const PrintSuratPengantar = () => {
-  const { id } = useParams() as { id: string };
+  const { id, tenant } = useParams() as { id: string; tenant: string };
+  const tenantId = Array.isArray(tenant) ? tenant[0] : tenant;
   const [surat, setSurat] = useState<(SuratPengantarData & { id: string }) | null>(null);
   const [penduduk, setPenduduk] = useState<PendudukData | null>(null);
   const [settings, setSettings] = useState<SiteSettings | null>(null);
@@ -18,7 +19,7 @@ const PrintSuratPengantar = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const [suratData, settingsData] = await Promise.all([getSuratPengantarById(id), getSiteSettings()]);
+      const [suratData, settingsData] = await Promise.all([getSuratPengantarById(id), getSiteSettings(tenantId)]);
       if (suratData) { setSurat(suratData); const p = await getPendudukById(suratData.pendudukId); if (p) setPenduduk(p); }
       if (settingsData) setSettings(settingsData);
       setLoading(false);
