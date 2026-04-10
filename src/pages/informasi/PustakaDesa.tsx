@@ -7,7 +7,7 @@ import Image from "next/image";
 
 const pustakaData = [
   {
-    title: "Sejarah Lisan Desa Remau Bako Tuo",
+    title: "Sejarah Lisan Desa: Legenda dan Tradisi Lokal",
     author: "Tim Peneliti Sejarah Lokal",
     year: 2022,
     category: "Sejarah & Budaya",
@@ -26,7 +26,7 @@ const pustakaData = [
   },
   {
     title: "Kumpulan Resep Masakan Khas Pesisir",
-    author: "Tim PKK Desa Remau Bako Tuo",
+    author: "Tim PKK Desa",
     year: 2023,
     category: "Kuliner & Gaya Hidup",
     imageUrl: "https://picsum.photos/seed/recipe/300/400",
@@ -57,7 +57,7 @@ const PustakaDesa = () => {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Pustaka Digital Desa</h2>
           <p className="text-muted-foreground">
-            Koleksi buku, dokumen, dan karya tulis yang berkaitan dengan Desa Remau Bako Tuo.
+            Koleksi buku, dokumen, dan karya tulis yang berkaitan dengan desa.
           </p>
         </div>
 

@@ -8,31 +8,31 @@ export const initialPages: InitialPage[] = [
   {
     title: "Profil Desa",
     slug: "profil/profil-desa",
-    content: `<h1>Profil Umum Desa Remau Bako Tuo</h1>
-<p>Desa Remau Bako Tuo adalah sebuah desa yang terletak di Kecamatan Sadu, Kabupaten Tanjung Jabung Timur, Provinsi Jambi. Desa ini memiliki luas wilayah sekitar 150 km² dengan topografi yang didominasi oleh dataran rendah dan kawasan pesisir.</p>
+    content: `<h1>Profil Umum Desa</h1>
+<p>Desa ini terletak di wilayah kecamatan setempat dan memiliki luas wilayah yang beragam dengan topografi yang khas sesuai kondisi geografis daerah.</p>
 <h2>Demografi</h2>
-<p>Berdasarkan data terakhir, jumlah penduduk Desa Remau Bako Tuo adalah <strong>3,450 jiwa</strong> yang terdiri dari 1,780 laki-laki dan 1,670 perempuan, dengan total 950 Kepala Keluarga (KK).</p>
+<p>Berdasarkan data terakhir, jumlah penduduk desa terus berkembang dan terdiri dari berbagai kelompok usia yang produktif.</p>
 <p>Berikut adalah rincian statistik kependudukan:</p>
 [STATISTIK_PENDUDUK_CHART]
 <h2>Potensi Desa</h2>
-<p>Potensi utama desa terletak pada sektor pertanian dan perikanan, dengan komoditas unggulan seperti padi, kelapa, dan hasil laut. Selain itu, desa ini juga memiliki potensi wisata bahari yang sedang dikembangkan.</p>
+<p>Potensi utama desa terletak pada sektor pertanian, perikanan, atau industri lokal sesuai kondisi geografis. Desa ini terus dikembangkan untuk meningkatkan kesejahteraan warganya.</p>
 [STATISTIK_PEKERJAAN_CHART]`
   },
   {
     title: "Sejarah Desa",
     slug: "profil/sejarah-desa",
-    content: `<h1>Sejarah Singkat Desa Remau Bako Tuo</h1>
-<p>Desa Remau Bako Tuo memiliki sejarah panjang yang erat kaitannya dengan suku-suku pesisir Jambi. Nama 'Remau Bako Tuo' sendiri berasal dari bahasa lokal yang memiliki arti harfiah "Harimau Bakau Tua", merujuk pada legenda seekor harimau penjaga yang mendiami hutan bakau di sekitar wilayah desa pada masa lampau.</p>
-<p>Desa ini didirikan secara resmi pada tahun 1950 oleh para tokoh masyarakat setempat yang berasal dari berbagai kelompok etnis, termasuk Melayu, Bugis, dan Jawa. Mereka bersatu padu membuka lahan untuk pemukiman dan pertanian.</p>
+    content: `<h1>Sejarah Singkat Desa</h1>
+<p>Desa ini memiliki sejarah panjang yang erat kaitannya dengan perkembangan wilayah dan budaya setempat. Nama dan asal-usul desa mencerminkan kekayaan tradisi dan kearifan lokal masyarakatnya.</p>
+<p>Desa ini didirikan secara resmi oleh para tokoh masyarakat setempat yang bersatu padu membuka lahan untuk pemukiman dan pertanian.</p>
 <h2>Perkembangan Desa</h2>
-<p>Sejak berdirinya, Desa Remau Bako Tuo terus berkembang. Pembangunan infrastruktur seperti jalan, jembatan, dan sarana pendidikan mulai digalakkan pada era 1980-an. Kini, desa terus berbenah menuju desa digital yang maju dan mandiri.</p>`
+<p>Sejak berdirinya, desa terus berkembang. Pembangunan infrastruktur seperti jalan, jembatan, dan sarana pendidikan terus digalakkan. Kini, desa terus berbenah menuju desa digital yang maju dan mandiri.</p>`
   },
   {
     title: "Visi dan Misi",
     slug: "profil/visi-misi",
-    content: `<h1>Visi & Misi Desa Remau Bako Tuo</h1>
+    content: `<h1>Visi & Misi Desa</h1>
 <h2>Visi</h2>
-<p><strong>"Terwujudnya Desa Remau Bako Tuo yang Maju, Mandiri, Sejahtera, dan Berbudaya Berlandaskan Iman dan Taqwa"</strong></p>
+<p><strong>"Terwujudnya Desa yang Maju, Mandiri, Sejahtera, dan Berbudaya Berlandaskan Iman dan Taqwa"</strong></p>
 <h2>Misi</h2>
 <ol>
   <li>Meningkatkan kualitas sumber daya manusia melalui program pendidikan dan kesehatan yang merata dan terjangkau.</li>
@@ -46,7 +46,7 @@ export const initialPages: InitialPage[] = [
     title: "Struktur Pemerintahan",
     slug: "profil/struktur-pemerintahan",
     content: `<h1>Struktur Pemerintahan Desa</h1>
-<p>Berikut adalah jajaran aparatur Pemerintah Desa Remau Bako Tuo periode 2021-2027 yang berdedikasi untuk melayani masyarakat dan memajukan desa.</p>
+<p>Berikut adalah jajaran aparatur Pemerintah Desa yang berdedikasi untuk melayani masyarakat dan memajukan desa.</p>
 <div style="text-align: center; margin: 2rem 0; padding: 1.5rem; background-color: #f9fafb; border-radius: 0.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);">
     <img src="https://picsum.photos/seed/kades/200/200" alt="Kepala Desa" style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto; border: 4px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
     <h2 style="font-size: 1.5rem; font-weight: 700; margin-top: 1rem;">H. Abdullah</h2>
@@ -75,7 +75,7 @@ export const initialPages: InitialPage[] = [
     title: "Badan Permusyawaratan Desa",
     slug: "profil/struktur-badan",
     content: `<h1>Badan Permusyawaratan Desa (BPD)</h1>
-<p>Struktur dan perangkat Badan Permusyawaratan Desa Remau Bakotuo.</p>
+<p>Struktur dan perangkat Badan Permusyawaratan Desa.</p>
 <div style="margin: 2rem 0; padding: 1.5rem; background-color: #f9fafb; border-radius: 0.5rem; border: 1px solid #e5e7eb;">
     <h2>Ketua BPD Periode 2021-2026</h2>
     <h3>H. La Ode Karim</h3>
@@ -140,7 +140,7 @@ export const initialPages: InitialPage[] = [
     title: "Layanan Persuratan",
     slug: "layanan/persuratan",
     content: `<h1>Layanan Administrasi Persuratan</h1>
-<p>Pemerintah Desa Remau Bako Tuo menyediakan berbagai layanan administrasi persuratan untuk keperluan warga. Untuk mengajukan permohonan, silakan datang langsung ke Kantor Desa pada jam kerja dengan membawa persyaratan yang diperlukan.</p>
+<p>Pemerintah Desa menyediakan berbagai layanan administrasi persuratan untuk keperluan warga. Untuk mengajukan permohonan, silakan datang langsung ke Kantor Desa pada jam kerja dengan membawa persyaratan yang diperlukan.</p>
 <h2>Jenis Surat yang Dilayani</h2>
 <ul>
   <li>Surat Keterangan Usaha (SKU)</li>
@@ -158,7 +158,7 @@ export const initialPages: InitialPage[] = [
     title: "Penanganan Keluhan",
     slug: "layanan/penanganan-keluhan",
     content: `<h1>Sistem Penanganan Keluhan dan Aspirasi</h1>
-<p>Kami berkomitmen untuk memberikan pelayanan terbaik bagi seluruh warga Desa Remau Bako Tuo. Jika Anda memiliki keluhan, kritik, atau saran terkait pelayanan desa, pembangunan, atau masalah lainnya, silakan sampaikan melalui kanal yang telah kami sediakan.</p>
+<p>Kami berkomitmen untuk memberikan pelayanan terbaik bagi seluruh warga desa. Jika Anda memiliki keluhan, kritik, atau saran terkait pelayanan desa, pembangunan, atau masalah lainnya, silakan sampaikan melalui kanal yang telah kami sediakan.</p>
 <h2>Mekanisme Penyampaian Keluhan</h2>
 <ol>
   <li><strong>Datang Langsung:</strong> Sampaikan keluhan Anda secara langsung ke Kantor Desa pada jam kerja untuk mendapatkan penanganan segera.</li>
@@ -175,7 +175,7 @@ export const initialPages: InitialPage[] = [
 
 <h2>Informasi Umum PKK</h2>
 <p>Pemberdayaan Kesejahteraan Keluarga (PKK) adalah gerakan nasional dalam pembangunan masyarakat yang tumbuh dari bawah yang pengelolaannya dari, oleh, dan untuk masyarakat menuju terwujudnya keluarga yang beriman dan bertaqwa kepada Tuhan Yang Maha Esa, berakhlak mulia dan berbudi luhur, sehat sejahtera, maju dan mandiri, kesetaraan dan keadilan gender serta kesadaran hukum dan lingkungan.</p>
-<p><strong>Nama Organisasi:</strong> TP-PKK Desa Remau Bako Tuo</p>
+<p><strong>Nama Organisasi:</strong> TP-PKK Desa</p>
 <p><strong>Tahun Berdiri:</strong> 1998</p>
 <p><strong>Jumlah Kader Aktif:</strong> 45 Orang</p>
 <p><strong>Status:</strong> Aktif</p>
@@ -466,7 +466,7 @@ export const initialPages: InitialPage[] = [
 <p><strong>Periode:</strong> 2021-2026</p>
 <p><strong>Dasar Hukum:</strong> Peraturan Desa No. 1 Tahun 2021</p>
 <h2>Visi</h2>
-<p>"Terwujudnya Desa Remau Bako Tuo yang Maju, Mandiri, Sejahtera, dan Berbudaya Berlandaskan Iman dan Taqwa"</p>
+<p>"Terwujudnya Desa yang Maju, Mandiri, Sejahtera, dan Berbudaya Berlandaskan Iman dan Taqwa"</p>
 <h2>Misi</h2>
 <ol>
     <li>Meningkatkan kualitas sumber daya manusia melalui program pendidikan dan kesehatan yang merata dan terjangkau.</li>
@@ -508,7 +508,7 @@ export const initialPages: InitialPage[] = [
 </div>
 <div style="border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; margin-bottom: 1rem;">
     <p style="font-size: 0.875rem; font-weight: 600; color: hsl(var(--primary));">Profil Desa</p>
-    <h3 style="font-size: 1.25rem; font-weight: 600; margin-top: 0.25rem;">Profil Desa Remau Bako Tuo Tahun 2024</h3>
+    <h3 style="font-size: 1.25rem; font-weight: 600; margin-top: 0.25rem;">Profil Desa Tahun 2024</h3>
     <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; margin-bottom: 0.5rem;">Dipublikasikan pada: 01 Maret 2024</p>
     <p style="font-size: 0.875rem; color: #6b7280;">Buku profil desa yang berisi data demografi, geografis, dan potensi desa terbaru.</p>
     <a href="#" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); text-decoration: none; border-radius: 0.375rem;">Unduh</a>
@@ -585,14 +585,14 @@ export const initialPages: InitialPage[] = [
     title: "Pendapatan Desa",
     slug: "dana-desa/pendapatan",
     content: `<h1>Transparansi Pendapatan Desa</h1>
-<p>Berikut adalah rincian sumber pendapatan Desa Remau Bako Tuo untuk tahun anggaran berjalan. Data ini diambil secara langsung dari sistem untuk memastikan transparansi.</p>
+<p>Berikut adalah rincian sumber pendapatan desa untuk tahun anggaran berjalan. Data ini diambil secara langsung dari sistem untuk memastikan transparansi.</p>
 [DIAGRAM_PENDAPATAN_DESA]`
   },
   {
     title: "Belanja Desa",
     slug: "dana-desa/belanja",
     content: `<h1>Transparansi Belanja Desa</h1>
-<p>Berikut adalah rincian alokasi belanja Desa Remau Bako Tuo untuk tahun anggaran berjalan, dikelompokkan berdasarkan bidang utama pembangunan.</p>
+<p>Berikut adalah rincian alokasi belanja desa untuk tahun anggaran berjalan, dikelompokkan berdasarkan bidang utama pembangunan.</p>
 [DIAGRAM_BELANJA_DESA]`
   }
 ];

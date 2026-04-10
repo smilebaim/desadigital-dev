@@ -92,7 +92,7 @@ const Hero: React.FC<HeroProps> = ({
               className="text-sm sm:text-base lg:text-lg font-semibold tracking-widest uppercase mb-3"
               style={{ ...fontStyle, color: heroTitleColor }}
             >
-              {heroTitle || 'SELAMAT DATANG DI LAMAN INFORMASI'}
+              {heroTitle || 'SELAMAT DATANG DI PORTAL DESA'}
             </h1>
           </FadeIn>
 
@@ -101,14 +101,14 @@ const Hero: React.FC<HeroProps> = ({
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
               style={{ ...fontStyle, color: heroSubtitleColor }}
             >
-              {heroSubtitle || 'DESA REMAU BAKO TUO'}
+              {heroSubtitle || 'SISTEM INFORMASI DESA DIGITAL'}
             </h1>
             <p 
               className="text-sm sm:text-base md:text-lg mb-8 max-w-2xl mx-auto leading-relaxed"
               style={{ ...fontStyle, color: heroDescriptionColor }}
             >
               {heroDescription ||
-                'Laman ini merupakan pengembangan Sistem Informasi Desa untuk menampilkan layanan publik dan meningkatkan peran masyarakat dalam mendukung program pembangunan desa yang lebih partisipatif dan berkelanjutan'}
+                'Portal informasi dan layanan publik desa yang modern, transparan, dan mudah diakses oleh seluruh warga.'}
             </p>
           </FadeIn>
         </div>

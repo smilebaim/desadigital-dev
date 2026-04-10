@@ -58,7 +58,7 @@ const Footer = ({ siteName, contactAddress, contactEmail, contactPhone }: {
                     <MapPin className="h-4 w-4" />
                   </div>
                   <span className="text-sm text-gray-500 leading-snug">
-                    {contactAddress || 'Kecamatan Dendang, Kabupaten Tanjung Jabung Timur, Provinsi Jambi'}
+                    {contactAddress || 'Alamat kantor desa belum diatur.'}
                   </span>
                 </div>
               </div>
@@ -67,13 +67,13 @@ const Footer = ({ siteName, contactAddress, contactEmail, contactPhone }: {
                   <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
                     <Phone className="h-4 w-4" />
                   </div>
-                  <span>{contactPhone || '+62 821 1234 5678'}</span>
+                  <span>{contactPhone || '-'}</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-500">
                   <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
                     <Mail className="h-4 w-4" />
                   </div>
-                  <span>{contactEmail || 'admin@desadigital.id'}</span>
+                  <span>{contactEmail || '-'}</span>
                 </div>
               </div>
             </div>
@@ -82,7 +82,7 @@ const Footer = ({ siteName, contactAddress, contactEmail, contactPhone }: {
 
         {/* Bottom Footer */}
         <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400 font-medium">
-          <p>© {currentYear} {siteName || 'Desa Remau Bako Tuo'}. Seluruh Hak Cipta Dilindungi.</p>
+          <p>© {currentYear} {siteName || 'Website Desa'}. Seluruh Hak Cipta Dilindungi.</p>
           <div className="flex items-center gap-6">
             <Link href="#" className="hover:text-emerald-600 transition-colors">Syarat & Ketentuan</Link>
             <Link href="#" className="hover:text-emerald-600 transition-colors">Kebijakan Privasi</Link>

@@ -39,7 +39,7 @@ const AgendaList = () => {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Agenda Kegiatan Desa</h2>
           <p className="text-muted-foreground">
-            Jadwal kegiatan dan acara yang akan datang di Desa Remau Bako Tuo.
+            Jadwal kegiatan dan acara yang akan datang di desa.
           </p>
         </div>
 

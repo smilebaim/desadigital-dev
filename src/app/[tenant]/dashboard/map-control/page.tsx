@@ -132,7 +132,7 @@ const MapControlPage = () => {
 
         const polygonData: MapPolygon = {
             name: 'Batas Administrasi Desa',
-            description: 'Batas wilayah administratif resmi Desa Remau Bako Tuo.',
+            description: 'Batas wilayah administratif resmi desa.',
             category: 'Batas Desa', // Match with a layer name in a category
             coordinates: ADMINISTRATIVE_BOUNDARY_JSON,
         };

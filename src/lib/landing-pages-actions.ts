@@ -28,7 +28,7 @@ const defaultLandingPages: Record<string, LandingPageData> = {
     'profil': {
         id: 'profil',
         title: 'Profil Desa',
-        subtitle: 'Kenali lebih dalam tentang Desa Remau Bako Tuo.',
+        subtitle: 'Kenali lebih dalam tentang profil dan sejarah desa.',
         links: [
             { title: "Profil Desa", href: "/profil/profil-desa", description: "Gambaran umum, geografis, dan demografi desa.", icon: "Users" },
             { title: "Sejarah Desa", href: "/profil/sejarah-desa", description: "Jejak langkah dan asal-usul berdirinya desa.", icon: "BookOpen" },
@@ -40,7 +40,7 @@ const defaultLandingPages: Record<string, LandingPageData> = {
     'layanan': {
         id: 'layanan',
         title: 'Layanan Desa',
-        subtitle: 'Jelajahi berbagai layanan publik yang tersedia untuk warga Desa Remau Bako Tuo.',
+        subtitle: 'Jelajahi berbagai layanan publik yang tersedia untuk warga desa.',
         links: [
             { title: "Layanan Persuratan", href: "/layanan/persuratan", description: "Pengurusan berbagai surat keterangan untuk warga.", icon: "FileSignature" },
             { title: "Pos Kesehatan Desa (Poskesdes)", href: "/layanan/poskesdes", description: "Layanan kesehatan primer untuk masyarakat desa.", icon: "HeartPulse" },
@@ -63,7 +63,7 @@ const defaultLandingPages: Record<string, LandingPageData> = {
     'pembangunan': {
         id: 'pembangunan',
         title: 'Perencanaan Pembangunan',
-        subtitle: 'Dokumen perencanaan pembangunan Desa Remau Bako Tuo.',
+        subtitle: 'Dokumen perencanaan pembangunan desa.',
         links: [
             { title: "RPJMDes", href: "/pembangunan/rpjmdes", description: "Rencana Pembangunan Jangka Menengah Desa (6 tahun).", icon: "FileText" },
             { title: "RKPDes", href: "/pembangunan/rkpdes", description: "Rencana Kerja Pemerintah Desa tahunan.", icon: "Construction" },
@@ -81,7 +81,7 @@ const defaultLandingPages: Record<string, LandingPageData> = {
     'ekonomi': {
         id: 'ekonomi',
         title: 'Potensi Ekonomi Desa',
-        subtitle: 'Jelajahi potensi ekonomi yang ada di Desa Remau Bako Tuo.',
+        subtitle: 'Jelajahi potensi ekonomi yang ada di desa.',
         links: [
             { title: "BUMDes", href: "/ekonomi/bumdes", description: "Informasi dan unit usaha Badan Usaha Milik Desa.", icon: "Building" },
             { title: "Koperasi", href: "/ekonomi/koperasi", description: "Layanan dan kinerja Koperasi Desa.", icon: "Users" },

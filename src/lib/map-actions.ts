@@ -61,8 +61,8 @@ export const seedDummyMarkers = async () => {
 
     const batch = writeBatch(db);
     const dummyMarkers: MapMarker[] = [
-        { name: 'Kantor Desa Remau Bako Tuo', description: 'Pusat pemerintahan dan pelayanan administrasi desa.', latitude: -1.222418, longitude: 104.383073, category: 'Kantor Desa' },
-        { name: 'SD Negeri 01 Remau Bako Tuo', description: 'Sekolah Dasar Negeri utama di desa.', latitude: -1.223500, longitude: 104.384000, category: 'Pendidikan' },
+        { name: 'Kantor Desa', description: 'Pusat pemerintahan dan pelayanan administrasi desa.', latitude: -1.222418, longitude: 104.383073, category: 'Kantor Desa' },
+        { name: 'SD Negeri Desa', description: 'Sekolah Dasar Negeri utama di desa.', latitude: -1.223500, longitude: 104.384000, category: 'Pendidikan' },
         { name: 'Puskesmas Pembantu', description: 'Layanan kesehatan primer untuk warga desa.', latitude: -1.221500, longitude: 104.382000, category: 'Kesehatan' },
         { name: 'Masjid Jami Al-Ikhlas', description: 'Masjid utama desa.', latitude: -1.224000, longitude: 104.385000, category: 'Ibadah' },
         { name: 'Pasar Tradisional Desa', description: 'Pusat kegiatan ekonomi warga.', latitude: -1.220500, longitude: 104.381000, category: 'Pasar' },
@@ -153,7 +153,7 @@ export const seedDummyPolygons = async () => {
     const dummyPolygons: MapPolygon[] = [
         {
             name: 'Batas Administrasi Desa',
-            description: 'Batas wilayah administratif Desa Remau Bako Tuo.',
+            description: 'Batas wilayah administratif resmi desa.',
             category: 'Batas Desa',
             coordinates: ADMINISTRATIVE_BOUNDARY_JSON
         },
